@@ -1,0 +1,26 @@
+--- a/src/NativeImpl/LunaHook/LunaHost/CMakeLists.txt
++++ b/src/NativeImpl/LunaHook/LunaHost/CMakeLists.txt
+@@ -10 +10 @@ target_precompile_headers(LunaHostDll REUSE_FROM pch)
+-set_target_properties(LunaHostDll PROPERTIES OUTPUT_NAME "LunaHost${bitappendix}")
++set_target_properties(LunaHostDll PROPERTIES OUTPUT_NAME "BGIBridge64")
+--- a/src/NativeImpl/LunaHook/include/defs.h
++++ b/src/NativeImpl/LunaHook/include/defs.h
+@@ -27,2 +27,2 @@ constexpr auto PIPE_AVAILABLE_EVENT = L"TEXT_PIPE_AVAILABLE";
+-constexpr auto LUNA_HOOK_DLL_64 = L"TextHook64";
+-constexpr auto LUNA_HOOK_DLL_32 = L"TextHook32";
++constexpr auto LUNA_HOOK_DLL_64 = L"BGIHook64";
++constexpr auto LUNA_HOOK_DLL_32 = L"BGIHook32";
+--- a/src/NativeImpl/version.cmake
++++ b/src/NativeImpl/version.cmake
+@@ -26,2 +26,3 @@ generate_product_version(
+-   NAME "LunaTranslator"
+-   COMPANY_COPYRIGHT "Copyright (C) 2026 HIllya51"
++   NAME "BGI"
++   BUNDLE "BGI"
++   COMPANY_COPYRIGHT "Copyright (C) 2026 HIllya51"
+@@ -33 +34,4 @@ generate_product_version(
+-   COMPANY_NAME "HIllya51"
++   COMPANY_NAME "Open-source contributors"
++   ORIGINAL_FILENAME "BGI Hook Component"
++   INTERNAL_NAME "BGI"
++   FILE_DESCRIPTION "BGI Hook Component"

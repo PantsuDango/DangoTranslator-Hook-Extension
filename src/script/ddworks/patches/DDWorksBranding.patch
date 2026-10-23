@@ -1,0 +1,31 @@
+--- a/src/NativeImpl/LunaHook/LunaHost/CMakeLists.txt
++++ b/src/NativeImpl/LunaHook/LunaHost/CMakeLists.txt
+@@ -10,1 +10,1 @@
+-set_target_properties(LunaHostDll PROPERTIES OUTPUT_NAME "LunaHost${bitappendix}")
++set_target_properties(LunaHostDll PROPERTIES OUTPUT_NAME "DDWorksBridge32")
+--- a/src/NativeImpl/LunaHook/LunaHook/CMakeLists.txt
++++ b/src/NativeImpl/LunaHook/LunaHook/CMakeLists.txt
+@@ -53,1 +53,1 @@
+-set_target_properties(LunaHook PROPERTIES OUTPUT_NAME "LunaHook${bitappendix}")
++set_target_properties(LunaHook PROPERTIES OUTPUT_NAME "DDWorksHook32")
+--- a/src/NativeImpl/LunaHook/include/defs.h
++++ b/src/NativeImpl/LunaHook/include/defs.h
+@@ -27,2 +27,2 @@
+-constexpr auto LUNA_HOOK_DLL_64 = L"TextHook64";
+-constexpr auto LUNA_HOOK_DLL_32 = L"TextHook32";
++constexpr auto LUNA_HOOK_DLL_64 = L"DDWorksHook64";
++constexpr auto LUNA_HOOK_DLL_32 = L"DDWorksHook32";
+--- a/src/NativeImpl/version.cmake
++++ b/src/NativeImpl/version.cmake
+@@ -26,2 +26,3 @@
+-   NAME "LunaTranslator"
+-   COMPANY_COPYRIGHT "Copyright (C) 2026 HIllya51"
++   NAME "DDWorks"
++   BUNDLE "DDWorks"
++   COMPANY_COPYRIGHT "Copyright (C) 2026 HIllya51"
+@@ -33,1 +34,4 @@
+-   COMPANY_NAME "HIllya51"
++   COMPANY_NAME "Open-source contributors"
++   ORIGINAL_FILENAME "DDWorks Hook Component"
++   INTERNAL_NAME "DDWorks"
++   FILE_DESCRIPTION "DDWorks Hook Component"

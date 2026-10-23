@@ -1,0 +1,15 @@
+--- a/src/NativeImpl/LunaHook/LunaHook/main.cc
++++ b/src/NativeImpl/LunaHook/LunaHook/main.cc
+@@ -4,0 +5,3 @@
++#if defined(DANGO_GSX_ONLY)
++bool GSXPrepareDetach();
++#endif
+@@ -164,0 +168,3 @@
++#if defined(DANGO_GSX_ONLY)
++        if (!GSXPrepareDetach()) { host_connected = false; return Pipe(0); }
++#endif
+@@ -166,1 +171,0 @@
+-		MH_Uninitialize();
+@@ -168,0 +174,2 @@
++        // 等待每个Hook退出后再释放MinHook跳板，避免断连时返回已释放地址
++		MH_Uninitialize();

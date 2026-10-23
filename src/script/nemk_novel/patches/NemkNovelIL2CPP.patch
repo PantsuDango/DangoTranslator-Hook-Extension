@@ -1,0 +1,23 @@
+--- a/src/NativeImpl/LunaHook/LunaHook/engines/mono/mono.cpp
++++ b/src/NativeImpl/LunaHook/LunaHook/engines/mono/mono.cpp
+@@ -2,1 +2,2 @@
+ #include "mono/monocommon.hpp"
++#include "nemk_novel.hpp"
+@@ -135,1 +136,8 @@
+-  return monocommon::hook_mono_il2cpp();
++  for (int attempt = 0; attempt < 120; ++attempt)
++  {
++    if (nemknovel::install())
++      return true;
++    Sleep(500);
++  }
++  Msg::Log("NemkNovel read-only unavailable");
++  return false;
+--- a/src/NativeImpl/LunaHook/LunaHook/main.cc
++++ b/src/NativeImpl/LunaHook/LunaHook/main.cc
+@@ -1,0 +1,1 @@
++bool NemkPrepareDetach();
+@@ -157,1 +158,2 @@
+-	if (dont_detach)
++	if (!NemkPrepareDetach()) { host_connected = false; return Pipe(0); }
++	if (dont_detach)

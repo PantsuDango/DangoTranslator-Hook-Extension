@@ -1,0 +1,216 @@
+--- a/src/NativeImpl/LunaHook/LunaHook/engines/mono/mono.cpp
++++ b/src/NativeImpl/LunaHook/LunaHook/engines/mono/mono.cpp
+@@ -132,5 +132,15 @@ bool monodll()
+ #endif
+ bool mono::attach_function_()
+ {
++#if defined(DANGO_UTAGE_ONLY)
++  for (int attempt = 0; attempt < 40; ++attempt)
++  {
++    if (monocommon::hook_mono_il2cpp())
++      return true;
++    Sleep(500);
++  }
++  return false;
++#else
+   return monocommon::hook_mono_il2cpp();
+-}
+\ No newline at end of file
++#endif
++}
+--- a/src/NativeImpl/LunaHook/LunaHook/engines/mono/monocommon.hpp
++++ b/src/NativeImpl/LunaHook/LunaHook/engines/mono/monocommon.hpp
+@@ -80,6 +80,117 @@ namespace
+         buffer.from(s);
+     }
+ }
++#if defined(DANGO_UTAGE_ONLY)
++namespace
++{
++    MonoObject *Utage_InvokeGetter(MonoObject *source, const char *getterName)
++    {
++        if (!source || !getterName || !mono_object_get_class || !mono_class_get_method_from_name || !mono_runtime_invoke)
++            return nullptr;
++
++        auto klass = mono_object_get_class(source);
++        if (!klass)
++            return nullptr;
++        auto getter = mono_class_get_method_from_name(klass, getterName, 0);
++        if (!getter)
++            return nullptr;
++
++        MonoObject *exception = nullptr;
++        auto result = mono_runtime_invoke(getter, source, nullptr, &exception);
++        return exception ? nullptr : result;
++    }
++
++    bool Utage_IsTextData(MonoObject *source)
++    {
++        if (!source || !mono_object_get_class || !mono_class_get_name || !mono_class_get_namespace)
++            return false;
++
++        auto klass = mono_object_get_class(source);
++        if (!klass)
++            return false;
++        const char *className = mono_class_get_name(klass);
++        const char *namespaceName = mono_class_get_namespace(klass);
++        return className && namespaceName && strcmp(className, "TextData") == 0 && strcmp(namespaceName, "Utage") == 0;
++    }
++
++    MonoObject *Utage_FindTextData(MonoObject *source, int depth = 0)
++    {
++        if (!source || depth > 3)
++            return nullptr;
++        if (Utage_IsTextData(source))
++            return source;
++
++        const char *getterNames[] = {
++            "get_Text",
++            "get_Page",
++            "get_TextData",
++            "get_CurrentTextDataInPage",
++        };
++        for (const char *getterName : getterNames)
++        {
++            auto child = Utage_InvokeGetter(source, getterName);
++            if (!child || child == source)
++                continue;
++            if (auto textData = Utage_FindTextData(child, depth + 1))
++                return textData;
++        }
++        return nullptr;
++    }
++
++    void Utage_ExtractText(hook_context *context, HookParam *hp, TextBuffer *buffer, uintptr_t *)
++    {
++        auto source = reinterpret_cast<MonoObject *>(context->argof(hp->offset, hp));
++        auto textData = Utage_FindTextData(source);
++        if (!textData)
++            return;
++
++        auto result = Utage_InvokeGetter(textData, "get_NoneMetaString");
++        if (!result)
++            return;
++        if (auto text = commonsolvemonostring(reinterpret_cast<uintptr_t>(result)))
++            buffer->from(text.value());
++    }
++
++    bool Utage_ReinitializeTextData(MonoObject *source, std::wstring_view text)
++    {
++        if (!source || text.empty() || !mono_object_get_class ||
++            !mono_class_get_method_from_name || !mono_runtime_invoke)
++            return false;
++
++        auto klass = mono_object_get_class(source);
++        if (!klass)
++            return false;
++        auto constructor = mono_class_get_method_from_name(klass, ".ctor", 1);
++        if (!constructor)
++            return false;
++
++        auto managedText = reinterpret_cast<MonoObject *>(create_string_csharp(text));
++        if (!managedText)
++            return false;
++
++        void *parameters[] = {managedText};
++        MonoObject *exception = nullptr;
++        mono_runtime_invoke(constructor, source, parameters, &exception);
++        return exception == nullptr;
++    }
++
++    void Utage_EmbedTextData(hook_context *context, TextBuffer buffer, HookParam *hp)
++    {
++        auto source = reinterpret_cast<MonoObject *>(context->argof(hp->offset, hp));
++        if (!Utage_IsTextData(source))
++            return;
++        Utage_ReinitializeTextData(source, buffer.viewW());
++    }
++
++    void Utage_EmbedString(hook_context *context, TextBuffer buffer, HookParam *hp)
++    {
++        auto &argument = context->argof(hp->offset, hp);
++        auto replacement = create_string_csharp(buffer.viewW(), reinterpret_cast<void *>(argument));
++        if (replacement)
++            argument = reinterpret_cast<uintptr_t>(replacement);
++    }
++}
++#endif
+ namespace
+ {
+ #ifdef _WIN64
+@@ -155,3 +266,6 @@ namespace monocommon
++#if defined(DANGO_UTAGE_ONLY)
++        hp.embed_fun = hook.embed_fun;
++#endif
+         if (hook.isstring)
+         {
+             hp.type = USING_STRING | CODEC_UTF16 | FULL_STRING;
+@@ -204,6 +318,19 @@ namespace monocommon
+         {"Elringus.Naninovel.Runtime", "Naninovel.UI", "RevealableText", "SetTextValue", 1, 2, nullptr, true, true, nullptr, Naninovel_UI_RevealableText_SetTextValue_Filter},
+ #endif
+     };
++#if defined(DANGO_UTAGE_ONLY)
++    std::vector<functioninfo> utageHooks{
++        {"Utage", "Utage", "NovelTextComponentWrapper", "SetNovelTextData", 4, 3, Utage_ExtractText, true, true, nullptr, nullptr, Utage_EmbedTextData},
++        {"Assembly-CSharp", "Utage", "NovelTextComponentWrapper", "SetNovelTextData", 4, 3, Utage_ExtractText, true, true, nullptr, nullptr, Utage_EmbedTextData},
++        {"Utage", "Utage", "NovelTextComponentWrapper", "SetText", 3, 3, nullptr, true, true, nullptr, nullptr, Utage_EmbedString},
++        {"Assembly-CSharp", "Utage", "NovelTextComponentWrapper", "SetText", 3, 3, nullptr, true, true, nullptr, nullptr, Utage_EmbedString},
++        {"Utage", "Utage", "NovelTextComponentWrapper", "SetTextDirect", 3, 3, nullptr, true, true, nullptr, nullptr, Utage_EmbedString},
++        {"Assembly-CSharp", "Utage", "NovelTextComponentWrapper", "SetTextDirect", 3, 3, nullptr, true, true, nullptr, nullptr, Utage_EmbedString},
++        {"Utage", "Utage", "AdvUguiMessageWindow", "OnTextChanged", 1, 2, Utage_ExtractText, false, true},
++        {"Assembly-CSharp", "Utage", "AdvUguiMessageWindow", "OnTextChanged", 1, 2, Utage_ExtractText, false, true},
++        {"Assembly-CSharp", "", "AdvUguiMessageWindow", "OnTextChanged", 1, 2, Utage_ExtractText, false, true},
++    };
++#endif
+     bool hook_mono_il2cpp()
+     {
+         for (const wchar_t *monoName : {L"mono.dll", L"mono-2.0-bdwgc.dll", L"GameAssembly.dll"})
+@@ -213,6 +340,33 @@ namespace monocommon
+                 il2cppfunctions::init(module);
+                 monofunctions::init(module);
+                 bool succ = false;
++#if defined(DANGO_UTAGE_ONLY)
++                bool modernInstalled = false;
++                bool directInstalled = false;
++                bool directLegacyInstalled = false;
++                bool legacyInstalled = false;
++                for (auto hook : utageHooks)
++                {
++                    const bool isModern = strcmp(hook.name, "SetNovelTextData") == 0;
++                    const bool isDirect = strcmp(hook.name, "SetText") == 0;
++                    const bool isDirectLegacy = strcmp(hook.name, "SetTextDirect") == 0;
++                    const bool isLegacy = strcmp(hook.name, "OnTextChanged") == 0;
++                    if ((isModern && modernInstalled) || (isDirect && directInstalled) ||
++                        (isDirectLegacy && directLegacyInstalled) || (isLegacy && (modernInstalled || legacyInstalled)))
++                        continue;
++                    auto addr = hook.getaddr(true);
++                    if (!addr)
++                        continue;
++                    if (NewHook_check(addr, hook))
++                    {
++                        succ = true;
++                        modernInstalled |= isModern;
++                        directInstalled |= isDirect;
++                        directLegacyInstalled |= isDirectLegacy;
++                        legacyInstalled |= isLegacy;
++                    }
++                }
++#else
+                 for (auto hook : commonhooks)
+                 {
+                     auto addr = hook.getaddr();
+@@ -227,6 +381,7 @@ namespace monocommon
+                         continue;
+                     succ |= NewHook_check(addr, hook);
+                 }
++#endif
+                 if (succ)
+                 {
+                     if (0)
+@@ -242,4 +397,4 @@ namespace monocommon
+             }
+         return false;
+     }
+-}
+\ No newline at end of file
++}

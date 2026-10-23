@@ -1,0 +1,43 @@
+--- a/src/NativeImpl/LunaHook/LunaHook/engine32/CatSystem.cpp
++++ b/src/NativeImpl/LunaHook/LunaHook/engine32/CatSystem.cpp
+@@ -1,4 +1,5 @@
+ #include "CatSystem.h"
++#include "CatSystem2Backfill.h"
+ // jichi 5/10/2014
+ // See also: http://bbs.sumisora.org/read.php?tid=11044704&fpage=2
+ //
+@@ -892,7 +893,7 @@
+         auto p = Patch::patchEncoding(startAddress, stopAddress);
+         if (p)
+         {
+-          hp.type |= EMBED_DYNA_SJIS;
++          hp.type |= EMBED_DYNA_SJIS | EMBED_ABLE;
+           hp.embed_hook_font = F_GetGlyphOutlineA;
+           if (*(WORD *)p == 0xc985)
+             patch_fun_ptrs = {{(void *)p, (PVOID)(ULONG)Patch::Private::thiscallisLeadByteChar}};
+@@ -900,15 +901,17 @@
+             patch_fun_ptrs = {{(void *)p, (PVOID)(ULONG)Patch::Private::isLeadByteChar}};
+         }
+       }
+-      hp.text_fun = Private::hookBefore;
+-      hp.embed_fun = Private::hookafter;
+-      hp.embed_hook_font = F_GetGlyphOutlineA;
+-      hp.filter_fun = [](TextBuffer *buffer, HookParam *hp)
+-      {
+-        buffer->from(re::sub(buffer->strA(), R"(\[(.+?)/.+\])", "$1"));
++      hp.text_fun = [](hook_context *context, HookParam *param, TextBuffer *buffer, uintptr_t *role)
++      {
++        CatSystem2Backfill::readText(context, param, buffer, role);
++        if (buffer->size > 0 && *role != 3 && Private::guessIsNameText(buffer->strA().c_str(), buffer->size))
++          *role = Engine::NameRole;
+       };
+-
+-      return NewHook(hp, "EmbedCS2");
++      hp.embed_fun = CatSystem2Backfill::writeText;
++      hp.embed_hook_font = F_GetGlyphOutlineA | F_CreateFontIndirectA;
++      // 交给Go侧按Unicode清理注音，不能把CP932尾字节误认为中括号
++      hp.filter_fun = nullptr;
++      return NewHook(hp, (hp.type & EMBED_ABLE) ? "EmbedCS2" : "CatSystem2new");
+     }
+   }
+ } // namespace ScenarioHook

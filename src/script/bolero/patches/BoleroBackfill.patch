@@ -1,0 +1,13 @@
+--- a/src/NativeImpl/LunaHook/LunaHook/engine32/Ryokucha.cpp
++++ b/src/NativeImpl/LunaHook/LunaHook/engine32/Ryokucha.cpp
+@@ -1 +1,2 @@
+ #include "Ryokucha.h"
++#include "BoleroBackfill.h"
+@@ -350,2 +351,4 @@
+ bool ScenarioPlayer_last::attach_function()
+ {
++  const bool backfill = BoleroBackfill::attach();
++  const bool listener = InsertScenarioPlayerHook_all();
+@@ -353 +356 @@
+-  return InsertScenarioPlayerHook_all();
++  return backfill || listener;

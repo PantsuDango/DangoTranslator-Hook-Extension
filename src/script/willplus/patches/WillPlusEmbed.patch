@@ -1,0 +1,70 @@
+--- a/src/NativeImpl/LunaHook/LunaHook/engine32/WillPlus.cpp
++++ b/src/NativeImpl/LunaHook/LunaHook/engine32/WillPlus.cpp
+@@ -1211,12 +1211,19 @@
+       void hookafter(hook_context *s, TextBuffer buffer, HookParam *)
+       {
+-
+         auto newData = buffer.strA();
+         auto text = (LPSTR)s->eax;
+         int size = ::strlen(text),
+             trimmedSize = size;
+         auto trimmedText = trim(text, &trimmedSize);
++        const int prefixSize = static_cast<int>(trimmedText - text);
++        if (prefixSize > 0)
++          newData.insert(0, text, prefixSize);
+         if (trimmedText[trimmedSize])
+           newData.append(trimmedText + trimmedSize); //, size - trimmedSize - (trimmedText - text));
++        // Re:BIRTHDAY SONG keeps the name and scenario in adjacent 1024-byte
++        // buffers. The Host applies a stricter 896-byte limit, while this
++        // final guard prevents direct bridge callers from overflowing it.
++        if (newData.size() >= 1024)
++          return;
+         ::strcpy(text, newData.c_str());
+       }
+@@ -1499,6 +1506,35 @@
+         buffer->from(text);
+       }
+ 
++      constexpr std::size_t kMaximumCachedTextBytes = 64u * 1024u * 1024u;
++      std::mutex cachedTextMutex;
++      std::map<std::string, char *> cachedTexts;
++      std::size_t cachedTextBytes = 0;
++
++      void hookAfter(hook_context *s, TextBuffer buffer, HookParam *)
++      {
++        const auto text = buffer.strA();
++        if (text.empty())
++          return;
++        std::lock_guard<std::mutex> lock(cachedTextMutex);
++        auto found = cachedTexts.find(text);
++        if (found == cachedTexts.end())
++        {
++          const auto required = text.size() + 1;
++          if (required > kMaximumCachedTextBytes - cachedTextBytes)
++            return;
++          auto stored = new (std::nothrow) char[required];
++          if (!stored)
++            return;
++          ::memcpy(stored, text.c_str(), required);
++          found = cachedTexts.emplace(text, stored).first;
++          cachedTextBytes += required;
++        }
++        // Only replace this drawing call's argument. The script value used by
++        // option branching and the caller-owned source string stay untouched.
++        s->stack[8] = reinterpret_cast<uintptr_t>(found->second);
++      }
++
+     } // namespace Private
+ 
+     /**
+@@ -1516,7 +1552,9 @@
+       HookParam hp;
+       hp.address = addr;
+       hp.text_fun = Private::hookBefore;
+-      hp.type = EMBED_ABLE | EMBED_DYNA_SJIS | EMBED_AFTER_OVERWRITE | NO_CONTEXT;
++      hp.embed_fun = Private::hookAfter;
++      hp.embed_hook_font = F_GetGlyphOutlineA | F_TextOutA;
++      hp.type = EMBED_ABLE | EMBED_DYNA_SJIS | NO_CONTEXT;
+       hp.offset = stackoffset(8);
+       return NewHook(hp, "EmbedWillplus_other");
+     }

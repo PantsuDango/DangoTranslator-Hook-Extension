@@ -1,0 +1,13 @@
+--- a/src/NativeImpl/LunaHook/LunaHook/engine32/Yuris.cpp
++++ b/src/NativeImpl/LunaHook/LunaHook/engine32/Yuris.cpp
+@@ -1 +1,2 @@
+ #include "Yuris.h"
++#include "YurisBackfill.h"
+@@ -477 +478,6 @@
+-  bool ok = InsertYuris1Hook();
++  // 必须先定位回填入口，旧读取Hook会改写菜单特征中的指令
++  const auto readAddress = codepage == 0 ? YurisBackfill::prepareRead() : 0;
++  const auto menuReadAddress = codepage == 0 ? YurisBackfill::prepareMenuRead() : 0;
++  bool ok = codepage == 0 && YurisBackfill::attach();
++  ok = YurisBackfill::attachRead(readAddress, menuReadAddress) || ok;
++  ok = InsertYuris1Hook() || ok;

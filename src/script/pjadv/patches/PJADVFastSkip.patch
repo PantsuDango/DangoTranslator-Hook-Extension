@@ -1,0 +1,6 @@
+--- a/src/NativeImpl/LunaHook/LunaHook/embed_util.cc
++++ b/src/NativeImpl/LunaHook/LunaHook/embed_util.cc
+@@ -218,0 +219,3 @@
++#if defined(DANGO_PJADV_ONLY)
++  if ((GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0) return false;
++#endif

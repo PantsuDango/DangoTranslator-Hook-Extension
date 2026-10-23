@@ -1,0 +1,39 @@
+--- a/src/NativeImpl/LunaHook/LunaHook/util/dyncodec/dynsjiscodec.cc
++++ b/src/NativeImpl/LunaHook/LunaHook/util/dyncodec/dynsjiscodec.cc
+@@ -56,3 +56,7 @@
+   size_t capacity() const
+   {
++#if defined(DANGO_AZSYSTEM_ONLY)
++    // AZSystem只在标准前导字节的空闲尾字节中分配动态字符，保留F0..FC原生字符区
++    return 47 * (67 - minimumSecondByte);
++#else
+     // See: http://en.wikipedia.org/wiki/Shift_JIS
+@@ -62,2 +66,3 @@
+         ;
++#endif
+   }
+@@ -94,3 +99,8 @@
+       }
++#if defined(DANGO_AZSYSTEM_ONLY)
++      // 字符池耗尽时整句回退，不能跳过字符后生成残缺译文
++      if (data.empty())
++        return {};
++#endif
+       ret.append(data);
+     }
+@@ -176,3 +186,7 @@
+     else if (ch >= 0xa1 && ch <= 0xdf) // size == 1
++#if defined(DANGO_AZSYSTEM_ONLY)
++      ret.append(StringToWideString(std::string_view(data + i, 1), codepage).value());
++#else
+       ret.append(StringToWideString(std::string_view(data + 1, 1), codepage).value());
++#endif
+     else
+@@ -182,2 +196,7 @@
+       UINT8 ch2 = (UINT8)data[++i];
++#if defined(DANGO_AZSYSTEM_ONLY)
++      // 黑、赶、增等汉字使用Windows CP932扩展区，不能按动态字符编号解码
++      if ((ch >= 0x81 && ch <= 0x9f || ch >= 0xe0 && ch <= 0xfc) && (ch2 != 0x7f && ch2 >= 0x40 && ch2 <= 0xfc))
++#else
+       if ((ch >= 0x81 && ch <= 0x9f || ch >= 0xe0 && ch <= 0xef) && (ch2 != 0x7f && ch2 >= 0x40 && ch2 <= 0xfc))
++#endif

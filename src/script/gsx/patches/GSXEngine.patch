@@ -1,0 +1,4 @@
+--- a/src/NativeImpl/LunaHook/LunaHook/enginecollection32.cpp
++++ b/src/NativeImpl/LunaHook/LunaHook/enginecollection32.cpp
+@@ -168,0 +169,1 @@
++#include "engine32/GSX.h"

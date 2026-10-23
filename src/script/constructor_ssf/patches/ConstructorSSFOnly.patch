@@ -1,0 +1,48 @@
+--- a/src/NativeImpl/LunaHook/LunaHook/CMakeLists.txt
++++ b/src/NativeImpl/LunaHook/LunaHook/CMakeLists.txt
+@@ -0,0 +1,1 @@
++set(DANGO_CONSTRUCTORSSF_ONLY ON)
+@@ -9,0 +11,4 @@
++if(DANGO_CONSTRUCTORSSF_ONLY)
++	set(enginessrc "engine32/ConstructorSSF.cpp")
++endif()
++
+@@ -28,0 +34,10 @@
++if(DANGO_CONSTRUCTORSSF_ONLY)
++	add_library(dango_constructorssf_support INTERFACE)
++	target_sources(dango_constructorssf_support INTERFACE
++		engines/mono/impl_mono.cpp
++		engines/mono/monoil2cpp.cpp
++		engines/mono/mono.cpp
++		engines/mono/impl_il2cpp.cpp
++		engines/pchooks/pchooks.cpp
++	)
++else()
+@@ -30,0 +46,1 @@
++endif()
+@@ -34,0 +51,1 @@
++target_compile_definitions(LunaHook PRIVATE DANGO_CONSTRUCTORSSF_ONLY=1)
+@@ -43,1 +44,2 @@
+-target_link_libraries(LunaHook PRIVATE trhelper VERSION_DEF Version httpapi ws2_32 Shlwapi pch minhook commonengine emulators utils ${YY_Thunks})
++target_link_libraries(LunaHook PRIVATE trhelper VERSION_DEF Version httpapi ws2_32 Shlwapi pch minhook utils ${YY_Thunks})
++target_link_libraries(LunaHook PRIVATE dango_constructorssf_support)
+--- a/src/NativeImpl/LunaHook/LunaHook/enginecollection32.cpp
++++ b/src/NativeImpl/LunaHook/LunaHook/enginecollection32.cpp
+@@ -229,0 +230,3 @@
++#if defined(DANGO_CONSTRUCTORSSF_ONLY)
++    return {new ConstructorSSF};
++#else
+@@ -505,1 +508,2 @@
+-}
+\ No newline at end of file
++#endif
++}
+--- a/src/NativeImpl/LunaHook/LunaHook/enginecontrol.cpp
++++ b/src/NativeImpl/LunaHook/LunaHook/enginecontrol.cpp
+@@ -153,1 +153,1 @@
+-    if (!result)
++    if (!result && !DANGO_CONSTRUCTORSSF_ONLY)
+@@ -158,1 +158,1 @@
+-}
+\ No newline at end of file
++}

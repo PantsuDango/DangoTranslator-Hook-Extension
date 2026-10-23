@@ -1,0 +1,1174 @@
+{
+  "version": 1,
+  "functions": [
+    {
+      "name": "message_setter",
+      "pattern": "55 8B EC 83 EC 08 89 4D FC 8B 45 08 50 E8 ?? ?? ?? ?? 83 C4 04 83 C0 01 89 45 F8 81 7D F8 00 04 00 00 7E 04 32 C0 EB 41 8B 4D 08 51 8B 55 FC 81 C2 08 01 00 00 52 E8 ?? ?? ?? ?? 83 C4 08 8B 45 FC C7 80 EC 00 00 00 00 00 00 00 8B 4D F8 83 E9 01 8B 55 FC 89 8A F0 00 00 00 8B 45 FC C7 80 28 05 00 00 00 00 00 00 B0 01 8B E5 5D C2 04 00"
+    },
+    {
+      "name": "message_copy",
+      "pattern": "68 00 04 00 00 8D 85 FC FB FF FF 50 8D 8D 1C FB FF FF 51 E8 ?? ?? ?? ?? 83 C4 0C 88 85 F6 FB FF FF 8D 95 FC FB FF FF 52 B8 04 00 00 00 6B C8 00 69 89 ?? ?? ?? ?? 50 05 00 00 03 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 88 85 F6 FB FF FF",
+      "callOffset": 64
+    },
+    {
+      "name": "message_restore",
+      "pattern": "69 45 F0 F0 08 00 00 8B 4D 10 8B 51 20 8D 84 02 3C 04 00 00 50 69 4D F0 50 05 00 00 03 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 69 4D F0 F0 08 00 00 8B 55 10 8B 42 20",
+      "callOffset": 34
+    },
+    {
+      "name": "choice_draw",
+      "pattern": "55 8B EC 83 EC 30 89 4D FC 6B 45 08 1C 8B 4D FC 8B 51 04 8B 44 02 10 89 45 E4 8B 4D E4 51 8B 55 FC 8B 0A E8 ?? ?? ?? ?? 6B 45 08 1C",
+      "callOffset": 35
+    },
+    {
+      "name": "choice_copy",
+      "pattern": "8B 95 EC FB FF FF 52 B9 ?? ?? ?? ?? E8 ?? ?? ?? ?? EB D0 A1 ?? ?? ?? ?? 89 85 C0 FB FF FF",
+      "callOffset": 12,
+      "target": "choice_draw"
+    }
+  ],
+  "glyphFunctions": [
+    {
+      "name": "glyph_measure",
+      "pattern": "55 8B EC 83 EC 10 89 4D FC 8B 45 FC 83 C0 3C 50 6A 00 6A 00 8B 4D FC 83 C1 58 51 8B 55 FC 8B 42 50 50 8B 4D 0C 51 8B 55 08 52 FF 15 ?? ?? ?? ?? 89 45 F8 83 7D F8 FF 75 07 32 C0 E9 A4 00 00 00 8B 45 FC 83 78 54 00 74 15 8B 4D FC 8B 51 54 89 55 F4 8B 45 F4 50 E8 ?? ?? ?? ?? 83 C4 04 8B 4D F8 51 E8 ?? ?? ?? ?? 83 C4 04 89 45 F0 8B 55 FC 8B 45 F0 89 42 54 8B 4D FC 8B 55 F8 89 51 6C 8B 45 FC 83 C0 3C 50 8B 4D FC 8B 51 54 52 8B 45 FC 8B 48 6C 51 8B 55 FC 83 C2 58 52 8B 45 FC 8B 48 50 51 8B 55 0C 52 8B 45 08 50 FF 15 ?? ?? ?? ?? 8B 4D FC 83 79 50 06 75 14 8B 55 FC 8B 42 58 83 C0 03 83 E0 FC 8B 4D FC 89 41 70 EB 15 8B 55 FC 8B 42 58 83 C0 1F C1 E8 05 C1 E0 02 8B 4D FC 89 41 70 B0 01 8B E5 5D C2 08 00"
+    },
+    {
+      "name": "glyph_draw",
+      "pattern": "55 8B EC 83 EC 0C 89 4D FC 81 7D 18 40 81 00 00 74 06 83 7D 18 20 75 07 B0 01 E9 A1 00 00 00 8B 45 FC 50 FF 15 ?? ?? ?? ?? 89 45 F8 83 7D F8 00 75 07 32 C0 E9 87 00 00 00 8B 4D F8 51 8B 55 08 52 FF 15 ?? ?? ?? ?? 89 45 F4 8B 45 18 50 8B 4D 08 51 8B 4D FC E8 ?? ?? ?? ?? 0F B6 D0 85 D2 75 12 8B 45 F4 50 8B 4D 08 51 FF 15 ?? ?? ?? ?? 32 C0 EB 4D 8B 55 FC 83 7A 50 06 75 16 8B 45 14 50 8B 4D 10 51 8B 55 0C 52 8B 4D FC E8 ?? ?? ?? ?? EB 14 8B 45 14 50 8B 4D 10 51 8B 55 0C 52 8B 4D FC E8 ?? ?? ?? ?? 8B 45 F4 50 8B 4D 08 51 FF 15 ?? ?? ?? ?? 8B 55 F8 52 FF 15 ?? ?? ?? ?? B0 01 8B E5 5D C2 14 00",
+      "callOffset": 85,
+      "target": "glyph_measure"
+    },
+    {
+      "name": "dbcs_classifier",
+      "pattern": "55 8B EC 51 B8 01 00 00 00 6B C8 00 8B 55 08 8A 04 0A 88 45 FF B9 01 00 00 00 C1 E1 00 8B 55 08 8A 04 0A 88 45 FE 0F B6 4D FF 81 F9 81 00 00 00 7C 0C 0F B6 55 FF 81 FA 9F 00 00 00 7E 17 0F B6 45 FF 3D E0 00 00 00 7C 3A 0F B6 4D FF 81 F9 FC 00 00 00 7F 2E 0F B6 55 FE 83 FA 40 7C 09 0F B6 45 FE 83 F8 7E 7E 18 0F B6 4D FE 81 F9 80 00 00 00 7C 10 0F B6 55 FE 81 FA FC 00 00 00 7F 04 B0 01 EB 02 32 C0 8B E5 5D C3"
+    }
+  ],
+  "displayFunctions": [
+    {
+      "name": "display_construct",
+      "pattern": "55 8B EC 6A FF 68 ?? ?? ?? ?? 64 A1 00 00 00 00 50 51 A1 ?? ?? ?? ?? 33 C5 50 8D 45 F4 64 A3 00 00 00 00 89 4D F0 8B 4D F0 E8 ?? ?? ?? ?? C7 45 FC 00 00 00 00 8B 4D F0 83 C1 44 E8 ?? ?? ?? ?? C6 45 FC 01 8B 4D F0 81 C1 FC 00 00 00 E8 ?? ?? ?? ?? C6 45 FC 02 8B 4D F0 81 C1 08 05 00 00 E8 ?? ?? ?? ?? C6 45 FC 03 8B 4D F0 E8 ?? ?? ?? ?? C7 45 FC FF FF FF FF 8B 45 F0 8B 4D F4 64 89 0D 00 00 00 00 59 8B E5 5D C3"
+    },
+    {
+      "name": "display_destruct",
+      "pattern": "55 8B EC 6A FF 68 ?? ?? ?? ?? 64 A1 00 00 00 00 50 51 A1 ?? ?? ?? ?? 33 C5 50 8D 45 F4 64 A3 00 00 00 00 89 4D F0 C7 45 FC 03 00 00 00 8B 4D F0 E8 ?? ?? ?? ?? C6 45 FC 02 8B 4D F0 81 C1 08 05 00 00 E8 ?? ?? ?? ?? C6 45 FC 01 8B 4D F0 81 C1 FC 00 00 00 E8 ?? ?? ?? ?? C6 45 FC 00 8B 4D F0 83 C1 44 E8 ?? ?? ?? ?? C7 45 FC FF FF FF FF 8B 4D F0 E8 ?? ?? ?? ?? 8B 4D F4 64 89 0D 00 00 00 00 59 8B E5 5D C3"
+    },
+    {
+      "name": "display_reset",
+      "pattern": "55 8B EC 51 89 4D FC 8B 45 FC C7 40 3C 00 00 00 00 8B 4D FC C7 41 30 00 00 00 00 8B 55 FC C7 42 38 00 00 00 00 8B 45 FC C7 40 34 00 00 00 00 8B 4D FC C7 41 40 00 00 00 00 8B 55 FC C7 82 C4 00 00 00 00 00 00 00 8B 45 FC C7 80 C8 00 00 00 00 00 00 00 8B 4D FC C7 81 CC 00 00 00 00 00 00 00 8B 55 FC C7 82 D0 00 00 00 00 00 00 00 8B 45 FC C7 80 D4 00 00 00 00 00 00 00 8B 4D FC C7 81 D8 00 00 00 00 00 00 00 8B 55 FC C7 82 DC 00 00 00 00 00 00 00 8B 45 FC C7 80 E0 00 00 00 00 00 00 00 8B 4D FC C7 81 E4 00 00 00 00 00 00 00 8B 55 FC C7 82 E8 00 00 00 00 00 00 00 8B 45 FC C7 80 EC 00 00 00 FF FF FF FF 8B 4D FC C7 81 F0 00 00 00 00 00 00 00 8B 55 FC C7 82 F4 00 00 00 00 00 00 00 8B 45 FC C7 80 F8 00 00 00 00 00 00 00 B9 01 00 00 00 6B D1 00 8B 45 FC C6 84 10 08 01 00 00 00 8B 4D FC C7 81 14 05 00 00 FF FF FF FF 8B 55 FC C7 82 18 05 00 00 01 00 00 00 8B 45 FC C7 80 1C 05 00 00 01 00 00 00 8B 4D FC C6 81 21 05 00 00 01 8B 55 FC C6 82 22 05 00 00 01 8B 45 FC C7 80 24 05 00 00 00 00 00 00 8B 4D FC C7 81 28 05 00 00 00 00 00 00 8B 55 FC C6 82 2C 05 00 00 01 8B 45 FC C6 80 2D 05 00 00 01 8B 4D FC C6 81 2E 05 00 00 00 8B 55 FC C6 82 2F 05 00 00 FF 8B 45 FC C6 80 30 05 00 00 FF 8B 4D FC C6 81 31 05 00 00 FF 8B 55 FC C6 82 32 05 00 00 00 8B 45 FC C6 80 33 05 00 00 00 8B 4D FC C6 81 34 05 00 00 00 8B 55 FC C7 82 38 05 00 00 00 00 00 00 8B 4D FC E8 ?? ?? ?? ?? 8B E5 5D C3"
+    },
+    {
+      "name": "display_finish",
+      "pattern": "55 8B EC 51 89 4D FC 8B 45 FC 8B 4D FC 8B 90 4C 05 00 00 FF D2 8B 4D FC E8 ?? ?? ?? ?? 8B E5 5D C3"
+    },
+    {
+      "name": "display_copy",
+      "pattern": "55 8B EC 83 EC 0C 89 4D FC 8B 4D FC E8 ?? ?? ?? ?? 8B 45 FC 8B 4D 08 8B 51 3C 89 50 3C 8B 45 FC 8B 4D 08 8B 51 40 89 50 40 8B 45 08 83 C0 44 50 8B 4D FC 83 C1 44 E8 ?? ?? ?? ?? 8B 4D 08 81 C1 C4 00 00 00 8B 55 FC 81 C2 C4 00 00 00 8B 01 89 02 8B 41 04 89 42 04 8B 41 08 89 42 08 8B 49 0C 89 4A 0C 8B 55 08 81 C2 D4 00 00 00 8B 45 FC 05 D4 00 00 00 8B 0A 89 08 8B 4A 04 89 48 04 8B 4A 08 89 48 08 8B 52 0C 89 50 0C 8B 45 FC 8B 4D FC 8B 91 C4 00 00 00 89 90 E4 00 00 00 8B 45 FC 8B 4D FC 8B 91 C8 00 00 00 89 90 E8 00 00 00 8B 45 FC C7 80 EC 00 00 00 00 00 00 00 8B 4D 08 8B 91 00 01 00 00 89 55 F8 8B 45 FC 8B 4D F8 89 88 F0 00 00 00 8B 55 FC 8B 45 08 8B 88 F4 00 00 00 89 8A F4 00 00 00 8B 55 FC 8B 45 08 8B 88 F8 00 00 00 89 8A F8 00 00 00 8B 55 08 8B 82 FC 00 00 00 89 45 F4 8B 4D F4 51 8B 55 FC 81 C2 08 01 00 00 52 E8 ?? ?? ?? ?? 83 C4 08 8B 45 08 8B 88 18 05 00 00 8B 90 1C 05 00 00 8B 45 FC 89 88 18 05 00 00 89 90 1C 05 00 00 8B 4D FC 8B 55 08 8A 82 21 05 00 00 88 81 21 05 00 00 8B 4D FC 8B 55 08 8A 82 22 05 00 00 88 81 22 05 00 00 8B 4D FC 8B 55 08 8B 82 24 05 00 00 89 81 24 05 00 00 8B 4D FC 8B 55 08 8A 82 2C 05 00 00 88 81 2C 05 00 00 8B 4D FC 8B 55 08 8A 82 2F 05 00 00 88 81 2F 05 00 00 8B 4D FC 8B 55 08 8A 82 30 05 00 00 88 81 30 05 00 00 8B 4D FC 8B 55 08 8A 82 31 05 00 00 88 81 31 05 00 00 8B 4D FC 8B 55 08 8A 82 32 05 00 00 88 81 32 05 00 00 8B 4D FC 8B 55 08 8A 82 33 05 00 00 88 81 33 05 00 00 8B 4D FC 8B 55 08 8A 82 34 05 00 00 88 81 34 05 00 00 8B 4D FC 8B 55 08 8B 82 38 05 00 00 89 81 38 05 00 00 8B 4D FC E8 ?? ?? ?? ?? 8B 4D FC E8 ?? ?? ?? ?? 8B E5 5D C2 04 00"
+    },
+    {
+      "name": "display_font_copy",
+      "pattern": "55 8B EC 51 56 57 89 4D FC B9 0F 00 00 00 8B 75 08 8B 7D FC F3 A5 8B 45 08 83 C0 3C 8B 4D FC 83 C1 3C 8B 10 89 11 8B 50 04 89 51 04 8B 50 08 89 51 08 8B 40 0C 89 41 0C 8B 4D FC 8B 55 08 8A 42 4C 88 41 4C 8B 4D FC 8B 55 08 8A 42 4D 88 41 4D 8B 4D FC 8B 55 08 8A 42 4E 88 41 4E 8B 4D FC 8B 55 08 8B 42 50 89 41 50 8B 4D FC 8B 55 08 8A 42 74 88 41 74 8B 4D FC 8B 55 08 8B 42 78 89 41 78 8B 4D FC 8B 55 08 8B 42 7C 89 41 7C 5F 5E 8B E5 5D C2 04 00"
+    },
+    {
+      "name": "display_callbacks",
+      "pattern": "55 8B EC 83 EC 08 89 4D FC 8B 45 FC 8B 88 38 05 00 00 89 4D F8 83 7D F8 00 74 02 EB 41 8B 55 FC C7 82 3C 05 00 00 ?? ?? ?? ?? 8B 45 FC C7 80 40 05 00 00 ?? ?? ?? ?? 8B 4D FC C7 81 44 05 00 00 ?? ?? ?? ?? 8B 55 FC C7 82 48 05 00 00 ?? ?? ?? ?? 8B 45 FC C7 80 4C 05 00 00 ?? ?? ?? ?? 8B E5 5D C3"
+    },
+    {
+      "name": "display_surfaces",
+      "pattern": "55 8B EC 6A FF 68 ?? ?? ?? ?? 64 A1 00 00 00 00 50 83 EC 40 A1 ?? ?? ?? ?? 33 C5 50 8D 45 F4 64 A3 00 00 00 00 89 4D F0 8B 45 F0 83 B8 CC 00 00 00 00 7E 0C 8B 4D F0 83 B9 D0 00 00 00 00 7F 0A B8 01 00 00 00 E9 2A 02 00 00 8B 55 F0 83 7A 30 00 75 44 6A 44 E8 ?? ?? ?? ?? 83 C4 04 89 45 EC C7 45 FC 00 00 00 00 83 7D EC 00 74 0D 8B 4D EC E8 ?? ?? ?? ?? 89 45 E8 EB 07 C7 45 E8 00 00 00 00 8B 45 E8 89 45 D4 C7 45 FC FF FF FF FF 8B 4D F0 8B 55 D4 89 51 30 8B 45 F0 83 78 34 00 75 44 6A 44 E8 ?? ?? ?? ?? 83 C4 04 89 45 E4 C7 45 FC 01 00 00 00 83 7D E4 00 74 0D 8B 4D E4 E8 ?? ?? ?? ?? 89 45 E0 EB 07 C7 45 E0 00 00 00 00 8B 4D E0 89 4D D0 C7 45 FC FF FF FF FF 8B 55 F0 8B 45 D0 89 42 34 8B 4D F0 83 79 38 00 75 44 6A 44 E8 ?? ?? ?? ?? 83 C4 04 89 45 DC C7 45 FC 02 00 00 00 83 7D DC 00 74 0D 8B 4D DC E8 ?? ?? ?? ?? 89 45 D8 EB 07 C7 45 D8 00 00 00 00 8B 55 D8 89 55 CC C7 45 FC FF FF FF FF 8B 45 F0 8B 4D CC 89 48 38 6A 18 8B 55 F0 8B 82 D0 00 00 00 50 8B 4D F0 8B 91 CC 00 00 00 52 8B 45 F0 8B 48 30 E8 ?? ?? ?? ?? 6A 18 8B 4D F0 8B 91 D0 00 00 00 52 8B 45 F0 8B 88 CC 00 00 00 51 8B 55 F0 8B 4A 34 E8 ?? ?? ?? ?? 6A 18 8B 45 F0 8B 88 D0 00 00 00 51 8B 55 F0 8B 82 CC 00 00 00 50 8B 4D F0 8B 49 38 E8 ?? ?? ?? ?? 8B 55 F0 8B 42 30 8B 48 08 89 4D C8 8B 55 F0 8B 42 30 8B 48 04 89 4D C4 8B 55 F0 0F B6 82 31 05 00 00 50 8B 4D F0 0F B6 91 30 05 00 00 52 8B 45 F0 0F B6 88 2F 05 00 00 51 8B 55 C8 52 8B 45 C4 50 6A 00 6A 00 8B 4D F0 8B 49 30 E8 ?? ?? ?? ?? 8B 55 F0 8B 42 34 8B 48 08 89 4D C0 8B 55 F0 8B 42 34 8B 48 04 89 4D BC 8B 55 F0 0F B6 82 34 05 00 00 50 8B 4D F0 0F B6 91 33 05 00 00 52 8B 45 F0 0F B6 88 32 05 00 00 51 8B 55 C0 52 8B 45 BC 50 6A 00 6A 00 8B 4D F0 8B 49 34 E8 ?? ?? ?? ?? 8B 55 F0 8B 42 38 8B 48 08 89 4D B8 8B 55 F0 8B 42 38 8B 48 04 89 4D B4 68 FF 00 00 00 68 FF 00 00 00 68 FF 00 00 00 8B 55 B8 52 8B 45 B4 50 6A 00 6A 00 8B 4D F0 8B 49 38 E8 ?? ?? ?? ?? 33 C0 8B 4D F4 64 89 0D 00 00 00 00 59 8B E5 5D C3"
+    },
+    {
+      "name": "display_step",
+      "pattern": "55 8B EC 6A FF 68 ?? ?? ?? ?? 64 A1 00 00 00 00 50 83 EC 5C A1 ?? ?? ?? ?? 33 C5 50 8D 45 F4 64 A3 00 00 00 00 89 4D EC C7 45 E8 00 00 00 00 8B 45 EC 8B 88 EC 00 00 00 8B 55 EC 0F BE 84 0A 08 01 00 00 85 C0 75 0A B8 FF 00 00 00 E9 52 04 00 00 8B 4D EC 8B 91 F0 00 00 00 83 EA 01 8B 45 EC 39 90 EC 00 00 00 7D 2D 8B 4D EC 8B 91 EC 00 00 00 8B 45 EC 8D 8C 10 08 01 00 00 89 4D CC 8B 55 CC 52 E8 ?? ?? ?? ?? 83 C4 04 0F B6 C0 85 C0 0F 85 45 02 00 00 8B 4D EC C6 81 20 05 00 00 01 8B 55 EC 8B 82 EC 00 00 00 8B 4D EC 0F B6 94 01 08 01 00 00 83 FA 1F 0F 8F E8 00 00 00 8B 45 EC 8B 88 EC 00 00 00 8B 55 EC 0F B6 84 0A 08 01 00 00 83 F8 03 75 0D 8B 4D EC C7 81 28 05 00 00 00 00 00 00 8B 55 EC 8B 82 EC 00 00 00 B9 01 00 00 00 6B D1 00 8B 4D EC 8A 84 01 08 01 00 00 88 44 15 F0 C7 45 E0 01 00 00 00 83 7D E0 03 73 02 EB 05 E8 ?? ?? ?? ?? 8B 4D E0 C6 44 0D F0 00 8D 55 A4 8D 45 F0 50 52 8B 4D EC 81 C1 FC 00 00 00 E8 ?? ?? ?? ?? 89 45 BC 8B 4D EC 81 C1 FC 00 00 00 89 4D DC C7 45 FC 00 00 00 00 8B 55 A4 89 55 C8 8B 45 C8 50 8B 4D DC E8 ?? ?? ?? ?? 8B 4D DC 89 4D B8 C7 45 FC FF FF FF FF 8D 4D A4 E8 ?? ?? ?? ?? 8B 55 EC 8B 82 EC 00 00 00 8B 4D EC 0F BE 94 01 08 01 00 00 89 55 C4 8B 45 EC 8B 88 EC 00 00 00 83 C1 01 8B 55 EC 89 8A EC 00 00 00 8B 45 C4 E9 FF 02 00 00 8B 4D EC E8 ?? ?? ?? ?? 89 45 E4 83 7D E4 00 74 29 8B 45 EC 0F B6 88 2C 05 00 00 85 C9 74 13 8B 55 E8 52 8B 4D EC E8 ?? ?? ?? ?? 0F B6 C0 85 C0 75 08 8B 45 E4 E9 C5 02 00 00 8B 4D EC 8B 91 EC 00 00 00 8B 45 EC 0F BE 8C 10 08 01 00 00 89 4D E8 8B 55 E8 C1 E2 08 52 8B 4D EC E8 ?? ?? ?? ?? 0F B6 C0 85 C0 74 15 8B 4D EC 8B 91 24 05 00 00 83 C2 01 8B 45 EC 89 90 24 05 00 00 8B 4D E8 C1 E1 08 51 8B 4D EC E8 ?? ?? ?? ?? 0F B6 D0 85 D2 75 2E 8B 45 EC 8B 88 24 05 00 00 83 E9 01 8B 55 EC 89 8A 24 05 00 00 8B 45 EC 83 B8 24 05 00 00 00 7D 0D 8B 4D EC C7 81 24 05 00 00 00 00 00 00 8B 55 E8 52 8B 4D EC E8 ?? ?? ?? ?? 8B 45 EC 8B 88 EC 00 00 00 BA 01 00 00 00 6B C2 00 8B 55 EC 8A 8C 0A 08 01 00 00 88 4C 05 F0 C7 45 D8 01 00 00 00 83 7D D8 03 73 02 EB 05 E8 ?? ?? ?? ?? 8B 55 D8 C6 44 15 F0 00 8B 45 EC 8B 88 EC 00 00 00 83 C1 01 8B 55 EC 89 8A EC 00 00 00 8B 45 EC 8B 88 28 05 00 00 83 C1 01 8B 55 EC 89 8A 28 05 00 00 E9 74 01 00 00 8B 45 EC C6 80 20 05 00 00 00 8B 4D EC 8B 91 EC 00 00 00 8B 45 EC 0F B6 8C 10 08 01 00 00 C1 E1 08 89 4D E8 8B 55 EC 8B 82 EC 00 00 00 8B 4D EC 0F B6 94 01 09 01 00 00 0B 55 E8 89 55 E8 8B 4D EC E8 ?? ?? ?? ?? 89 45 E4 83 7D E4 00 74 29 8B 45 EC 0F B6 88 2C 05 00 00 85 C9 74 13 8B 55 E8 52 8B 4D EC E8 ?? ?? ?? ?? 0F B6 C0 85 C0 75 08 8B 45 E4 E9 51 01 00 00 8B 4D E8 51 8B 4D EC E8 ?? ?? ?? ?? 0F B6 D0 85 D2 74 15 8B 45 EC 8B 88 24 05 00 00 83 C1 01 8B 55 EC 89 8A 24 05 00 00 8B 45 E8 50 8B 4D EC E8 ?? ?? ?? ?? 0F B6 C8 85 C9 75 2E 8B 55 EC 8B 82 24 05 00 00 83 E8 01 8B 4D EC 89 81 24 05 00 00 8B 55 EC 83 BA 24 05 00 00 00 7D 0D 8B 45 EC C7 80 24 05 00 00 00 00 00 00 8B 4D E8 51 8B 4D EC E8 ?? ?? ?? ?? 8B 55 EC 8B 82 EC 00 00 00 B9 01 00 00 00 6B D1 00 8B 4D EC 8A 84 01 08 01 00 00 88 44 15 F0 8B 4D EC 8B 91 EC 00 00 00 B8 01 00 00 00 C1 E0 00 8B 4D EC 8A 94 11 09 01 00 00 88 54 05 F0 B8 01 00 00 00 D1 E0 89 45 D4 83 7D D4 03 73 02 EB 05 E8 ?? ?? ?? ?? 8B 4D D4 C6 44 0D F0 00 8B 55 EC 8B 82 EC 00 00 00 83 C0 02 8B 4D EC 89 81 EC 00 00 00 8B 55 EC 8B 82 28 05 00 00 83 C0 01 8B 4D EC 89 81 28 05 00 00 8D 55 98 8D 45 F0 50 52 8B 4D EC 81 C1 FC 00 00 00 E8 ?? ?? ?? ?? 89 45 B4 8B 4D EC 81 C1 FC 00 00 00 89 4D D0 C7 45 FC 01 00 00 00 8B 55 98 89 55 C0 8B 45 C0 50 8B 4D D0 E8 ?? ?? ?? ?? 8B 4D D0 89 4D B0 C7 45 FC FF FF FF FF 8D 4D 98 E8 ?? ?? ?? ?? 33 C0 8B 4D F4 64 89 0D 00 00 00 00 59 8B E5 5D C3"
+    },
+    {
+      "name": "display_newline",
+      "pattern": "55 8B EC 83 EC 20 89 4D FC 8B 45 FC 0F B6 88 22 05 00 00 85 C9 74 75 8B 55 FC 83 BA 24 05 00 00 00 7E 69 8B 45 FC 0F B6 88 21 05 00 00 85 C9 74 32 8B 55 FC 8B 42 44 89 45 F4 8B 4D FC 8B 91 D4 00 00 00 03 55 F4 8B 45 FC 03 90 18 05 00 00 8B 4D FC 03 91 F8 00 00 00 8B 45 FC 89 90 E4 00 00 00 EB 27 8B 4D FC 8B 51 44 89 55 F0 8B 45 FC 8B 88 D4 00 00 00 03 4D F0 8B 55 FC 03 8A F8 00 00 00 8B 45 FC 89 88 E4 00 00 00 EB 12 8B 4D FC 8B 55 FC 8B 82 D4 00 00 00 89 81 E4 00 00 00 8B 4D FC 0F B6 91 21 05 00 00 85 D2 74 32 8B 45 FC 8B 48 44 89 4D EC 8B 55 FC 8B 45 EC 03 82 1C 05 00 00 8B 4D FC 03 81 F4 00 00 00 8B 55 FC 03 82 E8 00 00 00 8B 4D FC 89 81 E8 00 00 00 EB 27 8B 55 FC 8B 42 44 89 45 E8 8B 4D FC 8B 55 E8 03 91 F4 00 00 00 8B 45 FC 03 90 E8 00 00 00 8B 4D FC 89 91 E8 00 00 00 8B 55 FC 0F B6 82 21 05 00 00 85 C0 74 23 8B 4D FC 8B 51 44 89 55 E4 8B 45 FC 8B 88 E8 00 00 00 03 4D E4 8B 55 FC 03 8A 1C 05 00 00 89 4D F8 EB 18 8B 45 FC 8B 48 44 89 4D E0 8B 55 FC 8B 82 E8 00 00 00 03 45 E0 89 45 F8 8B 4D FC 8B 91 D8 00 00 00 8B 45 FC 03 90 E0 00 00 00 39 55 F8 7E 0F 8B 4D FC E8 ?? ?? ?? ?? B8 01 00 00 00 EB 02 33 C0 8B E5 5D C3"
+    },
+    {
+      "name": "display_clear",
+      "pattern": "55 8B EC 83 EC 0C 89 4D FC 8B 45 FC 8B 4D FC 8B 91 D4 00 00 00 89 90 E4 00 00 00 8B 45 FC 8B 4D FC 8B 91 D8 00 00 00 89 90 E8 00 00 00 8B 45 FC C7 80 24 05 00 00 00 00 00 00 8B 4D FC 83 79 38 00 74 3E 8B 55 FC 8B 42 38 8B 48 08 89 4D F8 8B 55 FC 8B 42 38 8B 48 04 89 4D F4 68 FF 00 00 00 68 FF 00 00 00 68 FF 00 00 00 8B 55 F8 52 8B 45 F4 50 6A 00 6A 00 8B 4D FC 8B 49 38 E8 ?? ?? ?? ?? 8B 4D FC 81 C1 FC 00 00 00 E8 ?? ?? ?? ?? 33 C0 8B E5 5D C3"
+    },
+    {
+      "name": "display_draw",
+      "pattern": "55 8B EC 83 EC 30 89 4D FC 8B 45 FC 8B 48 44 89 4D E8 8B 55 FC 8B 82 E8 00 00 00 03 45 E8 89 45 F4 8B 4D FC 83 C1 44 89 4D F0 8B 55 F0 C6 42 4C 00 8B 45 F0 C6 40 4D 00 8B 4D F0 C6 41 4E 00 8B 55 FC 8B 42 40 89 45 E4 8B 4D E4 8B 91 14 01 00 00 52 FF 15 ?? ?? ?? ?? 89 45 EC 8B 45 08 50 8B 4D FC 8B 55 F4 2B 91 C8 00 00 00 52 8B 45 FC 8B 4D FC 8B 90 E4 00 00 00 2B 91 C4 00 00 00 52 8B 45 FC 8B 48 38 51 8B 55 EC 52 8B 4D FC 83 C1 44 E8 ?? ?? ?? ?? 8B 45 FC 8B 48 40 89 4D E0 8B 55 EC 52 8B 45 E0 8B 88 14 01 00 00 51 FF 15 ?? ?? ?? ?? 81 7D 08 40 81 00 00 0F 84 0E 01 00 00 83 7D 08 20 0F 84 04 01 00 00 8B 55 FC 81 C2 9C 00 00 00 89 55 F8 8B 45 FC 0F B6 88 21 05 00 00 85 C9 74 7E 8B 55 FC 8B 42 38 50 8B 4D FC 8B 55 F4 2B 91 C8 00 00 00 8B 45 F8 2B 50 0C 52 8B 4D FC 8B 55 FC 8B 81 E4 00 00 00 2B 82 C4 00 00 00 8B 4D F8 03 41 08 50 8B 55 F8 8B 42 04 50 8B 4D F8 8B 11 52 8B 45 FC 8B 4D F4 03 88 1C 05 00 00 8B 55 F8 2B 4A 0C 51 8B 45 FC 8B 88 E4 00 00 00 8B 55 FC 03 8A 18 05 00 00 8B 45 F8 03 48 08 51 8B 4D FC 8B 51 34 52 8B 45 FC 8B 48 3C E8 ?? ?? ?? ?? 8B 4D FC 8B 51 38 52 8B 45 FC 8B 4D F4 2B 88 C8 00 00 00 8B 55 F8 2B 4A 0C 51 8B 45 FC 8B 4D FC 8B 90 E4 00 00 00 2B 91 C4 00 00 00 8B 45 F8 03 50 08 52 8B 4D F8 8B 51 04 52 8B 45 F8 8B 08 51 8B 55 F8 8B 45 F4 2B 42 0C 50 8B 4D FC 8B 91 E4 00 00 00 8B 45 F8 03 50 08 52 8B 4D FC 8B 51 30 52 8B 45 FC 8B 48 3C E8 ?? ?? ?? ?? 8B 4D FC 0F B6 91 20 05 00 00 85 D2 74 73 8B 45 FC 0F B6 88 21 05 00 00 85 C9 74 37 8B 55 FC 8B 42 44 89 45 DC 8B 45 DC 99 2B C2 D1 F8 8B 4D FC 03 81 F8 00 00 00 8B 55 FC 03 82 18 05 00 00 8B 4D FC 03 81 E4 00 00 00 8B 55 FC 89 82 E4 00 00 00 EB 2C 8B 45 FC 8B 48 44 89 4D D8 8B 45 D8 99 2B C2 D1 F8 8B 55 FC 03 82 F8 00 00 00 8B 4D FC 03 81 E4 00 00 00 8B 55 FC 89 82 E4 00 00 00 EB 67 8B 45 FC 0F B6 88 21 05 00 00 85 C9 74 32 8B 55 FC 8B 42 44 89 45 D4 8B 4D FC 8B 55 D4 03 91 F8 00 00 00 8B 45 FC 03 90 18 05 00 00 8B 4D FC 03 91 E4 00 00 00 8B 45 FC 89 90 E4 00 00 00 EB 27 8B 4D FC 8B 51 44 89 55 D0 8B 45 FC 8B 4D D0 03 88 F8 00 00 00 8B 55 FC 03 8A E4 00 00 00 8B 45 FC 89 88 E4 00 00 00 8B E5 5D C2 04 00"
+    },
+    {
+      "name": "display_compose",
+      "pattern": "55 8B EC 83 EC 0C 89 4D FC 8B 45 FC 83 78 38 00 75 05 E9 2A 01 00 00 8B 4D FC 8B 91 C4 00 00 00 8B 45 FC 03 90 18 05 00 00 8B 4D FC 03 91 CC 00 00 00 3B 55 08 7E 1A 8B 55 FC 8B 45 08 2B 82 C4 00 00 00 8B 4D FC 2B 81 18 05 00 00 89 45 F4 EB 0C 8B 55 FC 8B 82 CC 00 00 00 89 45 F4 8B 4D FC 8B 91 C8 00 00 00 8B 45 FC 03 90 1C 05 00 00 8B 4D FC 03 91 D0 00 00 00 3B 55 0C 7E 1A 8B 55 FC 8B 45 0C 2B 82 C8 00 00 00 8B 4D FC 2B 81 1C 05 00 00 89 45 F8 EB 0C 8B 55 FC 8B 82 D0 00 00 00 89 45 F8 8B 4D FC 0F B6 91 21 05 00 00 85 D2 74 4B 8B 45 FC 8B 48 38 51 6A 00 6A 00 8B 55 F8 52 8B 45 F4 50 8B 4D FC 8B 91 C8 00 00 00 8B 45 FC 03 90 1C 05 00 00 52 8B 4D FC 8B 91 C4 00 00 00 8B 45 FC 03 90 18 05 00 00 52 8B 4D FC 8B 51 34 52 8B 45 FC 8B 48 3C E8 ?? ?? ?? ?? 8B 4D FC 8B 51 38 52 6A 00 6A 00 8B 45 FC 8B 88 D0 00 00 00 51 8B 55 FC 8B 82 CC 00 00 00 50 8B 4D FC 8B 91 C8 00 00 00 52 8B 45 FC 8B 88 C4 00 00 00 51 8B 55 FC 8B 42 30 50 8B 4D FC 8B 49 3C E8 ?? ?? ?? ?? 8B E5 5D C2 08 00"
+    },
+    {
+      "name": "display_compose_rect",
+      "pattern": "55 8B EC 51 89 4D FC 8B 45 FC 83 78 38 00 75 05 E9 A6 00 00 00 8B 4D FC 0F B6 91 21 05 00 00 85 D2 74 55 8B 45 FC 8B 48 38 51 8B 55 FC 8B 45 0C 2B 82 C8 00 00 00 50 8B 4D FC 8B 55 08 2B 91 C4 00 00 00 52 8B 45 14 50 8B 4D 10 51 8B 55 FC 8B 45 0C 03 82 1C 05 00 00 50 8B 4D FC 8B 55 08 03 91 18 05 00 00 52 8B 45 FC 8B 48 34 51 8B 55 FC 8B 4A 3C E8 ?? ?? ?? ?? 8B 45 FC 8B 48 38 51 8B 55 FC 8B 45 0C 2B 82 C8 00 00 00 50 8B 4D FC 8B 55 08 2B 91 C4 00 00 00 52 8B 45 14 50 8B 4D 10 51 8B 55 0C 52 8B 45 08 50 8B 4D FC 8B 51 30 52 8B 45 FC 8B 48 3C E8 ?? ?? ?? ?? 8B E5 5D C2 10 00"
+    },
+    {
+      "name": "canvas_reset",
+      "pattern": "55 8B EC 51 89 4D FC 8B 45 FC C7 40 34 00 00 00 00 8B 4D FC C7 41 38 00 00 00 00 8B 55 FC C7 42 3C 00 00 00 00 8B 45 FC C7 40 40 00 00 00 00 6A 34 6A 00 8B 4D FC 51 E8 ?? ?? ?? ?? 83 C4 0C 8B E5 5D C3"
+    },
+    {
+      "name": "canvas_release",
+      "pattern": "55 8B EC 51 89 4D FC 8B 45 FC 83 78 34 00 74 13 FF 15 ?? ?? ?? ?? 8B 4D FC 8B 51 34 52 FF 15 ?? ?? ?? ?? 8B 4D FC E8 ?? ?? ?? ?? 8B E5 5D C3"
+    },
+    {
+      "name": "canvas_initialize",
+      "pattern": "55 8B EC 83 EC 10 89 4D FC 83 7D 10 08 75 07 32 C0 E9 CE 01 00 00 8B 4D FC E8 ?? ?? ?? ?? 8B 45 10 83 C0 07 99 83 E2 07 03 C2 C1 F8 03 0F AF 45 08 83 C0 03 83 E0 FC 8B 4D FC 89 41 3C 8B 45 10 83 C0 07 99 83 E2 07 03 C2 C1 F8 03 8B 55 FC 89 42 40 8B 45 FC C7 00 28 00 00 00 8B 4D FC 8B 55 08 89 51 04 8B 45 FC 8B 4D 0C 89 48 08 8B 55 FC 66 8B 45 10 66 89 42 0E B9 01 00 00 00 8B 55 FC 66 89 4A 0C 8B 45 FC C7 40 18 00 00 00 00 8B 4D FC C7 41 1C 00 00 00 00 8B 55 FC C7 42 20 00 00 00 00 8B 45 FC C7 40 24 00 00 00 00 83 7D 10 18 75 09 C7 45 F8 00 00 00 00 EB 07 C7 45 F8 03 00 00 00 8B 4D FC 8B 55 F8 89 51 10 8B 45 FC 8B 48 3C 0F AF 4D 0C 8B 55 FC 89 4A 14 8B 45 10 89 45 F4 83 7D F4 10 74 08 83 7D F4 20 74 3C EB 74 B9 04 00 00 00 6B D1 00 8B 45 FC C7 44 10 28 00 7C 00 00 B9 04 00 00 00 C1 E1 00 8B 55 FC C7 44 0A 28 E0 03 00 00 B8 04 00 00 00 D1 E0 8B 4D FC C7 44 01 28 1F 00 00 00 EB 72 BA 04 00 00 00 6B C2 00 8B 4D FC C7 44 01 28 00 00 FF 00 BA 04 00 00 00 C1 E2 00 8B 45 FC C7 44 10 28 00 FF 00 00 B9 04 00 00 00 D1 E1 8B 55 FC C7 44 0A 28 FF 00 00 00 EB 38 B8 04 00 00 00 6B C8 00 8B 55 FC C7 44 0A 28 00 00 00 00 B8 04 00 00 00 C1 E0 00 8B 4D FC C7 44 01 28 00 00 00 00 BA 04 00 00 00 D1 E2 8B 45 FC C7 44 10 28 00 00 00 00 6A 00 FF 15 ?? ?? ?? ?? 89 45 F0 6A 00 6A 00 8B 4D FC 83 C1 38 51 6A 00 8B 55 FC 52 8B 45 F0 50 FF 15 ?? ?? ?? ?? 8B 4D FC 89 41 34 8B 55 F0 52 6A 00 FF 15 ?? ?? ?? ?? 8B 45 FC 83 78 34 00 74 06 B0 01 EB 04 EB 02 32 C0 8B E5 5D C2 0C 00"
+    },
+    {
+      "name": "canvas_present",
+      "pattern": "55 8B EC 83 EC 0C 89 4D F8 8B 45 08 50 FF 15 ?? ?? ?? ?? 89 45 FC 8B 4D F8 8B 51 34 52 8B 45 FC 50 FF 15 ?? ?? ?? ?? 89 45 F4 68 20 00 CC 00 8B 4D 20 51 8B 55 1C 52 8B 45 FC 50 8B 4D 18 51 8B 55 14 52 8B 45 10 50 8B 4D 0C 51 8B 55 08 52 FF 15 ?? ?? ?? ?? FF 15 ?? ?? ?? ?? 8B 45 F4 50 8B 4D FC 51 FF 15 ?? ?? ?? ?? 8B 55 FC 52 FF 15 ?? ?? ?? ?? 8B E5 5D C2 1C 00"
+    },
+    {
+      "name": "canvas_present_rect",
+      "pattern": "55 8B EC 83 EC 0C 89 4D F8 8B 45 08 50 FF 15 ?? ?? ?? ?? 89 45 FC 8B 4D F8 8B 51 34 52 8B 45 FC 50 FF 15 ?? ?? ?? ?? 89 45 F4 68 20 00 CC 00 8B 4D 0C 8B 51 04 52 8B 45 0C 8B 08 51 8B 55 FC 52 8B 45 0C 8B 48 0C 51 8B 55 0C 8B 42 08 50 8B 4D 0C 8B 51 04 52 8B 45 0C 8B 08 51 8B 55 08 52 FF 15 ?? ?? ?? ?? FF 15 ?? ?? ?? ?? 8B 45 F4 50 8B 4D FC 51 FF 15 ?? ?? ?? ?? 8B 55 FC 52 FF 15 ?? ?? ?? ?? 8B E5 5D C2 08 00"
+    },
+    {
+      "name": "canvas_mix",
+      "pattern": "55 8B EC 83 EC 20 53 56 57 89 4D F0 8B 45 F0 0F B7 48 0E 8B C1 0F AF 45 14 99 83 E2 07 03 C2 C1 F8 03 99 83 E2 07 03 C2 C1 F8 03 89 45 E0 8B 55 F0 0F B7 42 0E 0F AF 45 14 99 83 E2 07 03 C2 C1 F8 03 25 07 00 00 80 79 05 48 83 C8 F8 40 89 45 E4 83 7D 14 03 0F 8D 20 01 00 00 C7 45 FC 00 00 00 00 EB 09 8B 4D FC 83 C1 01 89 4D FC 8B 55 FC 3B 55 18 0F 8D FD 00 00 00 8B 45 F0 8B 4D 0C 0F AF 48 40 8B 55 10 03 55 FC 8B 45 F0 8B 40 08 2B C2 83 E8 01 8B 55 F0 0F AF 42 3C 8B 55 F0 8B 52 38 03 D0 03 D1 89 55 F8 8B 45 08 8B 4D 1C 0F AF 48 40 8B 55 20 03 55 FC 8B 45 08 8B 40 08 2B C2 83 E8 01 8B 55 08 0F AF 42 3C 8B 55 08 8B 52 38 03 D0 03 D1 89 55 F4 8B 45 24 8B 4D 1C 0F AF 48 40 8B 55 20 03 55 FC 8B 45 24 8B 40 08 2B C2 83 E8 01 8B 55 24 0F AF 42 3C 8B 55 24 8B 52 38 03 D0 03 D1 89 55 EC 83 7D E4 00 74 65 C7 45 E8 00 00 00 00 EB 09 8B 45 E8 83 C0 01 89 45 E8 8B 4D E4 8B 55 E8 3B 14 8D ?? ?? ?? ?? 7D 44 8B 45 F4 0F B6 08 8B 55 F8 0F B6 02 8B 55 F4 0F B6 12 2B C2 8B 55 EC 0F B6 12 0F AF C2 C1 F8 08 03 C8 8B 45 F8 88 08 8B 4D F8 83 C1 01 89 4D F8 8B 55 F4 83 C2 01 89 55 F4 8B 45 EC 83 C0 01 89 45 EC EB A4 E9 EE FE FF FF E9 8B 01 00 00 C7 45 FC 00 00 00 00 EB 09 8B 4D FC 83 C1 01 89 4D FC 8B 55 FC 3B 55 18 0F 8D 6B 01 00 00 8B 45 F0 8B 4D 0C 0F AF 48 40 8B 55 10 03 55 FC 8B 45 F0 8B 40 08 2B C2 83 E8 01 8B 55 F0 0F AF 42 3C 8B 55 F0 8B 52 38 03 D0 03 D1 89 55 F8 8B 45 08 8B 4D 1C 0F AF 48 40 8B 55 20 03 55 FC 8B 45 08 8B 40 08 2B C2 83 E8 01 8B 55 08 0F AF 42 3C 8B 55 08 8B 52 38 03 D0 03 D1 89 55 F4 8B 45 24 8B 4D 1C 0F AF 48 40 8B 55 20 03 55 FC 8B 45 24 8B 40 08 2B C2 83 E8 01 8B 55 24 0F AF 42 3C 8B 55 24 8B 52 38 03 D0 03 D1 89 55 EC 8B 7D F8 8B 5D F4 8B 75 F8 8B 45 EC 8B 55 E0 0F EF FF 0F 6F 06 0F 6F 0B 0F 6F 20 0F 7F E5 0F 7F C2 0F 7F CB 0F 60 C7 0F 60 CF 0F 60 E7 0F 68 D7 0F 68 DF 0F 68 EF 0F F9 C1 0F F9 D3 0F D5 C4 0F D5 D5 0F 71 D0 08 0F 71 D2 08 0F FC C1 0F FC D3 0F 67 C2 0F 7F 07 83 C7 08 83 C6 08 83 C3 08 83 C0 08 4A 75 AD 89 7D F8 89 5D F4 89 45 EC 83 7D E4 00 74 65 C7 45 E8 00 00 00 00 EB 09 8B 45 E8 83 C0 01 89 45 E8 8B 4D E4 8B 55 E8 3B 14 8D ?? ?? ?? ?? 7D 44 8B 45 F4 0F B6 08 8B 55 F8 0F B6 02 8B 55 F4 0F B6 12 2B C2 8B 55 EC 0F B6 12 0F AF C2 C1 F8 08 03 C8 8B 45 F8 88 08 8B 4D F8 83 C1 01 89 4D F8 8B 55 F4 83 C2 01 89 55 F4 8B 45 EC 83 C0 01 89 45 EC EB A4 E9 80 FE FF FF 0F 77 5F 5E 5B 8B E5 5D C2 20 00"
+    },
+    {
+      "name": "canvas_fill",
+      "pattern": "55 8B EC 83 EC 10 89 4D F4 C7 45 F8 00 00 00 00 EB 09 8B 45 F8 83 C0 01 89 45 F8 8B 4D F8 3B 4D 14 0F 8D 8B 00 00 00 8B 55 F4 8B 45 08 0F AF 42 40 8B 4D 0C 03 4D F8 8B 55 F4 8B 52 08 2B D1 83 EA 01 8B 4D F4 0F AF 51 3C 8B 4D F4 8B 49 38 03 CA 03 C8 89 4D FC C7 45 F0 00 00 00 00 EB 09 8B 55 F0 83 C2 01 89 55 F0 8B 45 F0 3B 45 10 7D 3D B9 01 00 00 00 6B D1 00 8B 45 FC 8A 4D 20 88 0C 10 BA 01 00 00 00 C1 E2 00 8B 45 FC 8A 4D 1C 88 0C 10 BA 01 00 00 00 D1 E2 8B 45 FC 8A 4D 18 88 0C 10 8B 55 FC 83 C2 03 89 55 FC EB B2 E9 60 FF FF FF 8B E5 5D C2 1C 00"
+    },
+    {
+      "name": "canvas_construct",
+      "pattern": "55 8B EC 51 89 4D FC 8B 4D FC E8 ?? ?? ?? ?? 8B 45 FC 8B E5 5D C3"
+    },
+    {
+      "name": "display_bounds",
+      "pattern": "55 8B EC 83 EC 18 89 4D FC 8B 45 FC 0F B6 88 21 05 00 00 85 C9 74 20 8B 55 FC 8B 82 E4 00 00 00 8B 4D FC 03 81 18 05 00 00 8B 55 FC 03 82 F8 00 00 00 89 45 F8 EB 15 8B 45 FC 8B 88 E4 00 00 00 8B 55 FC 03 8A F8 00 00 00 89 4D F8 8B 45 FC 0F B6 88 20 05 00 00 85 C9 74 19 8B 55 FC 8B 42 44 89 45 F4 8B 45 F4 99 2B C2 D1 F8 03 45 F8 89 45 F8 EB 12 8B 4D FC 8B 51 44 89 55 F0 8B 45 F8 03 45 F0 89 45 F8 8B 4D FC 8B 91 D4 00 00 00 8B 45 FC 03 90 DC 00 00 00 39 55 F8 0F 8E 88 00 00 00 8B 4D FC 0F B6 91 21 05 00 00 85 D2 74 2F 8B 45 FC 8B 48 44 89 4D EC 8B 55 FC 8B 45 EC 03 82 1C 05 00 00 8B 4D FC 8B 91 E8 00 00 00 8D 04 42 8B 4D FC 03 81 F4 00 00 00 89 45 F8 EB 24 8B 55 FC 8B 42 44 89 45 E8 8B 4D FC 8B 91 E8 00 00 00 8B 45 E8 8D 0C 42 8B 55 FC 03 8A F4 00 00 00 89 4D F8 8B 45 FC 8B 88 D8 00 00 00 8B 55 FC 03 8A E0 00 00 00 39 4D F8 7E 09 B8 03 00 00 00 EB 0B EB 07 B8 01 00 00 00 EB 02 33 C0 8B E5 5D C3"
+    },
+    {
+      "name": "display_wrap_character",
+      "pattern": "55 8B EC 83 EC 08 89 4D F8 8B 45 F8 0F B6 88 20 05 00 00 85 C9 74 2F C7 45 FC 00 00 00 00 EB 09 8B 55 FC 83 C2 01 89 55 FC 83 7D FC 08 7D 15 8B 45 FC 8B 4D 08 3B 0C 85 ?? ?? ?? ?? 75 04 B0 01 EB 33 EB DC EB 2D C7 45 FC 00 00 00 00 EB 09 8B 55 FC 83 C2 01 89 55 FC 83 7D FC 0D 7D 15 8B 45 FC 8B 4D 08 3B 0C 85 ?? ?? ?? ?? 75 04 B0 01 EB 04 EB DC 32 C0 8B E5 5D C2 04 00"
+    },
+    {
+      "name": "display_open_quote",
+      "pattern": "55 8B EC 83 EC 08 89 4D F8 8B 45 F8 0F B6 88 20 05 00 00 85 C9 74 2F C7 45 FC 00 00 00 00 EB 09 8B 55 FC 83 C2 01 89 55 FC 83 7D FC 03 7D 15 8B 45 FC 8B 4D 08 3B 0C 85 ?? ?? ?? ?? 75 04 B0 01 EB 33 EB DC EB 2D C7 45 FC 00 00 00 00 EB 09 8B 55 FC 83 C2 01 89 55 FC 83 7D FC 08 7D 15 8B 45 FC 8B 4D 08 3B 0C 85 ?? ?? ?? ?? 75 04 B0 01 EB 04 EB DC 32 C0 8B E5 5D C2 04 00"
+    },
+    {
+      "name": "display_close_quote",
+      "pattern": "55 8B EC 83 EC 08 89 4D F8 8B 45 F8 0F B6 88 20 05 00 00 85 C9 74 2F C7 45 FC 00 00 00 00 EB 09 8B 55 FC 83 C2 01 89 55 FC 83 7D FC 03 7D 15 8B 45 FC 8B 4D 08 3B 0C 85 ?? ?? ?? ?? 75 04 32 C0 EB 33 EB DC EB 2D C7 45 FC 00 00 00 00 EB 09 8B 55 FC 83 C2 01 89 55 FC 83 7D FC 08 7D 15 8B 45 FC 8B 4D 08 3B 0C 85 ?? ?? ?? ?? 75 04 32 C0 EB 04 EB DC B0 01 8B E5 5D C2 04 00"
+    },
+    {
+      "name": "glyph_raster_gray",
+      "pattern": "55 8B EC 83 EC 1C 56 89 4D FC 8B 45 FC 8B 4D 0C 03 48 60 89 4D E4 8B 55 FC 8B 45 10 2B 42 64 89 45 EC 8B 4D FC 0F B6 51 74 85 D2 74 32 8B 45 FC 8B 4D EC 03 48 5C 3B 4D EC 7E 0C 8B 55 FC 8B 45 10 2B 42 5C 89 45 EC 8B 4D FC 8B 55 FC 8B 42 5C 89 41 78 8B 4D FC C7 41 7C 00 00 00 00 EB 24 8B 55 FC 8B 45 FC 8B 4A 5C 2B 48 64 8B 55 FC 89 4A 7C 8B 45 FC 8B 4D FC 8B 50 5C 2B 51 7C 8B 45 FC 89 50 78 C7 45 F4 00 00 00 00 EB 09 8B 4D F4 83 C1 01 89 4D F4 8B 55 FC 8B 45 F4 3B 42 5C 0F 83 57 01 00 00 8B 4D FC 8B 51 70 0F AF 55 F4 8B 45 FC 03 50 54 89 55 F0 8B 4D 08 8B 55 E4 0F AF 51 40 8B 45 EC 03 45 F4 8B 4D 08 8B 49 08 2B C8 83 E9 01 8B 45 08 0F AF 48 3C 8B 45 08 8B 40 38 03 C1 03 C2 89 45 F8 C7 45 E8 00 00 00 00 EB 09 8B 4D E8 83 C1 01 89 4D E8 8B 55 FC 8B 45 E8 3B 42 58 0F 83 EF 00 00 00 B9 01 00 00 00 6B D1 00 8B 45 F8 0F B6 0C 10 8B 55 FC 0F B6 42 4E BA 01 00 00 00 6B D2 00 8B 75 F8 0F B6 14 16 2B C2 8B 55 F0 0F B6 12 0F AF C2 99 83 E2 3F 03 C2 C1 F8 06 03 C8 B8 01 00 00 00 6B D0 00 8B 45 F8 88 0C 10 B9 01 00 00 00 C1 E1 00 8B 55 F8 0F B6 0C 0A 8B 55 FC 0F B6 42 4D BA 01 00 00 00 C1 E2 00 8B 75 F8 0F B6 14 16 2B C2 8B 55 F0 0F B6 12 0F AF C2 99 83 E2 3F 03 C2 C1 F8 06 03 C8 B8 01 00 00 00 C1 E0 00 8B 55 F8 88 0C 02 B8 01 00 00 00 D1 E0 8B 4D F8 0F B6 0C 01 8B 55 FC 0F B6 42 4C BA 01 00 00 00 D1 E2 8B 75 F8 0F B6 14 16 2B C2 8B 55 F0 0F B6 12 0F AF C2 99 83 E2 3F 03 C2 C1 F8 06 03 C8 B8 01 00 00 00 D1 E0 8B 55 F8 88 0C 02 8B 45 F8 83 C0 03 89 45 F8 8B 4D F0 83 C1 01 89 4D F0 E9 F9 FE FF FF E9 91 FE FF FF 5E 8B E5 5D C2 0C 00"
+    },
+    {
+      "name": "glyph_raster_mono",
+      "pattern": "55 8B EC 83 EC 20 89 4D FC 8B 45 FC 8B 4D 0C 03 48 60 89 4D E0 8B 55 FC 8B 45 10 2B 42 64 89 45 EC 8B 4D FC 0F B6 51 74 85 D2 74 32 8B 45 FC 8B 4D EC 03 48 5C 3B 4D EC 7E 0C 8B 55 FC 8B 45 10 2B 42 5C 89 45 EC 8B 4D FC 8B 55 FC 8B 42 5C 89 41 78 8B 4D FC C7 41 7C 00 00 00 00 EB 24 8B 55 FC 8B 45 FC 8B 4A 5C 2B 48 64 8B 55 FC 89 4A 7C 8B 45 FC 8B 4D FC 8B 50 5C 2B 51 7C 8B 45 FC 89 50 78 C7 45 F8 00 00 00 00 EB 09 8B 4D F8 83 C1 01 89 4D F8 8B 55 FC 8B 45 F8 3B 42 5C 0F 83 E5 00 00 00 8B 4D FC 8B 51 70 0F AF 55 F8 8B 45 FC 03 50 54 89 55 E4 8B 4D 08 8B 55 E0 0F AF 51 40 8B 45 EC 03 45 F8 8B 4D 08 8B 49 08 2B C8 83 E9 01 8B 45 08 0F AF 48 3C 8B 45 08 8B 40 38 03 C1 03 C2 89 45 F4 C7 45 E8 00 00 00 00 C7 45 F0 00 00 00 00 EB 12 8B 4D E8 83 C1 01 89 4D E8 8B 55 F0 83 C2 01 89 55 F0 8B 45 FC 8B 4D E8 3B 48 58 73 71 8B 55 E4 0F B6 02 8B 4D F0 D3 E0 25 80 00 00 00 74 3B B9 01 00 00 00 6B D1 00 8B 45 F4 8B 4D FC 8A 49 4E 88 0C 10 BA 01 00 00 00 C1 E2 00 8B 45 F4 8B 4D FC 8A 49 4D 88 0C 10 BA 01 00 00 00 D1 E2 8B 45 F4 8B 4D FC 8A 49 4C 88 0C 10 8B 55 F4 83 C2 03 89 55 F4 83 7D F0 07 75 10 C7 45 F0 FF FF FF FF 8B 45 E4 83 C0 01 89 45 E4 E9 72 FF FF FF E9 03 FF FF FF 8B E5 5D C2 0C 00"
+    }
+  ],
+  "displayDerived": [
+    {
+      "name": "canvas_construct",
+      "from": "display_surfaces",
+      "offset": 112
+    }
+  ],
+  "displayCalls": [
+    {
+      "from": "display_construct",
+      "offset": 107,
+      "to": "display_reset"
+    },
+    {
+      "from": "display_destruct",
+      "offset": 48,
+      "to": "display_finish"
+    },
+    {
+      "from": "display_reset",
+      "offset": 449,
+      "to": "display_callbacks"
+    },
+    {
+      "from": "display_finish",
+      "offset": 24,
+      "to": "display_reset"
+    },
+    {
+      "from": "display_copy",
+      "offset": 12,
+      "to": "display_reset"
+    },
+    {
+      "from": "display_copy",
+      "offset": 54,
+      "to": "display_font_copy"
+    },
+    {
+      "from": "display_copy",
+      "offset": 512,
+      "to": "display_callbacks"
+    },
+    {
+      "from": "display_copy",
+      "offset": 520,
+      "to": "display_surfaces"
+    },
+    {
+      "from": "display_surfaces",
+      "offset": 333,
+      "to": "canvas_initialize"
+    },
+    {
+      "from": "display_surfaces",
+      "offset": 366,
+      "to": "canvas_initialize"
+    },
+    {
+      "from": "display_surfaces",
+      "offset": 399,
+      "to": "canvas_initialize"
+    },
+    {
+      "from": "display_surfaces",
+      "offset": 479,
+      "to": "canvas_fill"
+    },
+    {
+      "from": "display_surfaces",
+      "offset": 559,
+      "to": "canvas_fill"
+    },
+    {
+      "from": "display_surfaces",
+      "offset": 621,
+      "to": "canvas_fill"
+    },
+    {
+      "from": "display_step",
+      "offset": 130,
+      "to": "dbcs_classifier"
+    },
+    {
+      "from": "display_step",
+      "offset": 619,
+      "to": "display_draw"
+    },
+    {
+      "from": "display_step",
+      "offset": 962,
+      "to": "display_draw"
+    },
+    {
+      "from": "display_newline",
+      "offset": 360,
+      "to": "display_clear"
+    },
+    {
+      "from": "display_clear",
+      "offset": 124,
+      "to": "canvas_fill"
+    },
+    {
+      "from": "display_draw",
+      "offset": 144,
+      "to": "glyph_draw"
+    },
+    {
+      "from": "display_draw",
+      "offset": 348,
+      "to": "canvas_mix"
+    },
+    {
+      "from": "display_draw",
+      "offset": 456,
+      "to": "canvas_mix"
+    },
+    {
+      "from": "display_compose",
+      "offset": 247,
+      "to": "canvas_mix"
+    },
+    {
+      "from": "display_compose",
+      "offset": 316,
+      "to": "canvas_mix"
+    },
+    {
+      "from": "display_compose_rect",
+      "offset": 115,
+      "to": "canvas_mix"
+    },
+    {
+      "from": "display_compose_rect",
+      "offset": 182,
+      "to": "canvas_mix"
+    },
+    {
+      "from": "canvas_release",
+      "offset": 38,
+      "to": "canvas_reset"
+    },
+    {
+      "from": "canvas_initialize",
+      "offset": 25,
+      "to": "canvas_release"
+    },
+    {
+      "from": "canvas_construct",
+      "offset": 10,
+      "to": "canvas_reset"
+    },
+    {
+      "from": "display_surfaces",
+      "offset": 189,
+      "to": "canvas_construct"
+    },
+    {
+      "from": "display_surfaces",
+      "offset": 266,
+      "to": "canvas_construct"
+    },
+    {
+      "from": "display_step",
+      "offset": 423,
+      "to": "display_bounds"
+    },
+    {
+      "from": "display_step",
+      "offset": 458,
+      "to": "display_wrap_character"
+    },
+    {
+      "from": "display_step",
+      "offset": 511,
+      "to": "display_open_quote"
+    },
+    {
+      "from": "display_step",
+      "offset": 554,
+      "to": "display_close_quote"
+    },
+    {
+      "from": "display_step",
+      "offset": 795,
+      "to": "display_bounds"
+    },
+    {
+      "from": "display_step",
+      "offset": 830,
+      "to": "display_wrap_character"
+    },
+    {
+      "from": "display_step",
+      "offset": 857,
+      "to": "display_open_quote"
+    },
+    {
+      "from": "display_step",
+      "offset": 897,
+      "to": "display_close_quote"
+    },
+    {
+      "from": "glyph_draw",
+      "offset": 139,
+      "to": "glyph_raster_gray"
+    },
+    {
+      "from": "glyph_draw",
+      "offset": 161,
+      "to": "glyph_raster_mono"
+    }
+  ],
+  "displayPointers": [
+    {
+      "from": "display_callbacks",
+      "offset": 51,
+      "to": "display_step"
+    },
+    {
+      "from": "display_callbacks",
+      "offset": 64,
+      "to": "display_newline"
+    },
+    {
+      "from": "display_callbacks",
+      "offset": 77,
+      "to": "display_clear"
+    },
+    {
+      "from": "display_callbacks",
+      "offset": 38,
+      "pattern": "55 8B EC 51 89 4D FC 33 C0 8B E5 5D C3"
+    },
+    {
+      "from": "display_callbacks",
+      "offset": 90,
+      "pattern": "55 8B EC 51 89 4D FC 33 C0 8B E5 5D C3"
+    }
+  ],
+  "displayImports": [
+    {
+      "from": "display_draw",
+      "offset": 82,
+      "dll": "user32.dll",
+      "symbol": "GetDC"
+    },
+    {
+      "from": "display_draw",
+      "offset": 172,
+      "dll": "user32.dll",
+      "symbol": "ReleaseDC"
+    },
+    {
+      "from": "canvas_release",
+      "offset": 16,
+      "dll": "gdi32.dll",
+      "symbol": "GdiFlush"
+    },
+    {
+      "from": "canvas_release",
+      "offset": 29,
+      "dll": "gdi32.dll",
+      "symbol": "DeleteObject"
+    },
+    {
+      "from": "canvas_initialize",
+      "offset": 413,
+      "dll": "user32.dll",
+      "symbol": "GetDC"
+    },
+    {
+      "from": "canvas_initialize",
+      "offset": 443,
+      "dll": "gdi32.dll",
+      "symbol": "CreateDIBSection"
+    },
+    {
+      "from": "canvas_initialize",
+      "offset": 461,
+      "dll": "user32.dll",
+      "symbol": "ReleaseDC"
+    },
+    {
+      "from": "canvas_present",
+      "offset": 13,
+      "dll": "gdi32.dll",
+      "symbol": "CreateCompatibleDC"
+    },
+    {
+      "from": "canvas_present",
+      "offset": 33,
+      "dll": "gdi32.dll",
+      "symbol": "SelectObject"
+    },
+    {
+      "from": "canvas_present",
+      "offset": 79,
+      "dll": "gdi32.dll",
+      "symbol": "BitBlt"
+    },
+    {
+      "from": "canvas_present",
+      "offset": 85,
+      "dll": "gdi32.dll",
+      "symbol": "GdiFlush"
+    },
+    {
+      "from": "canvas_present",
+      "offset": 99,
+      "dll": "gdi32.dll",
+      "symbol": "SelectObject"
+    },
+    {
+      "from": "canvas_present",
+      "offset": 109,
+      "dll": "gdi32.dll",
+      "symbol": "DeleteDC"
+    },
+    {
+      "from": "canvas_present_rect",
+      "offset": 13,
+      "dll": "gdi32.dll",
+      "symbol": "CreateCompatibleDC"
+    },
+    {
+      "from": "canvas_present_rect",
+      "offset": 33,
+      "dll": "gdi32.dll",
+      "symbol": "SelectObject"
+    },
+    {
+      "from": "canvas_present_rect",
+      "offset": 95,
+      "dll": "gdi32.dll",
+      "symbol": "BitBlt"
+    },
+    {
+      "from": "canvas_present_rect",
+      "offset": 101,
+      "dll": "gdi32.dll",
+      "symbol": "GdiFlush"
+    },
+    {
+      "from": "canvas_present_rect",
+      "offset": 115,
+      "dll": "gdi32.dll",
+      "symbol": "SelectObject"
+    },
+    {
+      "from": "canvas_present_rect",
+      "offset": 125,
+      "dll": "gdi32.dll",
+      "symbol": "DeleteDC"
+    }
+  ],
+  "displayData": [
+    {
+      "name": "wrap_single",
+      "from": "display_wrap_character",
+      "offset": 56,
+      "pattern": "00 3F 00 00 00 21 00 00 00 2C 00 00 00 2E 00 00 00 29 00 00 00 5D 00 00 00 7D 00 00 00 20 00 00"
+    },
+    {
+      "name": "wrap_double",
+      "from": "display_wrap_character",
+      "offset": 103,
+      "pattern": "48 81 00 00 49 81 00 00 41 81 00 00 42 81 00 00 43 81 00 00 6A 81 00 00 6C 81 00 00 6E 81 00 00 70 81 00 00 72 81 00 00 74 81 00 00 76 81 00 00 78 81 00 00"
+    },
+    {
+      "name": "open_single",
+      "from": "display_open_quote",
+      "offset": 56,
+      "pattern": "00 28 00 00 00 5B 00 00 00 7B 00 00"
+    },
+    {
+      "name": "open_double",
+      "from": "display_open_quote",
+      "offset": 103,
+      "pattern": "69 81 00 00 6B 81 00 00 6D 81 00 00 6F 81 00 00 71 81 00 00 73 81 00 00 75 81 00 00 77 81 00 00"
+    },
+    {
+      "name": "close_single",
+      "from": "display_close_quote",
+      "offset": 56,
+      "pattern": "00 29 00 00 00 5D 00 00 00 7D 00 00"
+    },
+    {
+      "name": "close_double",
+      "from": "display_close_quote",
+      "offset": 103,
+      "pattern": "6A 81 00 00 6C 81 00 00 6E 81 00 00 70 81 00 00 72 81 00 00 74 81 00 00 76 81 00 00 78 81 00 00"
+    },
+    {
+      "name": "mix_tail_short",
+      "from": "canvas_mix",
+      "offset": 295,
+      "pattern": "00 00 00 00 01 00 00 00 02 00 00 00 03 00 00 00 04 00 00 00 05 00 00 00 06 00 00 00 07 00 00 00"
+    },
+    {
+      "name": "mix_tail_wide",
+      "from": "canvas_mix",
+      "offset": 693,
+      "pattern": "00 00 00 00 01 00 00 00 02 00 00 00 03 00 00 00 04 00 00 00 05 00 00 00 06 00 00 00 07 00 00 00"
+    }
+  ],
+  "presentationFunctions": [
+    {
+      "name": "scene_redraw",
+      "pattern": "55 8B EC 6A FF 68 ?? ?? ?? ?? 64 A1 00 00 00 00 50 81 EC AC 05 00 00 A1 ?? ?? ?? ?? 33 C5 89 45 F0 50 8D 45 F4 64 A3 00 00 00 00 8D 8D A0 FA FF FF E8 ?? ?? ?? ?? C7 45 FC 00 00 00 00 8B 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? A1 ?? ?? ?? ?? 50 8B 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 8B 0D ?? ?? ?? ?? 51 8B 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 8B 15 ?? ?? ?? ?? 52 8B 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? A1 ?? ?? ?? ?? 50 8B 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? C7 85 84 FA FF FF 00 00 00 00 8B 0D ?? ?? ?? ?? 89 8D 5C FA FF FF 83 BD 5C FA FF FF 00 74 0C 8B 15 ?? ?? ?? ?? 89 95 84 FA FF FF C7 85 9C FA FF FF 00 00 00 00 EB 0F 8B 85 9C FA FF FF 83 C0 01 89 85 9C FA FF FF 8B 8D 9C FA FF FF 3B 0D ?? ?? ?? ?? 0F 8D 9C 01 00 00 83 BD 84 FA FF FF 00 74 24 69 95 9C FA FF FF 50 05 00 00 03 15 ?? ?? ?? ?? 39 95 84 FA FF FF 75 0C B9 ?? ?? ?? ?? E8 ?? ?? ?? ?? EB B2 69 85 9C FA FF FF 50 05 00 00 8B 0D ?? ?? ?? ?? 8B 94 01 00 01 00 00 89 95 48 FA FF FF 83 BD 48 FA FF FF 00 74 0C C7 85 80 FA FF FF 01 00 00 00 EB 0A C7 85 80 FA FF FF 00 00 00 00 0F B6 85 80 FA FF FF 85 C0 0F 84 1F 01 00 00 C6 85 9B FA FF FF 01 69 8D 9C FA FF FF 50 05 00 00 03 0D ?? ?? ?? ?? 51 8D 8D A0 FA FF FF E8 ?? ?? ?? ?? 0F B6 95 9B FA FF FF 85 D2 0F 84 B5 00 00 00 8D 8D A0 FA FF FF FF 55 E0 89 85 78 FA FF FF 8B 85 78 FA FF FF 89 85 88 FA FF FF 83 BD 88 FA FF FF 01 74 17 83 BD 88 FA FF FF 03 74 19 81 BD 88 FA FF FF FF 00 00 00 74 70 EB 75 8D 8D A0 FA FF FF FF 55 E4 EB 6A 8D 8D A0 FA FF FF FF 55 E8 8D 8D 64 FB FF FF 89 8D 94 FA FF FF 8B 95 94 FA FF FF 8B 42 04 50 8B 8D 94 FA FF FF 8B 11 52 8B 85 94 FA FF FF 8B 48 0C 51 8B 95 94 FA FF FF 8B 42 08 50 8B 8D 94 FA FF FF 8B 51 04 52 8B 85 94 FA FF FF 8B 08 51 8B 15 ?? ?? ?? ?? 52 8B 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? EB 07 C6 85 9B FA FF FF 00 E9 3C FF FF FF 8B 85 D8 FA FF FF 89 85 6C FA FF FF 69 8D 9C FA FF FF 50 05 00 00 8B 15 ?? ?? ?? ?? 8B 44 0A 38 89 85 4C FA FF FF 8B 8D 6C FA FF FF 51 8B 8D 4C FA FF FF E8 ?? ?? ?? ?? E9 43 FE FF FF 8B 15 ?? ?? ?? ?? 89 95 64 FA FF FF 8B 85 64 FA FF FF 8B 88 14 01 00 00 51 FF 15 ?? ?? ?? ?? 89 85 7C FA FF FF 8B 95 7C FA FF FF 52 8B 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? A1 ?? ?? ?? ?? 89 85 54 FA FF FF 8B 8D 7C FA FF FF 51 8B 95 54 FA FF FF 8B 82 14 01 00 00 50 FF 15 ?? ?? ?? ?? C7 85 9C FA FF FF 00 00 00 00 EB 0F 8B 8D 9C FA FF FF 83 C1 01 89 8D 9C FA FF FF 8B 15 ?? ?? ?? ?? 8B 42 08 89 85 74 FA FF FF 8B 8D 9C FA FF FF 3B 8D 74 FA FF FF 0F 8D A7 00 00 00 69 95 9C FA FF FF 80 01 00 00 A1 ?? ?? ?? ?? 8B 48 04 83 3C 11 00 0F 84 86 00 00 00 69 95 9C FA FF FF 80 01 00 00 A1 ?? ?? ?? ?? 8B 48 04 8B 14 11 89 95 70 FA FF FF 8B 85 70 FA FF FF 89 85 8C FA FF FF 83 BD 8C FA FF FF 00 74 32 8B 8D 8C FA FF FF E8 ?? ?? ?? ?? B9 01 00 00 00 83 E1 01 74 0F 8B 95 8C FA FF FF 52 E8 ?? ?? ?? ?? 83 C4 04 8B 85 8C FA FF FF 89 85 68 FA FF FF EB 0A C7 85 68 FA FF FF 00 00 00 00 69 8D 9C FA FF FF 80 01 00 00 8B 15 ?? ?? ?? ?? 8B 42 04 C7 04 08 00 00 00 00 E9 29 FF FF FF C7 85 9C FA FF FF 00 00 00 00 EB 0F 8B 8D 9C FA FF FF 83 C1 01 89 8D 9C FA FF FF 8B 15 ?? ?? ?? ?? 8B 42 14 89 85 60 FA FF FF 8B 8D 9C FA FF FF 3B 8D 60 FA FF FF 0F 8D A7 00 00 00 69 95 9C FA FF FF 80 01 00 00 A1 ?? ?? ?? ?? 8B 48 10 83 3C 11 00 0F 84 86 00 00 00 69 95 9C FA FF FF 80 01 00 00 A1 ?? ?? ?? ?? 8B 48 10 8B 14 11 89 95 58 FA FF FF 8B 85 58 FA FF FF 89 85 90 FA FF FF 83 BD 90 FA FF FF 00 74 32 8B 8D 90 FA FF FF E8 ?? ?? ?? ?? B9 01 00 00 00 83 E1 01 74 0F 8B 95 90 FA FF FF 52 E8 ?? ?? ?? ?? 83 C4 04 8B 85 90 FA FF FF 89 85 50 FA FF FF EB 0A C7 85 50 FA FF FF 00 00 00 00 69 8D 9C FA FF FF 80 01 00 00 8B 15 ?? ?? ?? ?? 8B 42 10 C7 04 08 00 00 00 00 E9 29 FF FF FF C7 45 FC FF FF FF FF 8D 8D A0 FA FF FF E8 ?? ?? ?? ?? 8B 4D F4 64 89 0D 00 00 00 00 59 8B 4D F0 33 CD E8 ?? ?? ?? ?? 8B E5 5D C3"
+    },
+    {
+      "name": "scene_message_compose",
+      "pattern": "55 8B EC A1 ?? ?? ?? ?? 50 8B 0D ?? ?? ?? ?? 51 69 4D 08 50 05 00 00 03 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 5D C3"
+    },
+    {
+      "name": "canvas_copy",
+      "pattern": "55 8B EC 83 EC 24 89 4D F0 6A 00 FF 15 ?? ?? ?? ?? 89 45 F4 8B 45 F4 50 FF 15 ?? ?? ?? ?? 89 45 F8 8B 4D F4 51 FF 15 ?? ?? ?? ?? 89 45 FC 8B 55 F0 8B 42 34 50 8B 4D F8 51 FF 15 ?? ?? ?? ?? 89 45 DC 8B 55 08 8B 42 34 89 45 EC 8B 4D EC 51 8B 55 FC 52 FF 15 ?? ?? ?? ?? 89 45 E0 8B 45 08 8B 48 08 89 4D E8 8B 55 08 8B 42 04 89 45 E4 68 20 00 CC 00 6A 00 6A 00 8B 4D FC 51 8B 55 E8 52 8B 45 E4 50 6A 00 6A 00 8B 4D F8 51 FF 15 ?? ?? ?? ?? FF 15 ?? ?? ?? ?? 8B 55 E0 52 8B 45 FC 50 FF 15 ?? ?? ?? ?? 8B 4D DC 51 8B 55 F8 52 FF 15 ?? ?? ?? ?? 8B 45 FC 50 FF 15 ?? ?? ?? ?? 8B 4D F8 51 FF 15 ?? ?? ?? ?? 8B 55 F4 52 6A 00 FF 15 ?? ?? ?? ?? 8B E5 5D C2 04 00"
+    },
+    {
+      "name": "canvas_copy_rect",
+      "pattern": "55 8B EC 83 EC 1C 89 4D F0 6A 00 FF 15 ?? ?? ?? ?? 89 45 F4 8B 45 F4 50 FF 15 ?? ?? ?? ?? 89 45 F8 8B 4D F4 51 FF 15 ?? ?? ?? ?? 89 45 FC 8B 55 F0 8B 42 34 50 8B 4D F8 51 FF 15 ?? ?? ?? ?? 89 45 E4 8B 55 08 8B 42 34 89 45 EC 8B 4D EC 51 8B 55 FC 52 FF 15 ?? ?? ?? ?? 89 45 E8 68 20 00 CC 00 8B 45 20 50 8B 4D 1C 51 8B 55 FC 52 8B 45 18 50 8B 4D 14 51 8B 55 10 52 8B 45 0C 50 8B 4D F8 51 FF 15 ?? ?? ?? ?? FF 15 ?? ?? ?? ?? 8B 55 E8 52 8B 45 FC 50 FF 15 ?? ?? ?? ?? 8B 4D E4 51 8B 55 F8 52 FF 15 ?? ?? ?? ?? 8B 45 FC 50 FF 15 ?? ?? ?? ?? 8B 4D F8 51 FF 15 ?? ?? ?? ?? 8B 55 F4 52 6A 00 FF 15 ?? ?? ?? ?? 8B E5 5D C2 1C 00"
+    },
+    {
+      "name": "canvas_present_full",
+      "pattern": "55 8B EC 51 89 4D FC 6A 00 6A 00 8B 45 FC 8B 48 08 51 8B 55 FC 8B 42 04 50 6A 00 6A 00 8B 4D 08 51 8B 4D FC E8 ?? ?? ?? ?? 8B E5 5D C2 04 00"
+    },
+    {
+      "name": "sprite_scene_build",
+      "pattern": "55 8B EC 83 EC 10 89 4D FC 8B 45 FC 8B 48 08 83 E9 01 89 4D F8 EB 09 8B 55 F8 83 EA 01 89 55 F8 83 7D F8 00 0F 8C 92 01 00 00 69 45 F8 80 01 00 00 8B 4D FC 8B 51 04 0F B6 44 02 34 85 C0 75 02 EB D5 6A 01 8B 4D F8 51 8B 4D FC E8 ?? ?? ?? ?? 0F B6 D0 85 D2 0F 84 5C 01 00 00 69 45 F8 80 01 00 00 8B 4D FC 8B 51 04 83 7C 02 2C 00 7C 1A 8B 45 FC 8B 48 5C 51 6A 01 8B 55 F8 52 8B 4D FC E8 ?? ?? ?? ?? E9 2E 01 00 00 69 45 F8 80 01 00 00 8B 4D FC 8B 51 04 83 3C 02 00 74 15 69 45 F8 80 01 00 00 8B 4D FC 8B 51 04 8B 04 02 89 45 F4 EB 12 69 4D F8 80 01 00 00 8B 55 FC 8B 02 8B 0C 08 89 4D F4 69 55 F8 80 01 00 00 8B 45 FC 8B 48 04 83 7C 11 04 00 7D 3E 8B 55 FC 8B 42 68 50 8B 4D FC 8B 51 64 52 8B 45 FC 8B 48 78 51 8B 55 FC 8B 42 74 50 8B 4D FC 8B 51 70 52 8B 45 FC 8B 48 6C 51 8B 55 F4 52 8B 45 FC 8B 48 5C E8 ?? ?? ?? ?? E9 A2 00 00 00 69 4D F8 80 01 00 00 8B 55 FC 8B 42 04 69 4C 08 04 80 01 00 00 8B 55 FC 8B 42 10 83 3C 08 00 74 23 69 4D F8 80 01 00 00 8B 55 FC 8B 42 04 69 4C 08 04 80 01 00 00 8B 55 FC 8B 42 10 8B 0C 08 89 4D F0 EB 21 69 55 F8 80 01 00 00 8B 45 FC 8B 48 04 69 54 11 04 80 01 00 00 8B 45 FC 8B 48 0C 8B 14 11 89 55 F0 8B 45 F0 50 8B 4D FC 8B 51 68 52 8B 45 FC 8B 48 64 51 8B 55 FC 8B 42 78 50 8B 4D FC 8B 51 74 52 8B 45 FC 8B 48 70 51 8B 55 FC 8B 42 6C 50 8B 4D F4 51 8B 55 FC 8B 4A 5C E8 ?? ?? ?? ?? E9 5B FE FF FF 8B 45 FC 83 B8 90 02 00 00 00 7C 11 8B 4D FC 8B 51 5C 52 6A 01 8B 4D FC E8 ?? ?? ?? ?? 8B E5 5D C3"
+    },
+    {
+      "name": "widget_scene_compose",
+      "pattern": "55 8B EC 83 EC 0C 56 89 4D FC C7 45 F8 00 00 00 00 EB 09 8B 45 F8 83 C0 01 89 45 F8 8B 4D FC 8B 55 F8 3B 11 0F 8D 34 02 00 00 6B 45 F8 58 8B 4D FC 8B 51 14 0F B6 44 02 29 85 C0 0F 84 18 02 00 00 6B 4D F8 58 8B 55 FC 8B 42 14 0F B6 4C 08 28 85 C9 0F 85 E7 00 00 00 8B 55 FC 83 7A 10 00 74 71 8B 45 FC 8B 48 10 51 6B 55 F8 58 8B 45 FC 8B 48 14 8B 54 11 0C 52 6B 45 F8 58 8B 4D FC 8B 51 14 8B 44 02 08 50 6B 4D F8 58 8B 55 FC 8B 42 14 8B 4C 08 14 51 6B 55 F8 58 8B 45 FC 8B 48 14 8B 54 11 10 52 6B 45 F8 58 8B 4D FC 8B 51 14 8B 44 02 04 50 6B 4D F8 58 8B 55 FC 8B 42 14 8B 0C 08 51 8B 55 FC 8B 42 0C 50 8B 4D 08 E8 ?? ?? ?? ?? EB 68 6B 4D F8 58 8B 55 FC 8B 42 14 8B 4C 08 0C 51 6B 55 F8 58 8B 45 FC 8B 48 14 8B 54 11 08 52 6B 45 F8 58 8B 4D FC 8B 51 14 8B 44 02 14 50 6B 4D F8 58 8B 55 FC 8B 42 14 8B 4C 08 10 51 6B 55 F8 58 8B 45 FC 8B 48 14 8B 54 11 04 52 6B 45 F8 58 8B 4D FC 8B 51 14 8B 04 02 50 8B 4D FC 8B 51 0C 52 8B 4D 08 E8 ?? ?? ?? ?? E9 1A 01 00 00 8B 45 FC 8B 48 08 3B 4D F8 75 24 6B 55 F8 58 8B 45 FC 8B 48 14 6B 45 F8 58 8B 75 FC 8B 76 14 8B 44 06 10 8B 4C 11 08 8D 14 41 89 55 F4 EB 1F 6B 45 F8 58 8B 4D FC 8B 51 14 6B 4D F8 58 8B 75 FC 8B 76 14 8B 54 02 08 03 54 0E 10 89 55 F4 8B 45 FC 83 78 10 00 74 66 8B 4D FC 8B 51 10 52 6B 45 F8 58 8B 4D FC 8B 51 14 8B 44 02 0C 50 8B 4D F4 51 6B 55 F8 58 8B 45 FC 8B 48 14 8B 54 11 14 52 6B 45 F8 58 8B 4D FC 8B 51 14 8B 44 02 10 50 6B 4D F8 58 8B 55 FC 8B 42 14 8B 4C 08 04 51 6B 55 F8 58 8B 45 FC 8B 48 14 8B 14 11 52 8B 45 FC 8B 48 0C 51 8B 4D 08 E8 ?? ?? ?? ?? EB 5D 6B 55 F8 58 8B 45 FC 8B 48 14 8B 54 11 0C 52 8B 45 F4 50 6B 4D F8 58 8B 55 FC 8B 42 14 8B 4C 08 14 51 6B 55 F8 58 8B 45 FC 8B 48 14 8B 54 11 10 52 6B 45 F8 58 8B 4D FC 8B 51 14 8B 44 02 04 50 6B 4D F8 58 8B 55 FC 8B 42 14 8B 0C 08 51 8B 55 FC 8B 42 0C 50 8B 4D 08 E8 ?? ?? ?? ?? E9 B5 FD FF FF 5E 8B E5 5D C2 04 00"
+    },
+    {
+      "name": "menu_image_compose",
+      "pattern": "55 8B EC 83 EC 10 89 4D F8 C7 45 F4 00 00 00 00 EB 09 8B 45 F4 83 C0 01 89 45 F4 8B 4D F8 8B 55 F4 3B 11 0F 8D C9 00 00 00 6B 45 F4 44 8B 4D F8 03 41 04 89 45 FC 8B 55 FC 0F B6 42 40 85 C0 74 11 8B 4D FC 8B 51 10 8B 45 FC 03 50 18 89 55 F0 EB 09 8B 4D FC 8B 51 10 89 55 F0 6B 45 F4 44 8B 4D F8 8B 51 04 83 7C 02 10 00 7D 05 E9 81 00 00 00 8B 45 F8 83 78 30 00 74 3E 8B 4D F8 8B 51 30 52 8B 45 FC 8B 48 14 51 8B 55 F0 52 8B 45 FC 8B 48 1C 51 8B 55 FC 8B 42 18 50 8B 4D FC 8B 51 04 52 8B 45 FC 8B 08 51 8B 55 F8 8B 42 2C 50 8B 4D 08 E8 ?? ?? ?? ?? EB 35 8B 4D FC 8B 51 14 52 8B 45 F0 50 8B 4D FC 8B 51 1C 52 8B 45 FC 8B 48 18 51 8B 55 FC 8B 42 04 50 8B 4D FC 8B 11 52 8B 45 F8 8B 48 2C 51 8B 4D 08 E8 ?? ?? ?? ?? E9 20 FF FF FF 8B E5 5D C2 04 00"
+    }
+  ],
+  "presentationCalls": [
+    {
+      "from": "scene_redraw",
+      "offset": 49,
+      "to": "display_construct"
+    },
+    {
+      "from": "scene_redraw",
+      "offset": 67,
+      "to": "sprite_scene_build"
+    },
+    {
+      "from": "scene_redraw",
+      "offset": 84,
+      "to": "canvas_copy"
+    },
+    {
+      "from": "scene_redraw",
+      "offset": 102,
+      "to": "widget_scene_compose"
+    },
+    {
+      "from": "scene_redraw",
+      "offset": 120,
+      "to": "menu_image_compose"
+    },
+    {
+      "from": "scene_redraw",
+      "offset": 137,
+      "to": "canvas_copy"
+    },
+    {
+      "from": "scene_redraw",
+      "offset": 380,
+      "to": "display_copy"
+    },
+    {
+      "from": "scene_redraw",
+      "offset": 562,
+      "to": "canvas_copy_rect"
+    },
+    {
+      "from": "scene_redraw",
+      "offset": 632,
+      "to": "canvas_copy"
+    },
+    {
+      "from": "scene_redraw",
+      "offset": 692,
+      "to": "canvas_present_full"
+    },
+    {
+      "from": "scene_redraw",
+      "offset": 1201,
+      "to": "display_destruct"
+    },
+    {
+      "from": "scene_message_compose",
+      "offset": 29,
+      "to": "display_compose"
+    },
+    {
+      "from": "canvas_present_full",
+      "offset": 36,
+      "to": "canvas_present"
+    },
+    {
+      "from": "sprite_scene_build",
+      "offset": 267,
+      "to": "canvas_copy_rect"
+    },
+    {
+      "from": "sprite_scene_build",
+      "offset": 434,
+      "to": "canvas_mix"
+    },
+    {
+      "from": "widget_scene_compose",
+      "offset": 203,
+      "to": "canvas_mix"
+    },
+    {
+      "from": "widget_scene_compose",
+      "offset": 309,
+      "to": "canvas_copy_rect"
+    },
+    {
+      "from": "widget_scene_compose",
+      "offset": 501,
+      "to": "canvas_mix"
+    },
+    {
+      "from": "widget_scene_compose",
+      "offset": 596,
+      "to": "canvas_copy_rect"
+    },
+    {
+      "from": "menu_image_compose",
+      "offset": 177,
+      "to": "canvas_mix"
+    },
+    {
+      "from": "menu_image_compose",
+      "offset": 232,
+      "to": "canvas_copy_rect"
+    }
+  ],
+  "presentationImports": [
+    {
+      "from": "scene_redraw",
+      "offset": 667,
+      "dll": "user32.dll",
+      "symbol": "GetDC"
+    },
+    {
+      "from": "scene_redraw",
+      "offset": 728,
+      "dll": "user32.dll",
+      "symbol": "ReleaseDC"
+    },
+    {
+      "from": "canvas_copy",
+      "offset": 11,
+      "dll": "user32.dll",
+      "symbol": "GetDC"
+    },
+    {
+      "from": "canvas_copy",
+      "offset": 24,
+      "dll": "gdi32.dll",
+      "symbol": "CreateCompatibleDC"
+    },
+    {
+      "from": "canvas_copy",
+      "offset": 37,
+      "dll": "gdi32.dll",
+      "symbol": "CreateCompatibleDC"
+    },
+    {
+      "from": "canvas_copy",
+      "offset": 57,
+      "dll": "gdi32.dll",
+      "symbol": "SelectObject"
+    },
+    {
+      "from": "canvas_copy",
+      "offset": 83,
+      "dll": "gdi32.dll",
+      "symbol": "SelectObject"
+    },
+    {
+      "from": "canvas_copy",
+      "offset": 139,
+      "dll": "gdi32.dll",
+      "symbol": "BitBlt"
+    },
+    {
+      "from": "canvas_copy",
+      "offset": 145,
+      "dll": "gdi32.dll",
+      "symbol": "GdiFlush"
+    },
+    {
+      "from": "canvas_copy",
+      "offset": 159,
+      "dll": "gdi32.dll",
+      "symbol": "SelectObject"
+    },
+    {
+      "from": "canvas_copy",
+      "offset": 173,
+      "dll": "gdi32.dll",
+      "symbol": "SelectObject"
+    },
+    {
+      "from": "canvas_copy",
+      "offset": 183,
+      "dll": "gdi32.dll",
+      "symbol": "DeleteDC"
+    },
+    {
+      "from": "canvas_copy",
+      "offset": 193,
+      "dll": "gdi32.dll",
+      "symbol": "DeleteDC"
+    },
+    {
+      "from": "canvas_copy",
+      "offset": 205,
+      "dll": "user32.dll",
+      "symbol": "ReleaseDC"
+    },
+    {
+      "from": "canvas_copy_rect",
+      "offset": 11,
+      "dll": "user32.dll",
+      "symbol": "GetDC"
+    },
+    {
+      "from": "canvas_copy_rect",
+      "offset": 24,
+      "dll": "gdi32.dll",
+      "symbol": "CreateCompatibleDC"
+    },
+    {
+      "from": "canvas_copy_rect",
+      "offset": 37,
+      "dll": "gdi32.dll",
+      "symbol": "CreateCompatibleDC"
+    },
+    {
+      "from": "canvas_copy_rect",
+      "offset": 57,
+      "dll": "gdi32.dll",
+      "symbol": "SelectObject"
+    },
+    {
+      "from": "canvas_copy_rect",
+      "offset": 83,
+      "dll": "gdi32.dll",
+      "symbol": "SelectObject"
+    },
+    {
+      "from": "canvas_copy_rect",
+      "offset": 129,
+      "dll": "gdi32.dll",
+      "symbol": "BitBlt"
+    },
+    {
+      "from": "canvas_copy_rect",
+      "offset": 135,
+      "dll": "gdi32.dll",
+      "symbol": "GdiFlush"
+    },
+    {
+      "from": "canvas_copy_rect",
+      "offset": 149,
+      "dll": "gdi32.dll",
+      "symbol": "SelectObject"
+    },
+    {
+      "from": "canvas_copy_rect",
+      "offset": 163,
+      "dll": "gdi32.dll",
+      "symbol": "SelectObject"
+    },
+    {
+      "from": "canvas_copy_rect",
+      "offset": 173,
+      "dll": "gdi32.dll",
+      "symbol": "DeleteDC"
+    },
+    {
+      "from": "canvas_copy_rect",
+      "offset": 183,
+      "dll": "gdi32.dll",
+      "symbol": "DeleteDC"
+    },
+    {
+      "from": "canvas_copy_rect",
+      "offset": 195,
+      "dll": "user32.dll",
+      "symbol": "ReleaseDC"
+    }
+  ],
+  "presentationGlobals": [
+    {
+      "from": "scene_redraw",
+      "offset": 63,
+      "name": "sprites",
+      "size": 4
+    },
+    {
+      "from": "scene_redraw",
+      "offset": 73,
+      "name": "background",
+      "size": 4
+    },
+    {
+      "from": "scene_redraw",
+      "offset": 80,
+      "name": "base_image",
+      "size": 4
+    },
+    {
+      "from": "scene_redraw",
+      "offset": 91,
+      "name": "background",
+      "size": 4
+    },
+    {
+      "from": "scene_redraw",
+      "offset": 98,
+      "name": "widget_images",
+      "size": 4
+    },
+    {
+      "from": "scene_redraw",
+      "offset": 109,
+      "name": "background",
+      "size": 4
+    },
+    {
+      "from": "scene_redraw",
+      "offset": 116,
+      "name": "menu_images",
+      "size": 4
+    },
+    {
+      "from": "scene_redraw",
+      "offset": 126,
+      "name": "background",
+      "size": 4
+    },
+    {
+      "from": "scene_redraw",
+      "offset": 133,
+      "name": "output",
+      "size": 4
+    },
+    {
+      "from": "scene_redraw",
+      "offset": 154,
+      "name": "choice_count",
+      "size": 4
+    },
+    {
+      "from": "scene_redraw",
+      "offset": 175,
+      "name": "choice_renderer",
+      "size": 28
+    },
+    {
+      "from": "scene_redraw",
+      "offset": 220,
+      "name": "message_count",
+      "size": 4
+    },
+    {
+      "from": "scene_redraw",
+      "offset": 251,
+      "name": "messages",
+      "size": 4
+    },
+    {
+      "from": "scene_redraw",
+      "offset": 264,
+      "name": "choice_renderer",
+      "size": 28
+    },
+    {
+      "from": "scene_redraw",
+      "offset": 287,
+      "name": "messages",
+      "size": 4
+    },
+    {
+      "from": "scene_redraw",
+      "offset": 369,
+      "name": "messages",
+      "size": 4
+    },
+    {
+      "from": "scene_redraw",
+      "offset": 551,
+      "name": "background",
+      "size": 4
+    },
+    {
+      "from": "scene_redraw",
+      "offset": 558,
+      "name": "output",
+      "size": 4
+    },
+    {
+      "from": "scene_redraw",
+      "offset": 605,
+      "name": "messages",
+      "size": 4
+    },
+    {
+      "from": "scene_redraw",
+      "offset": 644,
+      "name": "window",
+      "size": 4
+    },
+    {
+      "from": "scene_redraw",
+      "offset": 688,
+      "name": "output",
+      "size": 4
+    },
+    {
+      "from": "scene_redraw",
+      "offset": 698,
+      "name": "window",
+      "size": 4
+    },
+    {
+      "from": "scene_redraw",
+      "offset": 763,
+      "name": "sprites",
+      "size": 4
+    },
+    {
+      "from": "scene_redraw",
+      "offset": 805,
+      "name": "sprites",
+      "size": 4
+    },
+    {
+      "from": "scene_redraw",
+      "offset": 833,
+      "name": "sprites",
+      "size": 4
+    },
+    {
+      "from": "scene_redraw",
+      "offset": 942,
+      "name": "sprites",
+      "size": 4
+    },
+    {
+      "from": "scene_redraw",
+      "offset": 990,
+      "name": "sprites",
+      "size": 4
+    },
+    {
+      "from": "scene_redraw",
+      "offset": 1032,
+      "name": "sprites",
+      "size": 4
+    },
+    {
+      "from": "scene_redraw",
+      "offset": 1060,
+      "name": "sprites",
+      "size": 4
+    },
+    {
+      "from": "scene_redraw",
+      "offset": 1169,
+      "name": "sprites",
+      "size": 4
+    },
+    {
+      "from": "scene_message_compose",
+      "offset": 4,
+      "name": "height",
+      "size": 4
+    },
+    {
+      "from": "scene_message_compose",
+      "offset": 11,
+      "name": "width",
+      "size": 4
+    },
+    {
+      "from": "scene_message_compose",
+      "offset": 25,
+      "name": "messages",
+      "size": 4
+    },
+    {
+      "from": "message_copy",
+      "offset": 60,
+      "name": "messages",
+      "size": 4
+    },
+    {
+      "from": "message_restore",
+      "offset": 30,
+      "name": "messages",
+      "size": 4
+    }
+  ],
+  "presentationPhases": [
+    {
+      "from": "scene_redraw",
+      "offset": 142,
+      "name": "background_ready",
+      "pattern": "C7 85 84 FA FF FF 00 00 00 00 8B 0D ?? ?? ?? ?? 89 8D"
+    },
+    {
+      "from": "scene_redraw",
+      "offset": 642,
+      "name": "messages_complete",
+      "pattern": "8B 15 ?? ?? ?? ?? 89 95 64 FA FF FF 8B 85 64 FA FF FF"
+    },
+    {
+      "from": "scene_redraw",
+      "offset": 697,
+      "name": "scene_present_return",
+      "dcFrameOffset": -1412,
+      "pattern": "A1 ?? ?? ?? ?? 89 85 54 FA FF FF 8B 8D 7C FA FF FF 51"
+    }
+  ],
+  "refreshPhases": [
+    { "from": "canvas_present_rect", "offset": 0, "name": "refresh_enter", "pattern": "55 8B EC 83 EC 0C 89 4D F8" },
+    { "from": "canvas_present_rect", "offset": 107, "name": "refresh_present_return", "dcFrameOffset": 8, "objectFrameOffset": -8, "pattern": "8B 45 F4 50 8B 4D FC 51 FF 15 ?? ?? ?? ?? 8B 55 FC 52 FF 15 ?? ?? ?? ?? 8B E5 5D C2 08 00" }
+  ],
+  "choiceFunctions": [
+    {
+      "name": "choice_display",
+      "pattern": "55 8B EC 83 EC 30 89 4D FC 6B 45 08 1C 8B 4D FC 8B 51 04 8B 44 02 10 89 45 E4 8B 4D E4 51 8B 55 FC 8B 0A E8 ?? ?? ?? ?? 6B 45 08 1C 8B 4D FC 8B 51 04 8B 44 02 04 89 45 DC 6B 4D 08 1C 8B 55 FC 8B 42 04 8B 0C 08 89 4D E0 8B 55 FC 8B 02 89 45 F8 8B 4D F8 8B 55 E0 89 91 E4 00 00 00 8B 45 F8 8B 4D DC 89 88 E8 00 00 00 8B 55 FC 8B 02 89 45 F4 8B 55 F4 8B 4D F4 8B 82 40 05 00 00 FF D0 89 45 D8 8B 4D D8 89 4D F0 83 7D F0 01 74 0B 81 7D F0 FF 00 00 00 74 58 EB 58 8B 55 FC 8B 02 89 45 EC 8B 55 EC 8B 4D EC 8B 82 44 05 00 00 FF D0 8B 4D FC 8B 11 8B 82 E8 00 00 00 89 45 D0 6B 4D 08 1C 8B 55 FC 8B 42 04 8B 0C 08 89 4D D4 8B 55 FC 8B 02 89 45 E8 8B 4D E8 8B 55 D4 89 91 E4 00 00 00 8B 45 E8 8B 4D D0 89 88 E8 00 00 00 EB 02 EB 0D BA 01 00 00 00 85 D2 0F 85 6B FF FF FF 8B E5 5D C2 04 00"
+    },
+    {
+      "name": "choice_redraw",
+      "pattern": "55 8B EC 83 EC 24 89 4D F8 8B 45 F8 8B 08 89 4D F0 8B 55 F0 8B 4D F0 8B 82 48 05 00 00 FF D0 8B 4D F8 8A 51 18 88 55 FF 0F B6 45 FF 85 C0 75 5D 8B 4D F8 8B 51 10 89 55 E0 8B 45 E0 50 8B 4D F8 8B 09 E8 ?? ?? ?? ?? 8B 55 F8 8B 02 89 45 EC 8B 55 EC 8B 4D EC 8B 82 40 05 00 00 FF D0 89 45 E4 8B 4D E4 89 4D DC 83 7D DC 01 74 02 EB 16 8B 55 F8 8B 02 89 45 E8 8B 55 E8 8B 4D E8 8B 82 44 05 00 00 FF D0 81 7D E4 FF 00 00 00 75 BA C7 45 F4 00 00 00 00 EB 09 8B 4D F4 83 C1 01 89 4D F4 8B 55 F8 8B 45 F4 3B 42 08 7D 0E 8B 4D F4 51 8B 4D F8 E8 ?? ?? ?? ?? EB DE 8B E5 5D C3"
+    }
+  ],
+  "hoverFunctions": [
+    {
+      "name": "choice_hover",
+      "pattern": "55 8B EC 83 EC 18 6B 45 08 1C 03 05 ?? ?? ?? ?? 89 45 FC 8B 4D FC 8B 51 04 83 C2 03 8B 45 FC 89 50 04 8B 4D FC 51 8B 15 ?? ?? ?? ?? 52 8B 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 0F B6 45 0C 85 C0 0F 84 B7 00 00 00 8B 4D FC 8B 51 04 8B 45 FC 03 50 0C 89 55 EC 8B 4D FC 8B 11 8B 45 FC 03 50 08 89 55 E8 8B 4D FC 8B 51 04 89 55 F4 EB 09 8B 45 F4 83 C0 01 89 45 F4 8B 4D F4 3B 4D EC 7D 7E 8B 55 FC 8B 02 89 45 F8 EB 09 8B 4D F8 83 C1 01 89 4D F8 8B 55 F8 3B 55 E8 7D 5E A1 ?? ?? ?? ?? 8B 4D F8 0F AF 48 40 8B 15 ?? ?? ?? ?? 8B 42 08 2B 45 F4 83 E8 01 8B 15 ?? ?? ?? ?? 0F AF 42 3C 8B 15 ?? ?? ?? ?? 8B 52 38 03 D0 03 D1 89 55 F0 8B 45 F0 0F B6 08 81 F9 80 00 00 00 7C 08 8B 55 F0 C6 02 FF EB 11 8B 45 F0 0F B6 08 81 C1 80 00 00 00 8B 55 F0 88 0A EB 91 E9 71 FF FF FF 8B 45 FC 8B 48 04 83 E9 03 8B 55 FC 89 4A 04 8B 45 FC 8B 48 0C 51 8B 55 FC 8B 42 08 50 8B 4D FC 8B 51 04 83 C2 02 52 8B 45 FC 8B 08 83 E9 01 51 BA 04 00 00 00 D1 E2 69 8A ?? ?? ?? ?? 50 05 00 00 03 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 8B E5 5D C3"
+    },
+    {
+      "name": "canvas_copy_same_rect",
+      "pattern": "55 8B EC 83 EC 1C 89 4D F0 6A 00 FF 15 ?? ?? ?? ?? 89 45 F4 8B 45 F4 50 FF 15 ?? ?? ?? ?? 89 45 F8 8B 4D F4 51 FF 15 ?? ?? ?? ?? 89 45 FC 8B 55 F0 8B 42 34 50 8B 4D F8 51 FF 15 ?? ?? ?? ?? 89 45 E4 8B 55 08 8B 42 34 89 45 EC 8B 4D EC 51 8B 55 FC 52 FF 15 ?? ?? ?? ?? 89 45 E8 68 20 00 CC 00 8B 45 0C 8B 48 04 51 8B 55 0C 8B 02 50 8B 4D FC 51 8B 55 0C 8B 42 0C 50 8B 4D 0C 8B 51 08 52 8B 45 0C 8B 48 04 51 8B 55 0C 8B 02 50 8B 4D F8 51 FF 15 ?? ?? ?? ?? FF 15 ?? ?? ?? ?? 8B 55 E8 52 8B 45 FC 50 FF 15 ?? ?? ?? ?? 8B 4D E4 51 8B 55 F8 52 FF 15 ?? ?? ?? ?? 8B 45 FC 50 FF 15 ?? ?? ?? ?? 8B 4D F8 51 FF 15 ?? ?? ?? ?? 8B 55 F4 52 6A 00 FF 15 ?? ?? ?? ?? 8B E5 5D C2 08 00"
+    }
+  ],
+  "hoverCalls": [
+    { "from": "choice_hover", "offset": 51, "to": "canvas_copy_same_rect" },
+    { "from": "choice_hover", "offset": 322, "to": "display_compose_rect" }
+  ],
+  "hoverImports": [
+    { "from": "canvas_copy_same_rect", "offset": 11, "dll": "user32.dll", "symbol": "GetDC" },
+    { "from": "canvas_copy_same_rect", "offset": 24, "dll": "gdi32.dll", "symbol": "CreateCompatibleDC" },
+    { "from": "canvas_copy_same_rect", "offset": 37, "dll": "gdi32.dll", "symbol": "CreateCompatibleDC" },
+    { "from": "canvas_copy_same_rect", "offset": 57, "dll": "gdi32.dll", "symbol": "SelectObject" },
+    { "from": "canvas_copy_same_rect", "offset": 83, "dll": "gdi32.dll", "symbol": "SelectObject" },
+    { "from": "canvas_copy_same_rect", "offset": 145, "dll": "gdi32.dll", "symbol": "BitBlt" },
+    { "from": "canvas_copy_same_rect", "offset": 151, "dll": "gdi32.dll", "symbol": "GdiFlush" },
+    { "from": "canvas_copy_same_rect", "offset": 165, "dll": "gdi32.dll", "symbol": "SelectObject" },
+    { "from": "canvas_copy_same_rect", "offset": 179, "dll": "gdi32.dll", "symbol": "SelectObject" },
+    { "from": "canvas_copy_same_rect", "offset": 189, "dll": "gdi32.dll", "symbol": "DeleteDC" },
+    { "from": "canvas_copy_same_rect", "offset": 199, "dll": "gdi32.dll", "symbol": "DeleteDC" },
+    { "from": "canvas_copy_same_rect", "offset": 211, "dll": "user32.dll", "symbol": "ReleaseDC" }
+  ],
+  "hoverGlobals": [
+    { "from": "choice_hover", "offset": 12, "name": "choice_records", "size": 4 },
+    { "from": "choice_hover", "offset": 40, "name": "background", "size": 4 },
+    { "from": "choice_hover", "offset": 47, "name": "output", "size": 4 },
+    { "from": "choice_hover", "offset": 153, "name": "output", "size": 4 },
+    { "from": "choice_hover", "offset": 166, "name": "output", "size": 4 },
+    { "from": "choice_hover", "offset": 181, "name": "output", "size": 4 },
+    { "from": "choice_hover", "offset": 191, "name": "output", "size": 4 },
+    { "from": "choice_hover", "offset": 308, "name": "choice_state", "size": 12 },
+    { "from": "choice_hover", "offset": 318, "name": "messages", "size": 4 }
+  ],
+  "choiceCalls": [
+    {
+      "from": "scene_redraw",
+      "offset": 268,
+      "to": "choice_redraw"
+    },
+    {
+      "from": "choice_display",
+      "offset": 35,
+      "to": "message_setter"
+    },
+    {
+      "from": "choice_redraw",
+      "offset": 66,
+      "to": "message_setter"
+    },
+    {
+      "from": "choice_redraw",
+      "offset": 177,
+      "to": "choice_display"
+    }
+  ]
+}

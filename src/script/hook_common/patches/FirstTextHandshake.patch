@@ -1,0 +1,101 @@
+--- /dev/null
++++ b/src/NativeImpl/LunaHook/include/firsttext.h
+@@ -0,0 +1,33 @@
++#pragma once
++
++// firstTextEventName 为具体文本线程生成跨进程注册确认事件名
++inline void firstTextEventName(char *name, size_t size, const ThreadParam &tp)
++{
++    sprintf_s(name, size, "DANGO_THREAD_READY.%lu.%llu.%llu.%llu",
++        static_cast<unsigned long>(tp.processId), static_cast<unsigned long long>(tp.addr),
++        static_cast<unsigned long long>(tp.ctx), static_cast<unsigned long long>(tp.ctx2));
++}
++
++// createFirstTextEvent 在发送首次文本前建立注册确认通道
++inline HANDLE createFirstTextEvent(const ThreadParam &tp)
++{
++    char name[192];
++    firstTextEventName(name, sizeof(name), tp);
++    return CreateEventA(nullptr, TRUE, FALSE, name);
++}
++
++// acknowledgeFirstText 在线程创建回调完成后确认当前文本可检查注入状态
++inline void acknowledgeFirstText(const ThreadParam &tp)
++{
++    char name[192];
++    firstTextEventName(name, sizeof(name), tp);
++    HANDLE event = OpenEventA(EVENT_MODIFY_STATE, FALSE, name);
++    if (event)
++    {
++        SetEvent(event);
++        CloseHandle(event);
++    }
++}
++
++// firstTextRegistrationTimeout 限制断连时的首次注册等待，不作为正常显示延迟
++constexpr DWORD firstTextRegistrationTimeout = 1000;
+--- a/src/NativeImpl/LunaHook/LunaHook/texthook.cc
++++ b/src/NativeImpl/LunaHook/LunaHook/texthook.cc
+@@ -2,2 +2,3 @@
+ #include "MinHook.h"
++#include "firsttext.h"
+ #include "veh_hook.h"
+@@ -245,2 +246,4 @@
+ 	TextBuffer buff{buffer->data, 0};
++	HANDLE registrationEvent = nullptr;
++	HANDLE translationEvent = nullptr;
+ 	_InterlockedIncrement((long *)&useCount);
+@@ -374 +377 @@
+-		bool canembed;
++		bool canembed = false;
+@@ -393 +396,12 @@
++		if (canembed && host_connected)
++		{
++			// 先保留响应事件，避免本地缓存立即返回时通知先于等待句柄被销毁
++			translationEvent = prepareEmbedResponseEvent(hp, buff);
++			if (!check_embed_able(tp))
++				registrationEvent = createFirstTextEvent(tp);
++		}
+ 		TextOutput(tp, hp, buffer, buff.size);
++		// Bridge先执行线程注册和注入选择，当前首句再决定是否等待译文
++		if (registrationEvent && WaitForSingleObject(registrationEvent, firstTextRegistrationTimeout) != WAIT_OBJECT_0)
++			canembed = false;
++		MemoryBarrier();
+@@ -437 +451,5 @@
++	if (registrationEvent)
++		CloseHandle(registrationEvent);
++	if (translationEvent)
++		CloseHandle(translationEvent);
+ 	_InterlockedDecrement((long *)&useCount);
+--- a/src/NativeImpl/LunaHook/LunaHook/embed_util.h
++++ b/src/NativeImpl/LunaHook/LunaHook/embed_util.h
+@@ -35 +35,2 @@
+ bool checktranslatedok(TextBuffer buff);
++HANDLE prepareEmbedResponseEvent(HookParam &hp, TextBuffer buff);
+--- a/src/NativeImpl/LunaHook/LunaHook/embed_util.cc
++++ b/src/NativeImpl/LunaHook/LunaHook/embed_util.cc
+@@ -221 +221,15 @@
++// prepareEmbedResponseEvent 在原文送出前持有本句译文通知，防止快速回填丢失唤醒
++HANDLE prepareEmbedResponseEvent(HookParam &hp, TextBuffer buff)
++{
++  if (!commonsharedmem)
++    return nullptr;
++  auto origin = commonparsestring(buff.data, buff.size, &hp, commonsharedmem->codepage ? commonsharedmem->codepage : 932);
++  if (!origin || origin->empty())
++    return nullptr;
++  char eventname[192];
++  sprintf_s(eventname, sizeof(eventname), LUNA_EMBED_notify_event, GetCurrentProcessId(),
++      simplehash::djb2_n2(reinterpret_cast<const unsigned char *>(origin->data()), origin->size() * sizeof(wchar_t)));
++  return CreateEventA(nullptr, TRUE, FALSE, eventname);
++}
++
+ bool waitforevent(UINT32 timems, const ThreadParam &tp, const std::wstring &origin)
+--- a/src/NativeImpl/LunaHook/LunaHost/host.cpp
++++ b/src/NativeImpl/LunaHook/LunaHost/host.cpp
+@@ -1 +1,2 @@
+ #include "host.h"
++#include "firsttext.h"
+@@ -243 +244,3 @@
++				MemoryBarrier();
++				acknowledgeFirstText(tp);
+ 				thread->second.hp.type = data->type;

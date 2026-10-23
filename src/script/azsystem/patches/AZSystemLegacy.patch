@@ -1,0 +1,58 @@
+--- a/src/NativeImpl/LunaHook/LunaHook/engine32/AZSystem.cpp
++++ b/src/NativeImpl/LunaHook/LunaHook/engine32/AZSystem.cpp
+@@ -1,4 +1,42 @@
+ #include "AZSystem.h"
++#include "AZSystemEmbed.h"
++namespace
++{
++// attachAZSystem2007TextRenderer 为2007年前后版本挂接完整Shift-JIS排版字符串入口
++bool attachAZSystem2007TextRenderer(const BYTE *bytes, std::size_t size, const char *name)
++{
++  const auto addr = MemDbg::findBytes(bytes, size, processStartAddress, processStopAddress);
++  if (!addr)
++    return false;
++  HookParam hp;
++  hp.address = addr;
++  hp.offset = stackoffset(3);
++  hp.type = USING_STRING | NO_CONTEXT;
++  return NewHook(hp, name);
++}
++
++// attachAZSystem2007Text 挂接三种布局共用的完整字符串排版入口
++bool attachAZSystem2007Text()
++{
++  const BYTE leftLayout[] = {
++      0x55, 0x8b, 0xec, 0x83, 0xec, 0x10, 0x53, 0x56,
++      0x8b, 0xf1, 0x8b, 0x06, 0xff, 0x50, 0x24, 0x85,
++      0xc0, 0x74, XX, 0x83, 0x7d, 0x20, 0x00};
++  const BYTE centerLayout[] = {
++      0x55, 0x8b, 0xec, 0x83, 0xec, 0x18, 0x56, 0x8b,
++      0xf1, 0x8b, 0x06, 0xff, 0x50, 0x24, 0x85, 0xc0,
++      0x74, XX, 0x83, 0x7d, 0x20, 0x00};
++  const BYTE rightLayout[] = {
++      0x55, 0x8b, 0xec, 0x83, 0xec, 0x10, 0x56, 0x8b,
++      0xf1, 0x8b, 0x06, 0xff, 0x50, 0x24, 0x85, 0xc0,
++      0x74, XX, 0x83, 0x7d, 0x20, 0x00};
++  const bool leftFound = attachAZSystem2007TextRenderer(leftLayout, sizeof(leftLayout), "AZSystem2007A");
++  const bool centerFound = attachAZSystem2007TextRenderer(centerLayout, sizeof(centerLayout), "AZSystem2007B");
++  const bool rightFound = attachAZSystem2007TextRenderer(rightLayout, sizeof(rightLayout), "AZSystem2007C");
++  return leftFound || centerFound || rightFound;
++}
++} // namespace
++
+ // Triptych
+ // https://vndb.org/v537
+ bool AZSystem::attach_function()
+@@ -5,2 +43,4 @@
+ {
++  if (attachAZSystemDisplayArguments())
++    return true;
+   BYTE bytes[] = {
+@@ -16,6 +56,6 @@ bool AZSystem::attach_function()
+       0x66, 0x89, 0x54, 0x24, 0x10,
+       0x03, 0xf9};
+   auto addr = MemDbg::findBytes(bytes, sizeof(bytes), processStartAddress, processStopAddress);
+   if (!addr)
+-    return false;
++    return attachAZSystem2007Text();
+   HookParam hp;

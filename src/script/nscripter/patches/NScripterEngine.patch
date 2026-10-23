@@ -1,0 +1,5 @@
+--- a/src/NativeImpl/LunaHook/LunaHook/enginecollection32.cpp
++++ b/src/NativeImpl/LunaHook/LunaHook/enginecollection32.cpp
+@@ -168,1 +168,2 @@
+ #include "engine32/WillPlus.h"
++#include "engine32/NScripter.h"

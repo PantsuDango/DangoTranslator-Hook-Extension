@@ -1,0 +1,597 @@
+
+#include "MinHook.h"
+void HIJACK();
+void detachall();
+#if EMUADD_MAP_MULTI
+std::unordered_map<uint32_t, std::pair<JITTYPE, std::set<uintptr_t>>> emuaddr2jitaddr;
+#else
+std::unordered_map<uint32_t, std::pair<JITTYPE, uintptr_t>> emuaddr2jitaddr;
+#endif
+std::unordered_map<uintptr_t, std::pair<JITTYPE, uint32_t>> jitaddr2emuaddr;
+std::mutex maplock;
+std::vector<HookParam> JIT_HP_Records;
+std::mutex JIT_HP_Records_lock;
+HMODULE hLUNAHOOKDLL;
+WinMutex viewMutex;
+CommonSharedMem *commonsharedmem;
+std::vector<std::wstring> checkFileHelperVector;
+Synchronized<std::map<uint32_t, std::pair<std::string, HookParam>>> delayinserthook;
+namespace
+{
+	AutoHandle<> hookPipe = INVALID_HANDLE_VALUE,
+				 mappedFile = INVALID_HANDLE_VALUE,
+				 mappedFile3 = INVALID_HANDLE_VALUE;
+	TextHook (*hooks)[MAX_HOOK];
+	int currentHook = 0;
+}
+void Send_I18N_Keys()
+{
+	for (auto &[_en, data] : TR.get_hook())
+	{
+		HostInfoI18NReq resp(_en, data.raw());
+		WriteFile(hookPipe, &resp, sizeof(resp), DUMMY, nullptr);
+	}
+}
+static void ParseCommand(HANDLE hostPipe, bool &running)
+{
+	DWORD count = 0;
+	static BYTE buffer[PIPE_BUFFER_SIZE] = {};
+	if (!running)
+		return;
+	if (!ReadFile(hostPipe, buffer, PIPE_BUFFER_SIZE, &count, nullptr))
+	{
+		running = false;
+		return;
+	}
+	switch (*(HostCommandType *)buffer)
+	{
+	case HOST_COMMAND_I18N_RESPONSE:
+	{
+		auto info = (I18NResponse *)buffer;
+		TR.get_hook()[info->enum_].set(info->result);
+	}
+	break;
+	case HOST_COMMAND_NEW_HOOK:
+	{
+		auto info = (InsertHookCmd *)buffer;
+		static int userHooks = 0;
+		NewHook(info->hp, ("UserHook" + std::to_string(userHooks += 1)).c_str());
+	}
+	break;
+	case HOST_COMMAND_INSERT_PC_HOOKS:
+	{
+		auto info = (InsertPCHooksCmd *)buffer;
+		if (info->which == 0)
+			PcHooks::hookGdiGdiplusD3dxFunctions();
+		else if (info->which == 1)
+			PcHooks::hookOtherPcFunctions();
+	}
+	break;
+	case HOST_COMMAND_I18N_QUERY:
+	{
+		Send_I18N_Keys();
+	}
+	break;
+	case HOST_COMMAND_REMOVE_HOOK:
+	{
+		auto info = (RemoveHookCmd *)buffer;
+		RemoveHook(info->address, 0);
+	}
+	break;
+	case HOST_COMMAND_FIND_HOOK:
+	{
+		auto info = (FindHookCmd *)buffer;
+		if (*info->sp.text)
+			SearchForText(info->sp.text, info->sp.codepage);
+		else
+			SearchForHooks(info->sp);
+	}
+	break;
+	case HOST_COMMAND_DETACH:
+	{
+		running = false;
+	}
+	break;
+	}
+}
+void CommunicationInitialize(HANDLE hostPipe, HANDLE hookPipe, bool &running)
+{
+	// 1. hook->host
+	// WORD[4] version
+	// GUID
+	DWORD count;
+	WriteFile(hookPipe, LUNA_VERSION, sizeof(LUNA_VERSION), &count, nullptr);
+	WriteFile(hookPipe, &compatible_sig, sizeof(compatible_sig), &count, nullptr);
+	// 2. checkFile
+	// host->currentpath
+	// hook->list files
+	auto currpath = std::filesystem::current_path().wstring();
+	int size = currpath.size();
+	WriteFile(hookPipe, &size, 4, &count, nullptr);
+	WriteFile(hookPipe, currpath.c_str(), 2 * currpath.size(), &count, nullptr);
+	while (true)
+	{
+		ReadFile(hostPipe, &size, sizeof(size), &count, nullptr);
+		if (size == -1)
+			break;
+		std::wstring fname;
+		fname.resize(size);
+		ReadFile(hostPipe, fname.data(), 2 * size, &count, nullptr);
+		checkFileHelperVector.push_back(fname);
+	}
+	// 3. hook->host && host->hook
+	// i18n key & result
+	for (auto &[_en, data] : TR.get_hook())
+	{
+		HostInfoI18NReq req(_en, data.raw());
+		WriteFile(hookPipe, &req, sizeof(req), DUMMY, nullptr);
+		ParseCommand(hostPipe, running);
+		if (!running)
+			return;
+	}
+	WriteFile(hookPipe, &HostInfoPreparedOK, sizeof(HostInfoPreparedOK), DUMMY, nullptr);
+}
+DWORD WINAPI Pipe(LPVOID)
+{
+	for (bool running = true; running; hookPipe = INVALID_HANDLE_VALUE)
+	{
+		AutoHandle<> hostPipe = INVALID_HANDLE_VALUE;
+
+		while (!hostPipe || !hookPipe)
+		{
+			// WinMutex connectionMutex(CONNECTING_MUTEX, &allAccess);
+			// std::scoped_lock lock(connectionMutex);
+			WaitForSingleObject(AutoHandle<>(CreateEventW(&allAccess, FALSE, FALSE, (std::wstring(PIPE_AVAILABLE_EVENT) + std::to_wstring(GetCurrentProcessId())).c_str())), INFINITE);
+			hostPipe = CreateFileW((std::wstring(HOST_PIPE) + std::to_wstring(GetCurrentProcessId())).c_str(), GENERIC_READ | FILE_WRITE_ATTRIBUTES, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+			hookPipe = CreateFileW((std::wstring(HOOK_PIPE) + std::to_wstring(GetCurrentProcessId())).c_str(), GENERIC_WRITE, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+		}
+		DWORD mode = PIPE_READMODE_MESSAGE;
+		SetNamedPipeHandleState(hostPipe, &mode, NULL, NULL);
+
+		CommunicationInitialize(hostPipe, hookPipe, running);
+		HIJACK();
+		host_connected = true;
+		while (running)
+			ParseCommand(hostPipe, running);
+	}
+
+	if (dont_detach)
+	{
+		host_connected = false;
+		return Pipe(0);
+	}
+	else
+	{
+		isDetachClear = true;
+		MH_Uninitialize();
+		for (auto &hook : *hooks)
+			hook.Clear();
+		FreeLibraryAndExitThread(GetModuleHandleW(LUNA_HOOK_DLL), 0);
+	}
+}
+
+void TextOutput(const ThreadParam &tp, const HookParam &hp, TextOutput_T *buffer, int len)
+{
+	if (!len)
+		return;
+	memcpy(&buffer->tp, &tp, sizeof(tp));
+	memcpy(&buffer->hp, &hp, sizeof(hp));
+	WriteFile(hookPipe, buffer, sizeof(TextOutput_T) + len, DUMMY, nullptr);
+}
+
+namespace Msg
+{
+#define vhostinfoA(_type, cp)                                         \
+	{                                                                 \
+		va_list args;                                                 \
+		va_start(args, text);                                         \
+		HostInfoNotif buffer;                                         \
+		buffer.type = _type;                                          \
+		buffer.codepage = cp;                                         \
+		vsnprintf(buffer.message, MESSAGE_SIZE, text, args);          \
+		va_end(args);                                                 \
+		WriteFile(hookPipe, &buffer, sizeof(buffer), DUMMY, nullptr); \
+	}
+
+#define vhostinfoW(_type)                                                   \
+	{                                                                       \
+		va_list args;                                                       \
+		va_start(args, text);                                               \
+		HostInfoNotifW buffer;                                              \
+		buffer.type = _type;                                                \
+		_vsnwprintf_s(buffer.message, MESSAGE_SIZE, _TRUNCATE, text, args); \
+		va_end(args);                                                       \
+		WriteFile(hookPipe, &buffer, sizeof(buffer), DUMMY, nullptr);       \
+	}
+
+#define definefunction(funcname, type)             \
+	template <>                                    \
+	void funcname<char>(LPCSTR text, ...)          \
+		vhostinfoA(type, CP_UTF8);                 \
+	template <>                                    \
+	void funcname<wchar_t>(LPCWSTR text, ...)      \
+		vhostinfoW(type);                          \
+	void funcname(UINT codepage, LPCSTR text, ...) \
+		vhostinfoA(type, codepage);
+
+	definefunction(Log, HOSTINFO::Console);
+	definefunction(Warning, HOSTINFO::Warning);
+	definefunction(EmuConnected, HOSTINFO::EmuConnected);
+	definefunction(EmuWarning, HOSTINFO::EmuWarning);
+	void EmuGameInfo(const char *id, const char *title, const char *version)
+	{
+		EmuGameInfoNotif buffer(id, title, version);
+		WriteFile(hookPipe, &buffer, sizeof(buffer), DUMMY, nullptr);
+	}
+
+#undef definefunction
+#undef vhostinfoW
+#undef vhostinfoA
+}
+Synchronized<std::unordered_map<uintptr_t, std::wstring>> modulecache;
+std::wstring &querymodule(uintptr_t addr)
+{
+	auto &re = modulecache.Acquire().contents;
+	auto found = re.find(addr);
+	if (found != re.end())
+		return found->second;
+	WCHAR fn[MAX_PATH];
+	if (GetModuleFileNameW((HMODULE)addr, fn, MAX_PATH))
+	{
+		re[addr] = wcsrchr(fn, L'\\') + 1;
+	}
+	else
+	{
+		re[addr] = L"";
+	}
+	return re[addr];
+}
+void NotifyHookFound(HookParam hp, wchar_t *text)
+{
+	if (hp.jittype == JITTYPE::PC)
+		if (!(hp.type & MODULE_OFFSET))
+			if (MEMORY_BASIC_INFORMATION info = {}; VirtualQuery((LPCVOID)hp.address, &info, sizeof(info)))
+			{
+				auto mm = querymodule((uintptr_t)info.AllocationBase);
+				if (mm.size())
+				{
+					hp.type |= MODULE_OFFSET;
+					hp.address -= (uint64_t)info.AllocationBase;
+					wcsncpy_s(hp.module, mm.c_str(), MAX_MODULE_SIZE - 1);
+				}
+			}
+	HookFoundNotif buffer(hp, text);
+	WriteFile(hookPipe, &buffer, sizeof(buffer), DUMMY, nullptr);
+}
+void NotifyHookRemove(uint64_t addr, LPCSTR name)
+{
+	if (name)
+		Msg::Log(TR[REMOVING_HOOK], name);
+	HookRemovedNotif buffer(addr);
+	WriteFile(hookPipe, &buffer, sizeof(buffer), DUMMY, nullptr);
+}
+void NotifyHookInserting(uint64_t addr, wchar_t hookcode[])
+{
+	HookInsertingNotif buffer(addr);
+	wcscpy_s(buffer.hookcode, ARRAYSIZE(buffer.hookcode), hookcode);
+	WriteFile(hookPipe, &buffer, sizeof(buffer), DUMMY, nullptr);
+}
+BOOL WINAPI DllMain(HINSTANCE hModule, DWORD fdwReason, LPVOID)
+{
+	switch (fdwReason)
+	{
+	case DLL_PROCESS_ATTACH:
+	{
+		hLUNAHOOKDLL = hModule;
+		viewMutex = WinMutex(ITH_HOOKMAN_MUTEX_ + std::to_wstring(GetCurrentProcessId()), &allAccess);
+		if (GetLastError() == ERROR_ALREADY_EXISTS)
+			return FALSE;
+		DisableThreadLibraryCalls(hModule);
+
+		auto createfm = [](AutoHandle<> &handle, void **ptr, DWORD sz, const std::wstring &name)
+		{
+			handle = CreateFileMappingW(INVALID_HANDLE_VALUE, &allAccess, PAGE_EXECUTE_READWRITE, 0, sz, name.c_str());
+			*ptr = MapViewOfFile(handle, FILE_MAP_ALL_ACCESS | FILE_MAP_EXECUTE, 0, 0, sz);
+			memset(*ptr, 0, sz);
+		};
+		hooks = (decltype(hooks))new TextHook[MAX_HOOK];
+		VirtualProtect((LPVOID)hooks, sizeof(TextHook) * MAX_HOOK, PAGE_EXECUTE_READWRITE, DUMMY);
+		createfm(mappedFile3, (void **)&commonsharedmem, sizeof(CommonSharedMem), EMBED_SHARED_MEM + std::to_wstring(GetCurrentProcessId()));
+
+		MH_Initialize();
+
+		// https://stackoverflow.com/questions/331536/windows-threading-beginthread-vs-beginthreadex-vs-createthread-c
+		// CreateThread is part of kernel32.dll (a DLL that all processes have already loaded into memory by the time any user DLLs are brought in), it is among a very small set of functions that are safe to call from DllMain (...). _beginthreadex offers no guarantee of safety and I would imagine the fact that it implicitly requires the Visual C++ runtime to be initialized will be the source of deadlocks if you attempt to do this from DllMain.
+		CloseHandle(CreateThread(nullptr, 0, Pipe, nullptr, 0, nullptr)); // Using std::thread here = deadlock
+	}
+	break;
+	case DLL_PROCESS_DETACH:
+	{
+		detachall();
+		MH_Uninitialize();
+		delete[] hooks;
+		UnmapViewOfFile(commonsharedmem);
+	}
+	break;
+	}
+	return TRUE;
+}
+int HookStrLen(HookParam *hp, BYTE *data)
+{
+	if (data == 0)
+		return 0;
+
+	if (hp->type & CODEC_UTF16)
+		return wcsnlen((wchar_t *)data, TEXT_BUFFER_SIZE) * 2;
+	else if (hp->type & CODEC_UTF32)
+		return strlenEx((char32_t *)data) * 4;
+	else
+		return strnlen((char *)data, TEXT_BUFFER_SIZE);
+}
+void jitaddrclear()
+{
+	{
+		std::lock_guard _(maplock);
+		emuaddr2jitaddr.clear();
+		jitaddr2emuaddr.clear();
+	}
+	{
+		std::lock_guard __(JIT_HP_Records_lock);
+		JIT_HP_Records.clear();
+	}
+}
+void jitaddraddr(uint32_t em_addr, uintptr_t jitaddr, JITTYPE jittype)
+{
+	std::lock_guard _(maplock);
+#if EMUADD_MAP_MULTI
+	if (emuaddr2jitaddr.find(em_addr) == emuaddr2jitaddr.end())
+		emuaddr2jitaddr[em_addr] = {jittype, {}};
+	emuaddr2jitaddr[em_addr].second.insert(jitaddr);
+#else
+	emuaddr2jitaddr[em_addr] = {jittype, jitaddr};
+#endif
+	jitaddr2emuaddr[jitaddr] = {jittype, em_addr};
+}
+bool NewHook_1(HookParam &hp, LPCSTR lpname, bool silentlyfail = false)
+{
+	if (++currentHook >= MAX_HOOK)
+	{
+		Msg::Log(TR[TOO_MANY_HOOKS]);
+		return false;
+	}
+	if (lpname && *lpname)
+		strncpy_s(hp.name, lpname, HOOK_NAME_SIZE - 1);
+
+	wcscpy_s(hp.hookcode, HOOKCODE_LEN, HookCode::Generate(hp, GetCurrentProcessId()).c_str());
+	if (!(*hooks)[currentHook].Insert(hp))
+	{
+		if (!silentlyfail)
+			Msg::Log(TR[InsertHookFailed], WideStringToString(hp.hookcode).c_str());
+		(*hooks)[currentHook].Clear();
+		return false;
+	}
+	else
+	{
+		if (hp.emu_addr)
+		{
+			Msg::Log("%08X => %p", hp.emu_addr, (uintptr_t)hp.address);
+			std::lock_guard __(JIT_HP_Records_lock);
+			JIT_HP_Records.push_back(hp);
+		}
+		NotifyHookInserting(hp.address, hp.hookcode);
+		return true;
+	}
+}
+void delayinsertadd(HookParam hp, std::string name)
+{
+	delayinserthook->insert(std::make_pair(hp.emu_addr, std::make_pair(name, hp)));
+	Msg::Log(TR[INSERTING_HOOK], name.c_str(), hp.emu_addr);
+}
+void delayinsertNewHook(uint32_t em_address)
+{
+	auto &&_delayinserthook = delayinserthook.Acquire();
+	if (_delayinserthook->find(em_address) == _delayinserthook->end())
+		return;
+	auto h = _delayinserthook->at(em_address);
+	_delayinserthook->erase(em_address);
+	NewHook(h.second, h.first.c_str());
+}
+#ifdef _WIN64
+bool PCSX2_UserHook_delayinsert(uint32_t);
+bool RPCS3_UserHook_insert(HookParam hp, LPCSTR name, std::function<bool(HookParam hp, LPCSTR)>);
+#endif
+bool NewHook_2(HookParam hp, LPCSTR name, bool silentlyfail = false)
+{
+	if (hp.address || hp.jittype == JITTYPE::PC)
+		return NewHook_1(hp, name, silentlyfail);
+	if (hp.jittype == JITTYPE::UNITY)
+	{
+		auto spls = strSplit(hp.function, ":");
+		if (spls.size() != 5)
+		{
+			Msg::Log("invalid");
+			return false;
+		}
+		int argcount;
+		try
+		{
+			argcount = std::stoi(spls[4]);
+		}
+		catch (...)
+		{
+			argcount = -1;
+		}
+		hp.address = tryfindmonoil2cpp(spls[0].c_str(), spls[1].c_str(), spls[2].c_str(), spls[3].c_str(), argcount);
+
+		if (!hp.address)
+		{
+			Msg::Log("not find");
+			return false;
+		}
+		return NewHook_1(hp, name, silentlyfail);
+	}
+	std::lock_guard _(maplock);
+// 下面的是手动插入
+#ifdef _WIN64
+	if (hp.jittype == JITTYPE::PCSX2)
+	{
+		if (hp.type & DIRECT_READ)
+		{
+			hp.address = PCSX2Types::emu_addr(hp.emu_addr);
+			return NewHook_1(hp, name, silentlyfail);
+		}
+		else if (PCSX2_UserHook_delayinsert(hp.emu_addr))
+			return true;
+		else if (!emuaddr2jitaddr.count(hp.emu_addr))
+		{
+			delayinsertadd(hp, name);
+			return true;
+		}
+	}
+	else if (hp.jittype == JITTYPE::RPCS3)
+	{
+		if (hp.type & DIRECT_READ)
+		{
+			hp.address = RPCS3::emu_addr(hp.emu_addr);
+			return NewHook_1(hp, name, silentlyfail);
+		}
+		else
+		{
+			return RPCS3_UserHook_insert(hp, name, [=](auto _, auto _2)
+										 { return NewHook_1(_, _2, silentlyfail); });
+		}
+	}
+	else
+#endif
+	{
+		if (!emuaddr2jitaddr.count(hp.emu_addr))
+		{
+			delayinsertadd(hp, name);
+			return true;
+		}
+	}
+	strcpy_s(hp.function, ARRAYSIZE(hp.function), "");
+	wcscpy_s(hp.module, ARRAYSIZE(hp.module), L"");
+	hp.type &= ~MODULE_OFFSET;
+
+	hp.jittype = emuaddr2jitaddr[hp.emu_addr].first;
+#if EMUADD_MAP_MULTI
+	bool succ = false;
+	for (auto addr : emuaddr2jitaddr[hp.emu_addr].second)
+	{
+		hp.address = addr;
+		succ |= NewHook_1(hp, name, silentlyfail);
+	}
+	return succ;
+#else
+	hp.address = emuaddr2jitaddr[hp.emu_addr].second;
+	return NewHook_1(hp, name, silentlyfail);
+#endif
+}
+
+bool NewHook(HookParam hp, LPCSTR name)
+{
+	auto retry = (!(hp.type & BREAK_POINT)) && commonsharedmem->tryvehhook;
+	if (NewHook_2(hp, name, retry))
+		return true;
+	if (!retry)
+		return false;
+	hp.type |= BREAK_POINT;
+	return NewHook_2(hp, name);
+}
+void RemoveHook(uint64_t addr, int maxOffset)
+{
+	for (auto &hook : *hooks)
+		if (abs((long long)(hook.address - addr)) <= maxOffset)
+			return hook.Clear();
+}
+std::string LoadResData(LPCWSTR pszResID, LPCWSTR _type)
+{
+	HMODULE hModule = hLUNAHOOKDLL;
+	HRSRC hRsrc = ::FindResourceW(hModule, pszResID, _type);
+	if (!hRsrc)
+		return "";
+	DWORD len = SizeofResource(hModule, hRsrc);
+	BYTE *lpRsrc = (BYTE *)LoadResource(hModule, hRsrc);
+	if (!lpRsrc)
+		return "";
+	HGLOBAL m_hMem = GlobalAlloc(GMEM_FIXED, len);
+	BYTE *pmem = (BYTE *)GlobalLock(m_hMem);
+	memcpy(pmem, lpRsrc, len);
+	auto data = std::string((char *)pmem, len);
+	GlobalUnlock(m_hMem);
+	GlobalFree(m_hMem);
+	FreeResource(lpRsrc);
+	return data;
+}
+bool is_memory_readable_ex(void *ptr, size_t size)
+{
+	if (!ptr)
+		return false;
+
+	MEMORY_BASIC_INFORMATION mbi = {};
+	SIZE_T result = VirtualQuery(ptr, &mbi, sizeof(mbi));
+
+	if (result == 0)
+	{
+		return false;
+	}
+	if (mbi.State != MEM_COMMIT)
+	{
+		return false;
+	}
+	DWORD readable_protections = PAGE_READONLY | PAGE_READWRITE |
+								 PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE |
+								 PAGE_WRITECOPY | PAGE_EXECUTE_WRITECOPY;
+	if (mbi.Protect & PAGE_NOACCESS)
+	{
+		return false;
+	}
+	return (mbi.Protect & readable_protections) != 0 &&
+		   mbi.RegionSize >= size;
+}
+
+static bool _queryversion(WORD *_1, WORD *_2, WORD *_3, WORD *_4)
+{
+	wchar_t fileName[MAX_PATH];
+	GetModuleFileNameW(NULL, fileName, MAX_PATH);
+	DWORD dwHandle;
+	DWORD dwSize = GetFileVersionInfoSizeW(fileName, &dwHandle);
+	if (dwSize == 0)
+	{
+		return false;
+	}
+
+	std::vector<char> versionInfoBuffer(dwSize);
+	if (!GetFileVersionInfoW(fileName, dwHandle, dwSize, versionInfoBuffer.data()))
+	{
+		return false;
+	}
+
+	VS_FIXEDFILEINFO *pFileInfo;
+	UINT fileInfoSize;
+	if (!VerQueryValueW(versionInfoBuffer.data(), L"\\", reinterpret_cast<LPVOID *>(&pFileInfo), &fileInfoSize))
+	{
+		return false;
+	}
+
+	DWORD ms = pFileInfo->dwFileVersionMS;
+	DWORD ls = pFileInfo->dwFileVersionLS;
+
+	WORD majorVersion = HIWORD(ms);
+	WORD minorVersion = LOWORD(ms);
+	WORD buildNumber = HIWORD(ls);
+	WORD revisionNumber = LOWORD(ls);
+	*_1 = majorVersion;
+	*_2 = minorVersion;
+	*_3 = buildNumber;
+	*_4 = revisionNumber;
+	return true;
+}
+std::optional<version_t> queryversion()
+{
+	WORD _1, _2, _3, _4;
+	if (!_queryversion(&_1, &_2, &_3, &_4))
+		return {};
+	return std::make_tuple(_1, _2, _3, _4);
+}

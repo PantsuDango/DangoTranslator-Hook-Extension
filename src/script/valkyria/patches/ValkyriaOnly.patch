@@ -1,0 +1,83 @@
+--- a/src/NativeImpl/LunaHook/LunaHook/CMakeLists.txt
++++ b/src/NativeImpl/LunaHook/LunaHook/CMakeLists.txt
+@@ -1,3 +1,4 @@
++set(DANGO_VALKYRIA_ONLY ON)
+ include_directories(. util engines)
+ if(${CMAKE_SIZEOF_VOID_P} EQUAL 8) 
+ 	aux_source_directory("engine64" enginessrc)
+@@ -7,6 +8,10 @@ else()
+ 	set(collector "enginecollection32.cpp")
+ endif()
+ 
++if(DANGO_VALKYRIA_ONLY)
++	set(enginessrc "engine32/VALKYRIA.cpp")
++endif()
++
+ set_source_files_properties(${enginessrc} PROPERTIES SOURCE_ENCODING "UTF-8")
+ 
+ 
+@@ -26,11 +31,23 @@ set(texthook_src
+ 		veh_hook.cpp
+ ) 
+ add_subdirectory(util)
++if(DANGO_VALKYRIA_ONLY)
++	add_library(dango_valkyria_support INTERFACE)
++	target_sources(dango_valkyria_support INTERFACE
++		engines/mono/impl_mono.cpp
++		engines/mono/monoil2cpp.cpp
++		engines/mono/mono.cpp
++		engines/mono/impl_il2cpp.cpp
++		engines/pchooks/pchooks.cpp
++	)
++else()
+ add_subdirectory(engines)
+ add_subdirectory(emulators)
++endif()
+ 
+ 
+ 
+ add_library(LunaHook MODULE ${texthook_src} resource.rc ${versioninfo})
++target_compile_definitions(LunaHook PRIVATE DANGO_VALKYRIA_ONLY=1)
+ add_library(trhelper ../include/InfoStrings.cpp)
+ target_compile_definitions(trhelper PRIVATE -DBUILD_HOOK=1)
+@@ -43,1 +44,2 @@
+-target_link_libraries(LunaHook PRIVATE trhelper VERSION_DEF Version httpapi ws2_32 Shlwapi pch minhook commonengine emulators utils ${YY_Thunks})
++target_link_libraries(LunaHook PRIVATE trhelper VERSION_DEF Version httpapi ws2_32 Shlwapi pch minhook utils ${YY_Thunks})
++target_link_libraries(LunaHook PRIVATE dango_valkyria_support)
+ 
+--- a/src/NativeImpl/LunaHook/LunaHook/enginecollection32.cpp
++++ b/src/NativeImpl/LunaHook/LunaHook/enginecollection32.cpp
+@@ -227,6 +227,9 @@
+ #include "emulators/ppsspp.h"
+ std::vector<ENGINE *> check_engines()
+ {
++#if defined(DANGO_VALKYRIA_ONLY)
++    return {new VALKYRIA};
++#else
+     return {
+         new LovaGame,
+         new PPSSPPWindows,
+@@ -502,4 +505,5 @@ std::vector<ENGINE *> check_engines()
+         new ivory,
+         new AZSystem,
+     };
+-}
+\ No newline at end of file
++#endif
++}
+--- a/src/NativeImpl/LunaHook/LunaHook/enginecontrol.cpp
++++ b/src/NativeImpl/LunaHook/LunaHook/enginecontrol.cpp
+@@ -150,9 +150,9 @@ void HIJACK()
+         Msg::Log(TR[HIJACK_ERROR]);
+     }
+ 
+-    if (!result)
++    if (!result && !DANGO_VALKYRIA_ONLY)
+     {
+         PcHooks::hookGdiGdiplusD3dxFunctions();
+         PcHooks::hookOtherPcFunctions();
+     }
+-}
+\ No newline at end of file
++}
+

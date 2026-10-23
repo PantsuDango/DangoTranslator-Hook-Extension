@@ -1,0 +1,63 @@
+[
+  {
+    "class": "TDScenarioWindow",
+    "name": "init",
+    "signature": "20|void|12:UnityEngine.TextAsset",
+    "code": "02036f0000000073000000007d0000000002027b000000006f000000007d00000000027b000000001428000000002c16027b00000000027b000000006f000000006f00000000027b000000001428000000002c16027b00000000027b000000006f000000006f0000000002027b000000006f0000000028000000002a",
+    "tokens": {
+      "102": "member:UnityEngine.UI.Text:set_text:20|void|string",
+      "109": "field:TDScenarioWindow:sc:06:12:Scenario",
+      "114": "method:Scenario:getEventList:20|12:System.Collections.Generic.List`1\u003c12:System.Collections.Generic.List`1\u003cstring\u003e\u003e",
+      "119": "method:TDScenarioWindow:runEventList:20|void|12:System.Collections.Generic.List`1\u003c12:System.Collections.Generic.List`1\u003cstring\u003e\u003e",
+      "13": "field:TDScenarioWindow:sc:06:12:Scenario",
+      "20": "field:TDScenarioWindow:sc:06:12:Scenario",
+      "25": "method:Scenario:getCurrentNameID:20|string",
+      "3": "member:UnityEngine.TextAsset:get_text:20|string",
+      "30": "field:TDScenarioWindow:current_name_id:06:string",
+      "36": "field:TDScenarioWindow:namewindow:06:12:UnityEngine.UI.Text",
+      "42": "member:UnityEngine.Object:op_Inequality:00|bool|12:UnityEngine.Object|12:UnityEngine.Object",
+      "50": "field:TDScenarioWindow:namewindow:06:12:UnityEngine.UI.Text",
+      "56": "field:TDScenarioWindow:sc:06:12:Scenario",
+      "61": "method:Scenario:getCurrentName:20|string",
+      "66": "member:UnityEngine.UI.Text:set_text:20|void|string",
+      "72": "field:TDScenarioWindow:textwindow:06:12:UnityEngine.UI.Text",
+      "78": "member:UnityEngine.Object:op_Inequality:00|bool|12:UnityEngine.Object|12:UnityEngine.Object",
+      "8": "method:Scenario:.ctor:20|void|string",
+      "86": "field:TDScenarioWindow:textwindow:06:12:UnityEngine.UI.Text",
+      "92": "field:TDScenarioWindow:sc:06:12:Scenario",
+      "97": "method:Scenario:getCurrentText:20|string"
+    },
+    "locals": "",
+    "exceptions": ""
+  },
+  {
+    "class": "TDScenarioWindow",
+    "name": "nextText",
+    "signature": "20|void",
+    "code": "027b000000002d012a027b000000006f00000000027b000000006f000000002c4f027b00000000027b000000006f000000006f00000000027b00000000027b000000006f000000006f0000000002027b000000006f000000007d0000000002027b000000006f0000000028000000002a0228000000002a",
+    "tokens": {
+      "102": "method:Scenario:getEventList:20|12:System.Collections.Generic.List`1\u003c12:System.Collections.Generic.List`1\u003cstring\u003e\u003e",
+      "107": "method:TDScenarioWindow:runEventList:20|void|12:System.Collections.Generic.List`1\u003c12:System.Collections.Generic.List`1\u003cstring\u003e\u003e",
+      "11": "field:TDScenarioWindow:timer:06:12:WTimer",
+      "114": "method:TDScenarioWindow:novelEndProcess:20|void",
+      "16": "method:WTimer:Reset:20|void",
+      "2": "field:TDScenarioWindow:activef:06:bool",
+      "22": "field:TDScenarioWindow:sc:06:12:Scenario",
+      "27": "method:Scenario:next:20|bool",
+      "35": "field:TDScenarioWindow:namewindow:06:12:UnityEngine.UI.Text",
+      "41": "field:TDScenarioWindow:sc:06:12:Scenario",
+      "46": "method:Scenario:getCurrentName:20|string",
+      "51": "member:UnityEngine.UI.Text:set_text:20|void|string",
+      "57": "field:TDScenarioWindow:textwindow:06:12:UnityEngine.UI.Text",
+      "63": "field:TDScenarioWindow:sc:06:12:Scenario",
+      "68": "method:Scenario:getCurrentText:20|string",
+      "73": "member:UnityEngine.UI.Text:set_text:20|void|string",
+      "80": "field:TDScenarioWindow:sc:06:12:Scenario",
+      "85": "method:Scenario:getCurrentNameID:20|string",
+      "90": "field:TDScenarioWindow:current_name_id:06:string",
+      "97": "field:TDScenarioWindow:sc:06:12:Scenario"
+    },
+    "locals": "",
+    "exceptions": ""
+  }
+]

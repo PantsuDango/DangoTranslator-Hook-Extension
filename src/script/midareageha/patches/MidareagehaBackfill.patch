@@ -1,0 +1,7 @@
+--- a/src/NativeImpl/LunaHook/LunaHook/engine32/MIDAREAGEHA.cpp
++++ b/src/NativeImpl/LunaHook/LunaHook/engine32/MIDAREAGEHA.cpp
+@@ -3,0 +4 @@
++#include "MidareagehaBackfill.h"
+@@ -121,0 +123,2 @@
++    if (MidareagehaBackfill::attach(textOffset))
++        return true;

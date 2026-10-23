@@ -1,0 +1,11 @@
+--- a/src/NativeImpl/LunaHook/LunaHook/main.cc
++++ b/src/NativeImpl/LunaHook/LunaHook/main.cc
+@@ -4,0 +5,3 @@
++#if defined(DANGO_CSYSTEM_ONLY)
++bool CSystemPrepareDetach();
++#endif
+@@ -164,0 +168,4 @@
++#if defined(DANGO_CSYSTEM_ONLY)
++        // The original renderer can still hold a private display-record argument.
++        if (!CSystemPrepareDetach()) { host_connected = false; return Pipe(0); }
++#endif

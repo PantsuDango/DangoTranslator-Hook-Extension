@@ -1,0 +1,33 @@
+--- a/src/NativeImpl/LunaHook/LunaHook/hijackfuns.cc
++++ b/src/NativeImpl/LunaHook/LunaHook/hijackfuns.cc
+@@ -239,1 +239,1 @@
+-    void add(HFONT hf, const LOGFONTW &lf);
++    bool add(HFONT hf, const LOGFONTW &lf);
+@@ -249,4 +249,6 @@
+-  void LogFontManager::add(HFONT hf, const LOGFONTW &lf)
++  bool LogFontManager::add(HFONT hf, const LOGFONTW &lf)
+   {
++    if (!hf || fonts_.size() >= 64) return false;
+     fonts_.push_back(std::make_pair(hf, lf));
++    return true;
+   }
+@@ -278,1 +280,4 @@
+     static LogFontManager fonts_;
++    static std::mutex fontMutex_;
++    std::unique_lock<std::mutex> fontLock_;
++    bool temporaryFont_;
+@@ -290,1 +295,2 @@
+   LogFontManager DCFontSwitcher::fonts_;
++  std::mutex DCFontSwitcher::fontMutex_;
+@@ -293,0 +300,2 @@
++    if (oldFont_ && oldFont_ != HGDI_ERROR) ::SelectObject(hdc_, oldFont_);
++    if (temporaryFont_ && newFont_) ::DeleteObject(newFont_);
+@@ -312,1 +320,1 @@
+-      : hdc_(hdc), oldFont_(nullptr), newFont_(nullptr), newfontname(L"")
++      : fontLock_(fontMutex_), temporaryFont_(false), hdc_(hdc), oldFont_(nullptr), newFont_(nullptr), newfontname(L"")
+@@ -354,1 +362,1 @@
+-    if ((!newFont_) || (newfontname != std::wstring(maybe_disabled_fontFamily())))
++    if (!newFont_)
+@@ -357,1 +365,1 @@
+-      fonts_.add(newFont_, lf);
++      temporaryFont_ = !fonts_.add(newFont_, lf);

@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "functions": [
+    {"name":"reader","pattern":"8D 8B B8 11 00 00 E8 ?? ?? ?? ?? 8D B3 9C 00 00 00 56 8D 8B B8 11 00 00 E8 ?? ?? ?? ?? 8B CE E8 ?? ?? ?? ??","callOffset":24,"target":"copy"},
+    {"name":"copy","pattern":"55 8B EC 53 56 57 68 00 10 00 00 8B D9 6A 00 53 E8 ?? ?? ?? ?? 8D B3 0C 10 00 00 C7 83 00 10 00 00 00 00 00 00 83 C8 FF C7 83 04 10 00 00 00 00 00 00 C7 83 08 10 00 00 00 00 00 00","callOffset":0,"target":""},
+    {"name":"dialogue","pattern":"8D 86 9C 33 00 00 50 FF B6 88 04 01 00 8D 86 B8 11 00 00 FF B6 44 06 01 00 8D 8E C0 F7 00 00 50 FF B6 48 C9 00 00 8D 86 B0 D9 00 00 50 E8 ?? ?? ?? ??","callOffset":45,"target":"render"},
+    {"name":"render","pattern":"55 8B EC 6A FF 68 ?? ?? ?? ?? 64 A1 00 00 00 00 50 81 EC F0 00 00 00 A1 ?? ?? ?? ?? 33 C5 89 45 F0 56 57 50 8D 45 F4 64 A3 00 00 00 00 8B F1 89 B5 04 FF FF FF 8B 45 08 8B 7D 10","callOffset":0,"target":""},
+    {"name":"parser","pattern":"55 8B EC B8 2C 21 00 00 E8 ?? ?? ?? ?? A1 ?? ?? ?? ?? 33 C5 89 45 FC 8B 45 08 53 56 57 68 00 08 00 00 89 85 D4 DE FF FF 33 DB 8D 85 FC F7 FF FF 8B F1","callOffset":0,"target":""},
+    {"name":"restore","pattern":"FF B7 5C 1C 01 00 8D 8F C0 AD 00 00 E8 ?? ?? ?? ?? 8D 85 D8 EE FF FF 50 8D 8F C0 AD 00 00","callOffset":12,"target":"seek"},
+    {"name":"seek","pattern":"55 8B EC 8B 51 04 B8 E3 A9 E7 3B 2B 11 F7 EA C1 FA 0A 8B C2 C1 E8 1F 03 C2 8B 55 08 3B C2 72 1A 39 51 10 7F 15 8B C2 2B 41 10 89 51 10 85 C0 7E 09 69 C0 18 11 00 00 01 41 0C 5D C2 04 00","callOffset":0,"target":""},
+    {"name":"choice0","pattern":"8D 86 B8 11 00 00 50 8D 8E 24 FD 00 00 E8 ?? ?? ?? ?? 5E C3","callOffset":13,"target":"menu"},
+    {"name":"choice1","pattern":"8D 86 B8 11 00 00 50 8D 8E 14 FB 00 00 E8 ?? ?? ?? ?? 33 C9 8D 86 28 03 01 00","callOffset":13,"target":"menu"},
+    {"name":"choice2","pattern":"8D 86 B8 11 00 00 50 8D 8E D0 FB 00 00 E8 ?? ?? ?? ?? 5E C3","callOffset":13,"target":"menu"},
+    {"name":"menu","pattern":"55 8B EC 6A FF 68 ?? ?? ?? ?? 64 A1 00 00 00 00 50 83 EC 30 A1 ?? ?? ?? ?? 33 C5 89 45 F0 53 56 57 50 8D 45 F4 64 A3 00 00 00 00 8B F1 89 75 CC 8B 45 08 33 C9 BB 07 00 00 00","callOffset":0,"target":""}
+  ]
+}

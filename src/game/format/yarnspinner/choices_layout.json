@@ -1,0 +1,475 @@
+{
+  "Assembly-CSharp.dll": [
+    {
+      "class": "CupidChatroom.Yarn.ChatroomView",
+      "code": "027b000000001428000000002c0d027b000000006f000000002d02142a027b000000006f000000002a",
+      "exceptions": "",
+      "handlers": "",
+      "locals": "",
+      "name": "get_CurrentOptionsContainer",
+      "signature": "20|12:UnityEngine.Transform",
+      "tokens": {
+        "16": "field:CupidChatroom.Yarn.ChatroomView:_currentContainer:06:12:UnityEngine.GameObject",
+        "2": "field:CupidChatroom.Yarn.ChatroomView:_currentContainer:06:12:UnityEngine.GameObject",
+        "21": "member:UnityEngine.GameObject:get_activeInHierarchy:20|bool",
+        "31": "field:CupidChatroom.Yarn.ChatroomView:_currentContainer:06:12:UnityEngine.GameObject",
+        "36": "member:UnityEngine.GameObject:get_transform:20|12:UnityEngine.Transform",
+        "8": "member:UnityEngine.Object:op_Inequality:00|bool|12:UnityEngine.Object|12:UnityEngine.Object"
+      }
+    },
+    {
+      "class": "CupidChatroom.Yarn.ChatroomView",
+      "code": "73000000000a06047d0000000006027d00000000027b0000000039a7000000022800000000027b00000000027b000000003c8a00000073000000000b07067d0000000002038e6928000000000c02027b000000001202280000000028000000007d0000000002027b0000000017587d0000000002027b0000000017587d0000000002167d000000000222000080bf7d000000000703089a7d0000000002077b000000007b000000007d000000000207fe060000000073000000007d000000002a0228000000002800000000027b00000000176f00000000027b000000002c16027b00000000027b000000006f000000006f00000000160d2b7f730000000013041104067d0000000003099a130511057b000000002c5e1104027b0000000028000000007d0000000011047b000000006f00000000027b000000006f00000000166f0000000011047b0000000011056f000000001104097d0000000011047b000000001104fe060000000073000000007d000000000917580d09038e693f78ffffff2a",
+      "exceptions": "",
+      "handlers": "",
+      "locals": "07|12:<>c__DisplayClass139_0|12:<>c__DisplayClass139_1|int|int|12:<>c__DisplayClass139_2|12:Yarn.Unity.DialogueOption",
+      "name": "RunOptions",
+      "signature": "20|void|1d:12:Yarn.Unity.DialogueOption|12:System.Action`1<int>",
+      "tokens": {
+        "1": "method:<>c__DisplayClass139_0:.ctor:20|void",
+        "104": "field:CupidChatroom.Yarn.ChatroomView:_restoredCount:06:int",
+        "111": "field:CupidChatroom.Yarn.ChatroomView:_restoredCount:06:int",
+        "118": "field:CupidChatroom.Yarn.ChatroomView:_dialogueIndex:06:int",
+        "125": "field:CupidChatroom.Yarn.ChatroomView:_dialogueIndex:06:int",
+        "132": "field:CupidChatroom.Yarn.ChatroomView:_willBeDeleted:06:bool",
+        "143": "field:CupidChatroom.Yarn.ChatroomView:_currentDelay:06:float",
+        "152": "field:<>c__DisplayClass139_1:picked:06:12:Yarn.Unity.DialogueOption",
+        "159": "field:<>c__DisplayClass139_1:picked:06:12:Yarn.Unity.DialogueOption",
+        "16": "field:<>c__DisplayClass139_0:<>4__this:06:12:CupidChatroom.Yarn.ChatroomView",
+        "164": "member:Yarn.Unity.DialogueOption:Line:06:12:Yarn.Unity.LocalizedLine",
+        "169": "field:CupidChatroom.Yarn.ChatroomView:_currentLine:06:12:Yarn.Unity.LocalizedLine",
+        "177": "method:<>c__DisplayClass139_1:<RunOptions>b__0:20|void",
+        "182": "member:System.Action:.ctor:20|void|object|nativeint",
+        "187": "field:CupidChatroom.Yarn.ChatroomView:_pendingOption:06:12:System.Action",
+        "194": "method:CupidChatroom.Yarn.ChatroomView:EndRestore:20|void",
+        "199": "method:SkipManager:NotifyChoiceShown:00|void",
+        "205": "field:CupidChatroom.Yarn.ChatroomView:_currentContainer:06:12:UnityEngine.GameObject",
+        "211": "member:UnityEngine.GameObject:SetActive:20|void|bool",
+        "217": "field:CupidChatroom.Yarn.ChatroomView:_isDm:06:bool",
+        "22": "field:CupidChatroom.Yarn.ChatroomView:_isRestoring:06:bool",
+        "225": "field:CupidChatroom.Yarn.ChatroomView:_currentContainer:06:12:UnityEngine.GameObject",
+        "231": "field:CupidChatroom.Yarn.ChatroomView:_directMessageManager:06:12:DirectMessageManager",
+        "236": "method:DirectMessageManager:IsRightDM:20|bool",
+        "241": "member:UnityEngine.GameObject:SetActive:20|void|bool",
+        "250": "method:<>c__DisplayClass139_2:.ctor:20|void",
+        "260": "field:<>c__DisplayClass139_2:CS$<>8__locals2:06:12:<>c__DisplayClass139_0",
+        "272": "member:Yarn.Unity.DialogueOption:IsAvailable:06:bool",
+        "282": "field:CupidChatroom.Yarn.ChatroomView:optionPrefab:06:12:Yarn.Unity.OptionView",
+        "287": "generic:member:UnityEngine.Object:Instantiate:10g1|1e:0|1e:0:0a|12:Yarn.Unity.OptionView",
+        "292": "field:<>c__DisplayClass139_2:optionView:06:12:Yarn.Unity.OptionView",
+        "299": "field:<>c__DisplayClass139_2:optionView:06:12:Yarn.Unity.OptionView",
+        "304": "member:UnityEngine.Component:get_transform:20|12:UnityEngine.Transform",
+        "310": "field:CupidChatroom.Yarn.ChatroomView:_currentContainer:06:12:UnityEngine.GameObject",
+        "315": "member:UnityEngine.GameObject:get_transform:20|12:UnityEngine.Transform",
+        "321": "member:UnityEngine.Transform:SetParent:20|void|12:UnityEngine.Transform|bool",
+        "328": "field:<>c__DisplayClass139_2:optionView:06:12:Yarn.Unity.OptionView",
+        "33": "method:CupidChatroom.Yarn.ChatroomView:EnsureRestoreStarted:20|void",
+        "335": "member:Yarn.Unity.OptionView:set_Option:20|void|12:Yarn.Unity.DialogueOption",
+        "343": "field:<>c__DisplayClass139_2:currentIndex:06:int",
+        "350": "field:<>c__DisplayClass139_2:optionView:06:12:Yarn.Unity.OptionView",
+        "358": "method:<>c__DisplayClass139_2:<RunOptions>b__1:20|void|12:Yarn.Unity.DialogueOption",
+        "363": "member:12:System.Action`1<12:Yarn.Unity.DialogueOption>:.ctor:20|void|object|nativeint",
+        "368": "member:Yarn.Unity.OptionView:OnOptionSelected:06:12:System.Action`1<12:Yarn.Unity.DialogueOption>",
+        "39": "field:CupidChatroom.Yarn.ChatroomView:_restoredCount:06:int",
+        "45": "field:CupidChatroom.Yarn.ChatroomView:_loadIndex:06:int",
+        "55": "method:<>c__DisplayClass139_1:.ctor:20|void",
+        "63": "field:<>c__DisplayClass139_1:CS$<>8__locals1:06:12:<>c__DisplayClass139_0",
+        "72": "method:CupidChatroom.Yarn.ChatroomView:NextRestoredChoice:20|int|int",
+        "80": "field:CupidChatroom.Yarn.ChatroomView:_selectedChoices:06:string",
+        "87": "member:System.Int32:ToString:20|string",
+        "9": "field:<>c__DisplayClass139_0:onOptionSelected:06:12:System.Action`1<int>",
+        "92": "member:System.String:Concat:00|string|string|string",
+        "97": "field:CupidChatroom.Yarn.ChatroomView:_selectedChoices:06:string"
+      }
+    },
+    {
+      "class": "CupidChatroom.Yarn.ChatroomView",
+      "code": "037b000000000a037b000000006f000000000b2b68120128000000000c1202280000000072000000006f000000002c4d120228000000000d120228000000001304720000000013051613072b1411057200000000280000000013051107175813071107110432e6060911046f00000000130606110611056f000000000a120128000000002d8fde0e1201fe16000000006f00000000dc062a",
+      "exceptions": "01100000020013007588000e00000000",
+      "handlers": "2|19|117|136|14",
+      "locals": "07|string|11:Enumerator<11:Yarn.Markup.MarkupAttribute>|11:Yarn.Markup.MarkupAttribute|int|int|string|string|int",
+      "name": "GetCensoredText",
+      "signature": "20|string|11:Yarn.Markup.MarkupParseResult",
+      "tokens": {
+        "108": "member:System.String:Substring:20|string|int|int",
+        "120": "member:System.String:Replace:20|string|string|string",
+        "128": "member:11:Enumerator<11:Yarn.Markup.MarkupAttribute>:MoveNext:20|bool",
+        "14": "member:12:System.Collections.Generic.List`1<11:Yarn.Markup.MarkupAttribute>:GetEnumerator:20|11:Enumerator<13:0>",
+        "140": "type:11:Enumerator<11:Yarn.Markup.MarkupAttribute>",
+        "145": "member:System.IDisposable:Dispose:20|void",
+        "2": "member:Yarn.Markup.MarkupParseResult:Text:06:string",
+        "24": "member:11:Enumerator<11:Yarn.Markup.MarkupAttribute>:get_Current:20|13:0",
+        "32": "member:Yarn.Markup.MarkupAttribute:get_Name:20|string",
+        "37": "str:630065006e0073006f00720000",
+        "42": "member:System.String:Equals:20|bool|string",
+        "51": "member:Yarn.Markup.MarkupAttribute:get_Position:20|int",
+        "59": "member:Yarn.Markup.MarkupAttribute:get_Length:20|int",
+        "66": "str:00",
+        "80": "str:652601",
+        "85": "member:System.String:Concat:00|string|string|string",
+        "9": "member:Yarn.Markup.MarkupParseResult:Attributes:06:12:System.Collections.Generic.List`1<11:Yarn.Markup.MarkupAttribute>"
+      }
+    },
+    {
+      "class": "<>c__DisplayClass139_2",
+      "code": "027b000000006f000000002800000000027b000000007b000000007b00000000166f00000000027b000000007b00000000037b000000007d00000000027b000000007b00000000027b000000007b000000007b00000000027c00000000280000000028000000007d00000000027b000000007b00000000037b000000006f0000000028000000000a06166f000000001f3e330d06176f000000006f000000000a027b000000007b0000000072000000000628000000007e0000000072000000006f00000000027b000000007b000000007b000000006f000000006f000000000b2b15076f0000000074000000006f000000002800000000076f000000002de3de110775000000000c082c06086f00000000dc027b000000007b000000007b000000006f000000007200000000062800000000027b000000007b00000000037b000000006f000000002a",
+      "exceptions": "011000000200e0002101011100000000",
+      "handlers": "2|224|33|257|17",
+      "locals": "07|string|12:System.Collections.IEnumerator|12:System.IDisposable",
+      "name": "<RunOptions>b__1",
+      "signature": "20|void|12:Yarn.Unity.DialogueOption",
+      "tokens": {
+        "104": "field:CupidChatroom.Yarn.ChatroomView:_selectedChoices:06:string",
+        "110": "field:<>c__DisplayClass139_2:CS$<>8__locals2:06:12:<>c__DisplayClass139_0",
+        "115": "field:<>c__DisplayClass139_0:<>4__this:06:12:CupidChatroom.Yarn.ChatroomView",
+        "12": "method:AffectionHeartFX:HintOrigin:00|void|12:UnityEngine.Transform",
+        "121": "member:Yarn.Unity.DialogueOption:Line:06:12:Yarn.Unity.LocalizedLine",
+        "126": "member:Yarn.Unity.LocalizedLine:get_TextWithoutCharacterName:20|11:Yarn.Markup.MarkupParseResult",
+        "131": "method:CupidChatroom.Yarn.ChatroomView:GetCensoredText:20|string|11:Yarn.Markup.MarkupParseResult",
+        "139": "member:System.String:get_Chars:20|char|int",
+        "150": "member:System.String:Substring:20|string|int",
+        "155": "member:System.String:TrimStart:20|string",
+        "162": "field:<>c__DisplayClass139_2:CS$<>8__locals2:06:12:<>c__DisplayClass139_0",
+        "167": "field:<>c__DisplayClass139_0:<>4__this:06:12:CupidChatroom.Yarn.ChatroomView",
+        "172": "str:4d00430000",
+        "178": "method:CupidChatroom.Yarn.ChatroomView:CreateMessage:20|void|string|string",
+        "18": "field:<>c__DisplayClass139_2:CS$<>8__locals2:06:12:<>c__DisplayClass139_0",
+        "183": "field:AudioManager:instance:06:12:AudioManager",
+        "188": "str:730065006e0064005f006d0065007300730061006700650000",
+        "193": "method:AudioManager:PlaySFX:20|void|string",
+        "199": "field:<>c__DisplayClass139_2:CS$<>8__locals2:06:12:<>c__DisplayClass139_0",
+        "2": "field:<>c__DisplayClass139_2:optionView:06:12:Yarn.Unity.OptionView",
+        "204": "field:<>c__DisplayClass139_0:<>4__this:06:12:CupidChatroom.Yarn.ChatroomView",
+        "209": "field:CupidChatroom.Yarn.ChatroomView:_currentContainer:06:12:UnityEngine.GameObject",
+        "214": "member:UnityEngine.GameObject:get_transform:20|12:UnityEngine.Transform",
+        "219": "member:UnityEngine.Transform:GetEnumerator:20|12:System.Collections.IEnumerator",
+        "228": "member:System.Collections.IEnumerator:get_Current:20|object",
+        "23": "field:<>c__DisplayClass139_0:<>4__this:06:12:CupidChatroom.Yarn.ChatroomView",
+        "233": "type:UnityEngine.Transform",
+        "238": "member:UnityEngine.Component:get_gameObject:20|12:UnityEngine.GameObject",
+        "243": "member:UnityEngine.Object:Destroy:00|void|12:UnityEngine.Object",
+        "249": "member:System.Collections.IEnumerator:MoveNext:20|bool",
+        "259": "type:System.IDisposable",
+        "269": "member:System.IDisposable:Dispose:20|void",
+        "276": "field:<>c__DisplayClass139_2:CS$<>8__locals2:06:12:<>c__DisplayClass139_0",
+        "28": "field:CupidChatroom.Yarn.ChatroomView:_currentContainer:06:12:UnityEngine.GameObject",
+        "281": "field:<>c__DisplayClass139_0:<>4__this:06:12:CupidChatroom.Yarn.ChatroomView",
+        "286": "field:CupidChatroom.Yarn.ChatroomView:_runner:06:12:Yarn.Unity.DialogueRunner",
+        "291": "member:Yarn.Unity.DialogueRunner:get_CurrentNodeName:20|string",
+        "296": "str:4d00430000",
+        "302": "method:SkipManager:NotifyChoiceSelected:00|void|string|string|string",
+        "308": "field:<>c__DisplayClass139_2:CS$<>8__locals2:06:12:<>c__DisplayClass139_0",
+        "313": "field:<>c__DisplayClass139_0:onOptionSelected:06:12:System.Action`1<int>",
+        "319": "member:Yarn.Unity.DialogueOption:DialogueOptionID:06:int",
+        "324": "member:12:System.Action`1<int>:Invoke:20|void|13:0",
+        "34": "member:UnityEngine.GameObject:SetActive:20|void|bool",
+        "40": "field:<>c__DisplayClass139_2:CS$<>8__locals2:06:12:<>c__DisplayClass139_0",
+        "45": "field:<>c__DisplayClass139_0:<>4__this:06:12:CupidChatroom.Yarn.ChatroomView",
+        "51": "member:Yarn.Unity.DialogueOption:Line:06:12:Yarn.Unity.LocalizedLine",
+        "56": "field:CupidChatroom.Yarn.ChatroomView:_currentLine:06:12:Yarn.Unity.LocalizedLine",
+        "62": "field:<>c__DisplayClass139_2:CS$<>8__locals2:06:12:<>c__DisplayClass139_0",
+        "67": "field:<>c__DisplayClass139_0:<>4__this:06:12:CupidChatroom.Yarn.ChatroomView",
+        "7": "member:UnityEngine.Component:get_transform:20|12:UnityEngine.Transform",
+        "73": "field:<>c__DisplayClass139_2:CS$<>8__locals2:06:12:<>c__DisplayClass139_0",
+        "78": "field:<>c__DisplayClass139_0:<>4__this:06:12:CupidChatroom.Yarn.ChatroomView",
+        "83": "field:CupidChatroom.Yarn.ChatroomView:_selectedChoices:06:string",
+        "89": "field:<>c__DisplayClass139_2:currentIndex:06:int",
+        "94": "member:System.Int32:ToString:20|string",
+        "99": "member:System.String:Concat:00|string|string|string"
+      }
+    },
+    {
+      "class": "ChoiceHover",
+      "code": "027b000000001428000000002c1f027b000000001428000000002c11027b00000000027b000000006f000000002a",
+      "exceptions": "",
+      "handlers": "",
+      "locals": "",
+      "name": "OnEnable",
+      "signature": "20|void",
+      "tokens": {
+        "16": "field:ChoiceHover:_normalFontAsset:06:12:TMPro.TMP_FontAsset",
+        "2": "field:ChoiceHover:_text:06:12:TMPro.TMP_Text",
+        "22": "member:UnityEngine.Object:op_Inequality:00|bool|12:UnityEngine.Object|12:UnityEngine.Object",
+        "30": "field:ChoiceHover:_text:06:12:TMPro.TMP_Text",
+        "36": "field:ChoiceHover:_normalFontAsset:06:12:TMPro.TMP_FontAsset",
+        "41": "member:TMPro.TMP_Text:set_font:20|void|12:TMPro.TMP_FontAsset",
+        "8": "member:UnityEngine.Object:op_Inequality:00|bool|12:UnityEngine.Object|12:UnityEngine.Object"
+      }
+    },
+    {
+      "class": "ChoiceHover",
+      "code": "027b00000000027b000000006f000000002a",
+      "exceptions": "",
+      "handlers": "",
+      "locals": "",
+      "name": "OnPointerClick",
+      "signature": "20|void|12:UnityEngine.EventSystems.PointerEventData",
+      "tokens": {
+        "13": "member:TMPro.TMP_Text:set_font:20|void|12:TMPro.TMP_FontAsset",
+        "2": "field:ChoiceHover:_text:06:12:TMPro.TMP_Text",
+        "8": "field:ChoiceHover:_normalFontAsset:06:12:TMPro.TMP_FontAsset"
+      }
+    },
+    {
+      "class": "ChoiceHover",
+      "code": "027b00000000027b000000006f000000002a",
+      "exceptions": "",
+      "handlers": "",
+      "locals": "",
+      "name": "OnPointerEnter",
+      "signature": "20|void|12:UnityEngine.EventSystems.PointerEventData",
+      "tokens": {
+        "13": "member:TMPro.TMP_Text:set_font:20|void|12:TMPro.TMP_FontAsset",
+        "2": "field:ChoiceHover:_text:06:12:TMPro.TMP_Text",
+        "8": "field:ChoiceHover:_hoverFontAsset:06:12:TMPro.TMP_FontAsset"
+      }
+    },
+    {
+      "class": "ChoiceHover",
+      "code": "027b00000000027b000000006f000000002a",
+      "exceptions": "",
+      "handlers": "",
+      "locals": "",
+      "name": "OnPointerExit",
+      "signature": "20|void|12:UnityEngine.EventSystems.PointerEventData",
+      "tokens": {
+        "13": "member:TMPro.TMP_Text:set_font:20|void|12:TMPro.TMP_FontAsset",
+        "2": "field:ChoiceHover:_text:06:12:TMPro.TMP_Text",
+        "8": "field:ChoiceHover:_normalFontAsset:06:12:TMPro.TMP_FontAsset"
+      }
+    },
+    {
+      "class": "CupidChatroom.Theming.ThemedChoiceHover",
+      "code": "28000000001428000000002c0e28000000006f0000000017fe012a162a",
+      "exceptions": "",
+      "handlers": "",
+      "locals": "",
+      "name": "get_IsNight",
+      "signature": "20|bool",
+      "tokens": {
+        "1": "method:CupidChatroom.Theming.ThemeManager:get_Instance:00|12:CupidChatroom.Theming.ThemeManager",
+        "14": "method:CupidChatroom.Theming.ThemeManager:get_Instance:00|12:CupidChatroom.Theming.ThemeManager",
+        "19": "method:CupidChatroom.Theming.ThemeManager:get_Current:20|11:CupidChatroom.Theming.ThemeMode",
+        "7": "member:UnityEngine.Object:op_Inequality:00|bool|12:UnityEngine.Object|12:UnityEngine.Object"
+      }
+    },
+    {
+      "class": "CupidChatroom.Theming.ThemedChoiceHover",
+      "code": "02fe060000000073000000002800000000021628000000002a",
+      "exceptions": "",
+      "handlers": "",
+      "locals": "",
+      "name": "OnEnable",
+      "signature": "20|void",
+      "tokens": {
+        "13": "method:CupidChatroom.Theming.ThemeManager:add_OnThemeChanged:00|void|12:System.Action",
+        "20": "method:CupidChatroom.Theming.ThemedChoiceHover:SetHovered:20|void|bool",
+        "3": "method:CupidChatroom.Theming.ThemedChoiceHover:ApplyTheme:20|void",
+        "8": "member:System.Action:.ctor:20|void|object|nativeint"
+      }
+    },
+    {
+      "class": "CupidChatroom.Theming.ThemedChoiceHover",
+      "code": "02fe0600000000730000000028000000002a",
+      "exceptions": "",
+      "handlers": "",
+      "locals": "",
+      "name": "OnDisable",
+      "signature": "20|void",
+      "tokens": {
+        "13": "method:CupidChatroom.Theming.ThemeManager:remove_OnThemeChanged:00|void|12:System.Action",
+        "3": "method:CupidChatroom.Theming.ThemedChoiceHover:ApplyTheme:20|void",
+        "8": "member:System.Action:.ctor:20|void|object|nativeint"
+      }
+    },
+    {
+      "class": "CupidChatroom.Theming.ThemedChoiceHover",
+      "code": "02027b0000000028000000002a",
+      "exceptions": "",
+      "handlers": "",
+      "locals": "",
+      "name": "ApplyTheme",
+      "signature": "20|void",
+      "tokens": {
+        "3": "field:CupidChatroom.Theming.ThemedChoiceHover:_isHovered:06:bool",
+        "8": "method:CupidChatroom.Theming.ThemedChoiceHover:SetHovered:20|void|bool"
+      }
+    },
+    {
+      "class": "CupidChatroom.Theming.ThemedChoiceHover",
+      "code": "02037d00000000027b000000001428000000002c012a032d08027b000000002b06027b000000000a032d08027b000000002b06027b000000000b0228000000002c09071428000000002d03062b01070c081428000000002c0c027b00000000086f00000000027b000000000228000000002d08027b000000002b06027b000000006f00000000027b000000002c2528000000002c1e027b00000000032d031d2b011e28000000006f00000000020328000000002a",
+      "exceptions": "",
+      "handlers": "",
+      "locals": "07|12:TMPro.TMP_FontAsset|12:TMPro.TMP_FontAsset|12:TMPro.TMP_FontAsset",
+      "name": "SetHovered",
+      "signature": "20|void|bool",
+      "tokens": {
+        "103": "field:CupidChatroom.Theming.ThemedChoiceHover:_text:06:12:TMPro.TMP_Text",
+        "109": "method:CupidChatroom.Theming.ThemedChoiceHover:get_IsNight:20|bool",
+        "117": "field:CupidChatroom.Theming.ThemedChoiceHover:_normalFontColor:06:11:UnityEngine.Color",
+        "125": "field:CupidChatroom.Theming.ThemedChoiceHover:_nightFontColor:06:11:UnityEngine.Color",
+        "130": "member:UnityEngine.UI.Graphic:set_color:20|void|11:UnityEngine.Color",
+        "136": "field:CupidChatroom.Theming.ThemedChoiceHover:_tintFromTheme:06:bool",
+        "143": "method:CupidChatroom.Theming.ThemeManager:get_HasTheme:00|bool",
+        "15": "member:UnityEngine.Object:op_Equality:00|bool|12:UnityEngine.Object|12:UnityEngine.Object",
+        "151": "field:CupidChatroom.Theming.ThemedChoiceHover:_text:06:12:TMPro.TMP_Text",
+        "163": "method:CupidChatroom.Theming.ThemeManager:GetColor:00|11:UnityEngine.Color|11:CupidChatroom.Theming.ThemeRole",
+        "168": "member:UnityEngine.UI.Graphic:set_color:20|void|11:UnityEngine.Color",
+        "175": "method:CupidChatroom.Theming.ThemedChoiceHover:ApplyOutline:20|void|bool",
+        "27": "field:CupidChatroom.Theming.ThemedChoiceHover:_normalFontAsset:06:12:TMPro.TMP_FontAsset",
+        "3": "field:CupidChatroom.Theming.ThemedChoiceHover:_isHovered:06:bool",
+        "35": "field:CupidChatroom.Theming.ThemedChoiceHover:_hoverFontAsset:06:12:TMPro.TMP_FontAsset",
+        "45": "field:CupidChatroom.Theming.ThemedChoiceHover:_nightNormalFontAsset:06:12:TMPro.TMP_FontAsset",
+        "53": "field:CupidChatroom.Theming.ThemedChoiceHover:_nightHoverFontAsset:06:12:TMPro.TMP_FontAsset",
+        "60": "method:CupidChatroom.Theming.ThemedChoiceHover:get_IsNight:20|bool",
+        "69": "member:UnityEngine.Object:op_Inequality:00|bool|12:UnityEngine.Object|12:UnityEngine.Object",
+        "83": "member:UnityEngine.Object:op_Inequality:00|bool|12:UnityEngine.Object|12:UnityEngine.Object",
+        "9": "field:CupidChatroom.Theming.ThemedChoiceHover:_text:06:12:TMPro.TMP_Text",
+        "91": "field:CupidChatroom.Theming.ThemedChoiceHover:_text:06:12:TMPro.TMP_Text",
+        "97": "member:TMPro.TMP_Text:set_font:20|void|12:TMPro.TMP_FontAsset"
+      }
+    },
+    {
+      "class": "CupidChatroom.Theming.ThemedChoiceHover",
+      "code": "027b000000006f000000000a061428000000002c012a032c24067e000000001f0928000000006f00000000067e00000000027b000000006f000000002a067e0000000022000000006f000000002a",
+      "exceptions": "",
+      "handlers": "",
+      "locals": "07|12:UnityEngine.Material",
+      "name": "ApplyOutline",
+      "signature": "20|void|bool",
+      "tokens": {
+        "15": "member:UnityEngine.Object:op_Equality:00|bool|12:UnityEngine.Object|12:UnityEngine.Object",
+        "2": "field:CupidChatroom.Theming.ThemedChoiceHover:_text:06:12:TMPro.TMP_Text",
+        "27": "member:TMPro.ShaderUtilities:ID_OutlineColor:06:int",
+        "34": "method:CupidChatroom.Theming.ThemeManager:GetColor:00|11:UnityEngine.Color|11:CupidChatroom.Theming.ThemeRole",
+        "39": "member:UnityEngine.Material:SetColor:20|void|int|11:UnityEngine.Color",
+        "45": "member:TMPro.ShaderUtilities:ID_OutlineWidth:06:int",
+        "51": "field:CupidChatroom.Theming.ThemedChoiceHover:_hoverOutlineWidth:06:float",
+        "56": "member:UnityEngine.Material:SetFloat:20|void|int|float",
+        "63": "member:TMPro.ShaderUtilities:ID_OutlineWidth:06:int",
+        "7": "member:TMPro.TMP_Text:get_fontMaterial:20|12:UnityEngine.Material",
+        "73": "member:UnityEngine.Material:SetFloat:20|void|int|float"
+      }
+    },
+    {
+      "class": "CupidChatroom.Theming.ThemedChoiceHover",
+      "code": "021728000000002a",
+      "exceptions": "",
+      "handlers": "",
+      "locals": "",
+      "name": "OnPointerEnter",
+      "signature": "20|void|12:UnityEngine.EventSystems.PointerEventData",
+      "tokens": {
+        "3": "method:CupidChatroom.Theming.ThemedChoiceHover:SetHovered:20|void|bool"
+      }
+    },
+    {
+      "class": "CupidChatroom.Theming.ThemedChoiceHover",
+      "code": "021628000000002a",
+      "exceptions": "",
+      "handlers": "",
+      "locals": "",
+      "name": "OnPointerExit",
+      "signature": "20|void|12:UnityEngine.EventSystems.PointerEventData",
+      "tokens": {
+        "3": "method:CupidChatroom.Theming.ThemedChoiceHover:SetHovered:20|void|bool"
+      }
+    },
+    {
+      "class": "CupidChatroom.Theming.ThemedChoiceHover",
+      "code": "021628000000002a",
+      "exceptions": "",
+      "handlers": "",
+      "locals": "",
+      "name": "OnPointerClick",
+      "signature": "20|void|12:UnityEngine.EventSystems.PointerEventData",
+      "tokens": {
+        "3": "method:CupidChatroom.Theming.ThemedChoiceHover:SetHovered:20|void|bool"
+      }
+    }
+  ],
+  "YarnSpinner.Unity.dll": [
+    {
+      "class": "Yarn.Unity.OptionView",
+      "code": "027b000000002a",
+      "exceptions": "",
+      "handlers": "",
+      "locals": "",
+      "name": "get_Option",
+      "signature": "20|12:Yarn.Unity.DialogueOption",
+      "tokens": {
+        "2": "field:Yarn.Unity.OptionView:_option:06:12:Yarn.Unity.DialogueOption"
+      }
+    },
+    {
+      "class": "Yarn.Unity.OptionView",
+      "code": "02037d0000000002167d00000000027b000000002c0e037b000000006f000000000a2b0c037b000000006f000000000a027b000000001428000000002c1a027b0000000006027b000000001628000000006f000000002b11027b00000000067b000000006f0000000002037b0000000028000000002a",
+      "exceptions": "",
+      "handlers": "",
+      "locals": "07|11:Yarn.Markup.MarkupParseResult",
+      "name": "set_Option",
+      "signature": "20|void|12:Yarn.Unity.DialogueOption",
+      "tokens": {
+        "10": "field:Yarn.Unity.OptionView:hasSubmittedOptionSelection:06:bool",
+        "101": "member:TMPro.TMP_Text:set_text:20|void|string",
+        "108": "field:Yarn.Unity.DialogueOption:IsAvailable:06:bool",
+        "113": "member:UnityEngine.UI.Selectable:set_interactable:20|void|bool",
+        "16": "field:Yarn.Unity.OptionView:showCharacterName:06:bool",
+        "24": "field:Yarn.Unity.DialogueOption:Line:06:12:Yarn.Unity.LocalizedLine",
+        "29": "method:Yarn.Unity.LocalizedLine:get_Text:20|11:Yarn.Markup.MarkupParseResult",
+        "3": "field:Yarn.Unity.OptionView:_option:06:12:Yarn.Unity.DialogueOption",
+        "38": "field:Yarn.Unity.DialogueOption:Line:06:12:Yarn.Unity.LocalizedLine",
+        "43": "method:Yarn.Unity.LocalizedLine:get_TextWithoutCharacterName:20|11:Yarn.Markup.MarkupParseResult",
+        "50": "field:Yarn.Unity.OptionView:palette:06:12:Yarn.Unity.MarkupPalette",
+        "56": "member:UnityEngine.Object:op_Inequality:00|bool|12:UnityEngine.Object|12:UnityEngine.Object",
+        "64": "field:Yarn.Unity.OptionView:text:06:12:TMPro.TextMeshProUGUI",
+        "71": "field:Yarn.Unity.OptionView:palette:06:12:Yarn.Unity.MarkupPalette",
+        "77": "method:Yarn.Unity.LineView:PaletteMarkedUpText:00|string|11:Yarn.Markup.MarkupParseResult|12:Yarn.Unity.MarkupPalette|bool",
+        "82": "member:TMPro.TMP_Text:set_text:20|void|string",
+        "90": "field:Yarn.Unity.OptionView:text:06:12:TMPro.TextMeshProUGUI",
+        "96": "member:Yarn.Markup.MarkupParseResult:Text:06:string"
+      }
+    },
+    {
+      "class": "Yarn.Unity.OptionView",
+      "code": "0228000000002a",
+      "exceptions": "",
+      "handlers": "",
+      "locals": "",
+      "name": "OnSubmit",
+      "signature": "20|void|12:UnityEngine.EventSystems.BaseEventData",
+      "tokens": {
+        "2": "method:Yarn.Unity.OptionView:InvokeOptionSelected:20|void"
+      }
+    },
+    {
+      "class": "Yarn.Unity.OptionView",
+      "code": "026f000000002d012a027b000000002d18027b000000000228000000006f0000000002177d000000002a",
+      "exceptions": "",
+      "handlers": "",
+      "locals": "",
+      "name": "InvokeOptionSelected",
+      "signature": "20|void",
+      "tokens": {
+        "11": "field:Yarn.Unity.OptionView:hasSubmittedOptionSelection:06:bool",
+        "19": "field:Yarn.Unity.OptionView:OnOptionSelected:06:12:System.Action`1<12:Yarn.Unity.DialogueOption>",
+        "2": "member:UnityEngine.UI.Selectable:IsInteractable:20|bool",
+        "25": "method:Yarn.Unity.OptionView:get_Option:20|12:Yarn.Unity.DialogueOption",
+        "30": "member:12:System.Action`1<12:Yarn.Unity.DialogueOption>:Invoke:20|void|13:0",
+        "37": "field:Yarn.Unity.OptionView:hasSubmittedOptionSelection:06:bool"
+      }
+    },
+    {
+      "class": "Yarn.Unity.OptionView",
+      "code": "0228000000002a",
+      "exceptions": "",
+      "handlers": "",
+      "locals": "",
+      "name": "OnPointerClick",
+      "signature": "20|void|12:UnityEngine.EventSystems.PointerEventData",
+      "tokens": {
+        "2": "method:Yarn.Unity.OptionView:InvokeOptionSelected:20|void"
+      }
+    }
+  ]
+}

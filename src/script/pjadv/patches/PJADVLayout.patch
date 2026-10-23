@@ -1,0 +1,37 @@
+--- a/src/NativeImpl/LunaHook/LunaHook/engine32/Pensil.cpp
++++ b/src/NativeImpl/LunaHook/LunaHook/engine32/Pensil.cpp
+@@ -925,12 +925,26 @@
+     return NewHook(hp, "abalone");
+   }
+ }
++#include "PJADVRuntime.h"
+ bool Pensil::attach_function()
+ {
+-  bool _1 = ScenarioHook::attach(processStartAddress, processStopAddress);
+-  if (_1)
+-    OtherHook::attach(processStartAddress, processStopAddress);
+-  bool _2rm = Insert2RMHook();
+-  auto _abalone = abalone();
+-  return InsertPensilHook() || _1 || _2rm || _abalone;
+-}
+\ No newline at end of file
++  const auto module = GetModuleHandleW(nullptr);
++  const auto message = DangoPJADV::findEntry(module, "message");
++  const auto choice = DangoPJADV::findEntry(module, "choice");
++  if (!message) return false;
++  if (!loadPJADVResources())
++    return false;
++  HookParam text;
++  text.address = message;
++  text.offset = stackoffset(2);
++  text.type = USING_STRING | EMBED_ABLE | EMBED_DYNA_SJIS;
++  text.filter_fun = pensilfilter;
++  text.embed_fun = pjadvEmbedText;
++  text.embed_hook_font = F_GetGlyphOutlineA;
++  if (!NewHook(text, "EmbedPensil")) return false;
++  if (!choice) return true;
++  HookParam options = text;
++  options.address = choice;
++  options.offset = stackoffset(1);
++  return NewHook(options, "EmbedPensilChoice");
++}

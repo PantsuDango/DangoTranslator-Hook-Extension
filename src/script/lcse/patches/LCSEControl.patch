@@ -1,0 +1,97 @@
+--- a/src/NativeImpl/LunaHook/LunaHost/host.cpp
++++ b/src/NativeImpl/LunaHook/LunaHost/host.cpp
+@@ -1,4 +1,7 @@
+ #include "host.h"
++#if defined(DANGO_LCSE_ONLY)
++#include "../LunaHook/engine32/LCSEControl.h"
++#endif
+ #include "firsttext.h"
+ #define HOOK_SEARCH_LENGTH STRING
+ // #define HOOK_SEARCH_LENGTH 0
+@@ -16,6 +19,16 @@
+ 			commonsharedmem = (CommonSharedMem *)MapViewOfFile(mappedFile2, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, sizeof(CommonSharedMem));
+ 			// 放到构造表里就不行，不知道为何。
+ 		}
++
++		// SendLCSE 仅在管道初始化完成后同步提交有界控制，避免乱序异步线程
++#if defined(DANGO_LCSE_ONLY)
++		bool SendLCSE(const LCSEControl::Request &request)
++		{
++			if (WaitForSingleObject(prepareWaiter, 0) != WAIT_OBJECT_0) return false;
++			DWORD written = 0;
++			return WriteFile(pipe, &request, sizeof(request), &written, nullptr) && written == sizeof(request);
++		}
++#endif
+ 
+ 		~ProcessRecord()
+ 		{
+@@ -475,3 +488,14 @@
+ 		return false;
+ 	}
+ }
++
++#if defined(DANGO_LCSE_ONLY)
++// Hook_LCSEControl 只转发当前目标进程固定请求，资源结果由原生管道确认
++extern "C" __declspec(dllexport) bool Hook_LCSEControl(DWORD process, const LCSEControl::Request *request)
++{
++	if (!request || request->process != process || !LCSEControl::validRequest(*request)) return false;
++	auto &records = processRecordsByIds.Acquire().contents;
++	auto found = records.find(process);
++	return found != records.end() && found->second.SendLCSE(*request);
++}
++#endif
+--- a/src/NativeImpl/LunaHook/LunaHost/CMakeLists.txt
++++ b/src/NativeImpl/LunaHook/LunaHost/CMakeLists.txt
+@@ -1,6 +1,7 @@
+ 
+ add_library(host host.cpp textthread.cpp injector.cpp ../include/InfoStrings.cpp)
+ target_compile_definitions(host PRIVATE -DBUILD_HOST=1)
++target_compile_definitions(host PRIVATE DANGO_LCSE_ONLY=1)
+ target_precompile_headers(host REUSE_FROM pch)
+ target_include_directories(host PUBLIC .)
+ target_link_libraries(host VERSION_DEF)
+--- a/src/NativeImpl/LunaHook/LunaHook/main.cc
++++ b/src/NativeImpl/LunaHook/LunaHook/main.cc
+@@ -1,5 +1,8 @@
+ 
+ #include "MinHook.h"
++#if defined(DANGO_LCSE_ONLY)
++#include "engine32/LCSE.h"
++#endif
+ void HIJACK();
+ void detachall();
+ #if EMUADD_MAP_MULTI
+@@ -43,6 +46,23 @@
+ 		running = false;
+ 		return;
+ 	}
++
++#if defined(DANGO_LCSE_ONLY)
++	if (count >= sizeof(DWORD) && *reinterpret_cast<const DWORD *>(buffer) == LCSEControl::command)
++	{
++		if (count != sizeof(LCSEControl::Request)) return;
++		LCSEControl::Request request;
++		memcpy(&request, buffer, sizeof(request));
++		try
++		{
++			const auto status = LCSE::processPresentationControl(request);
++			const auto response = std::string("LCSE control 1 ") + std::to_string(request.generation) + " " + LCSEControl::hexadecimal(request.token) + " " + status;
++			Msg::Log(CP_UTF8, "%s", response.c_str());
++		}
++		catch (...) { LCSE::resetPresentationControl(); }
++		return;
++	}
++#endif
+ 	switch (*(HostCommandType *)buffer)
+ 	{
+ 	case HOST_COMMAND_I18N_RESPONSE:
+@@ -155,6 +175,9 @@
+ 			ParseCommand(hostPipe, running);
+ 	}
+ 
++#if defined(DANGO_LCSE_ONLY)
++	LCSE::resetPresentationControl();
++#endif
+ 	if (dont_detach)
+ 	{
+ 		host_connected = false;

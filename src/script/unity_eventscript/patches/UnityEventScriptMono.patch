@@ -1,0 +1,161 @@
+--- a/src/NativeImpl/LunaHook/LunaHook/engines/mono/mono.cpp
++++ b/src/NativeImpl/LunaHook/LunaHook/engines/mono/mono.cpp
+@@ -132,5 +132,15 @@ bool monodll()
+ #endif
+ bool mono::attach_function_()
+ {
++#if defined(DANGO_UNITY_EVENTSCRIPT_ONLY)
++  for (int attempt = 0; attempt < 40; ++attempt)
++  {
++    if (monocommon::hook_mono_il2cpp())
++      return true;
++    Sleep(500);
++  }
++  return false;
++#else
+   return monocommon::hook_mono_il2cpp();
+-}
+\ No newline at end of file
++#endif
++}
+--- a/src/NativeImpl/LunaHook/LunaHook/engines/mono/monocommon.hpp
++++ b/src/NativeImpl/LunaHook/LunaHook/engines/mono/monocommon.hpp
+@@ -80,6 +80,82 @@ namespace
+         buffer.from(s);
+     }
+ }
++#if defined(DANGO_UNITY_EVENTSCRIPT_ONLY)
++namespace
++{
++    constexpr uintptr_t kEventScriptMaximumArrayLength = 128;
++
++    // EventScript_AppendString 将单个托管字符串追加到完整文本
++    void EventScript_AppendString(std::wstring &result, uintptr_t value)
++    {
++        auto text = commonsolvemonostring(value);
++        if (!text || text->empty())
++            return;
++        if (!result.empty())
++            result.push_back(L'\n');
++        result.append(text->data(), text->size());
++    }
++
++    // EventScript_AppendStringArray 按原始顺序追加托管字符串数组
++    void EventScript_AppendStringArray(std::wstring &result, uintptr_t value)
++    {
++        auto texts = reinterpret_cast<Il2CppArraySize *>(value);
++        if (!texts || texts->max_length == 0 || texts->max_length > kEventScriptMaximumArrayLength)
++            return;
++        for (uintptr_t index = 0; index < texts->max_length; ++index)
++        {
++            auto element = reinterpret_cast<uintptr_t>(texts->vector[index]);
++            if (element)
++                EventScript_AppendString(result, element);
++        }
++    }
++
++    // EventScript_ExtractDialogue 提取显示前的正文数组
++    void EventScript_ExtractDialogue(hook_context *context, HookParam *hp, TextBuffer *buffer, uintptr_t *)
++    {
++        std::wstring result;
++        EventScript_AppendStringArray(result, context->argof(2, hp));
++        if (!result.empty())
++            buffer->from(result);
++    }
++
++    // EventScript_EmbedDialogue 用译文替换显示前的正文数组
++    void EventScript_EmbedDialogue(hook_context *context, TextBuffer buffer, HookParam *hp)
++    {
++        auto texts = reinterpret_cast<Il2CppArraySize *>(context->argof(2, hp));
++        if (!texts || texts->max_length == 0 || texts->max_length > kEventScriptMaximumArrayLength)
++            return;
++        const auto translation = buffer.viewW();
++        if (translation.empty())
++            return;
++        auto replacement = create_string_csharp(translation, texts->vector[0]);
++        if (!replacement)
++            return;
++        texts->vector[0] = replacement;
++        for (uintptr_t index = 1; index < texts->max_length; ++index)
++            texts->vector[index] = create_string_csharp(L"", texts->vector[index]);
++    }
++
++    // EventScript_ExtractBackLog 提取角色名和完整页面正文
++    void EventScript_ExtractBackLog(hook_context *context, HookParam *hp, TextBuffer *buffer, uintptr_t *)
++    {
++        std::wstring result;
++        EventScript_AppendString(result, context->argof(2, hp));
++        EventScript_AppendStringArray(result, context->argof(3, hp));
++        if (!result.empty())
++            buffer->from(result);
++    }
++
++    // EventScript_ExtractChoices 提取当前显示的全部选项
++    void EventScript_ExtractChoices(hook_context *context, HookParam *hp, TextBuffer *buffer, uintptr_t *)
++    {
++        std::wstring result;
++        EventScript_AppendStringArray(result, context->argof(2, hp));
++        if (!result.empty())
++            buffer->from(result);
++    }
++}
++#endif
+ namespace
+ {
+ #ifdef _WIN64
+@@ -154,6 +230,9 @@ namespace monocommon
+         hp.lineSeparator = hook.lineSeparator;
+         hp.text_fun = hook.text_fun;
+         hp.filter_fun = hook.filter_fun;
++#if defined(DANGO_UNITY_EVENTSCRIPT_ONLY)
++        hp.embed_fun = hook.embed_fun;
++#endif
+         if (hook.isstring)
+         {
+             hp.type = USING_STRING | CODEC_UTF16 | FULL_STRING;
+@@ -204,6 +283,14 @@ namespace monocommon
+         {"Elringus.Naninovel.Runtime", "Naninovel.UI", "RevealableText", "SetTextValue", 1, 2, nullptr, true, true, nullptr, Naninovel_UI_RevealableText_SetTextValue_Filter},
+ #endif
+     };
++#if defined(DANGO_UNITY_EVENTSCRIPT_ONLY)
++    std::vector<functioninfo> eventScriptHooks{
++        {"Assembly-CSharp", "", "BackLogSaveData", "Add", 3, 0, EventScript_ExtractBackLog, false, true},
++        {"Assembly-CSharp", "", "SelectWindow", "Show", 1, 0, EventScript_ExtractChoices, false, true},
++        {"Assembly-CSharp", "", "SelectWindow", "Show", 3, 0, EventScript_ExtractChoices, false, true},
++        {"Assembly-CSharp", "", "SaiminTextWindow", "AddText", 4, 0, EventScript_ExtractDialogue, true, true, nullptr, nullptr, EventScript_EmbedDialogue},
++    };
++#endif
+     bool hook_mono_il2cpp()
+     {
+         for (const wchar_t *monoName : {L"mono.dll", L"mono-2.0-bdwgc.dll", L"GameAssembly.dll"})
+@@ -213,6 +297,15 @@ namespace monocommon
+                 il2cppfunctions::init(module);
+                 monofunctions::init(module);
+                 bool succ = false;
++#if defined(DANGO_UNITY_EVENTSCRIPT_ONLY)
++                for (auto hook : eventScriptHooks)
++                {
++                    auto addr = hook.getaddr();
++                    if (!addr)
++                        continue;
++                    succ |= NewHook_check(addr, hook);
++                }
++#else
+                 for (auto hook : commonhooks)
+                 {
+                     auto addr = hook.getaddr();
+@@ -227,6 +320,7 @@ namespace monocommon
+                         continue;
+                     succ |= NewHook_check(addr, hook);
+                 }
++#endif
+                 if (succ)
+                 {
+                     if (0)
+@@ -242,4 +336,4 @@ namespace monocommon
+             }
+         return false;
+     }
+-}
+\ No newline at end of file
++}

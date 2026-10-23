@@ -1,0 +1,359 @@
+diff --git a/src/NativeImpl/LunaHook/LunaHook/engine32/VALKYRIA.cpp b/src/NativeImpl/LunaHook/LunaHook/engine32/VALKYRIA.cpp
+index a304522..76e7c28 100644
+--- a/src/NativeImpl/LunaHook/LunaHook/engine32/VALKYRIA.cpp
++++ b/src/NativeImpl/LunaHook/LunaHook/engine32/VALKYRIA.cpp
+@@ -2,0 +3,112 @@
++std::wstring g_valkyriaStaticGlyphs;
++std::vector<unsigned char> g_valkyriaStaticFont;
++HANDLE g_valkyriaStaticFontHandle = nullptr;
++void solvefont(HookParam hp);
++
++namespace
++{
++  // 读取全文回填生成的私用字位表；文件不存在表示普通实时监听模式。
++  bool loadValkyriaStaticGlyphs(bool *present)
++  {
++    *present = false;
++    wchar_t executable[MAX_PATH] = {};
++    const auto length = GetModuleFileNameW(nullptr, executable, MAX_PATH);
++    if (!length || length >= MAX_PATH)
++      return false;
++    std::wstring path(executable, length);
++    const auto separator = path.find_last_of(L"\\/");
++    if (separator == std::wstring::npos)
++      return false;
++    path.resize(separator + 1);
++    path += L"dango_cache\\valkyria_pua.bin";
++    const DWORD attributes = GetFileAttributesW(path.c_str());
++    if (attributes == INVALID_FILE_ATTRIBUTES)
++    {
++      if (GetLastError() != ERROR_FILE_NOT_FOUND)
++        return false;
++      // 安装记录尚在却缺少字位表时拒绝挂载，不能静默显示缺字方框。
++      path.resize(path.find_last_of(L"\\/") + 1);
++      path += L"valkyria_resource_install.json";
++      const DWORD journalAttributes = GetFileAttributesW(path.c_str());
++      return journalAttributes == INVALID_FILE_ATTRIBUTES && GetLastError() == ERROR_FILE_NOT_FOUND;
++    }
++    if (attributes & FILE_ATTRIBUTE_DIRECTORY)
++      return false;
++    *present = true;
++    HANDLE file = CreateFileW(path.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
++    if (file == INVALID_HANDLE_VALUE)
++      return false;
++    LARGE_INTEGER size = {};
++    const bool validSize = GetFileSizeEx(file, &size) && size.QuadPart >= 10 &&
++                           size.QuadPart <= 8 + 1880 * 2 && (size.QuadPart % 2) == 0;
++    std::vector<unsigned char> bytes(validSize ? static_cast<size_t>(size.QuadPart) : 0);
++    DWORD read = 0;
++    const bool readOK = validSize && ReadFile(file, bytes.data(), static_cast<DWORD>(bytes.size()), &read, nullptr) &&
++                        read == bytes.size();
++    CloseHandle(file);
++    if (!readOK || std::memcmp(bytes.data(), "DGVKPUA1", 8) != 0)
++      return false;
++    std::wstring glyphs;
++    for (size_t offset = 8; offset < bytes.size(); offset += 2)
++    {
++      const wchar_t glyph = static_cast<wchar_t>(bytes[offset] | (bytes[offset + 1] << 8));
++      if (glyph >= 0xd800 && glyph <= 0xdfff)
++        return false;
++      glyphs.push_back(glyph);
++    }
++    g_valkyriaStaticGlyphs = std::move(glyphs);
++    return true;
++  }
++
++  // 从Hook组件所在的翻译器目录读取思源黑体，避免每个游戏都复制字体。
++  bool loadValkyriaStaticFont()
++  {
++    HMODULE module = nullptr;
++    if (!GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
++                            reinterpret_cast<LPCWSTR>(&loadValkyriaStaticFont), &module))
++      return false;
++    wchar_t executable[MAX_PATH] = {};
++    const auto length = GetModuleFileNameW(module, executable, MAX_PATH);
++    if (!length || length >= MAX_PATH)
++      return false;
++    std::wstring path(executable, length);
++    const auto separator = path.find_last_of(L"\\/");
++    if (separator == std::wstring::npos)
++      return false;
++    path.resize(separator);
++    const auto hookSeparator = path.find_last_of(L"\\/");
++    if (hookSeparator == std::wstring::npos)
++      return false;
++    path.resize(hookSeparator);
++    const auto rootSeparator = path.find_last_of(L"\\/");
++    if (rootSeparator == std::wstring::npos)
++      return false;
++    path.resize(rootSeparator + 1);
++    path += L"config\\SourceHanSansSC-Regular.otf";
++    HANDLE file = CreateFileW(path.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
++    if (file == INVALID_HANDLE_VALUE)
++      return false;
++    LARGE_INTEGER size = {};
++    const bool validSize = GetFileSizeEx(file, &size) && size.QuadPart > 0 && size.QuadPart <= 32 * 1024 * 1024;
++    g_valkyriaStaticFont.assign(validSize ? static_cast<size_t>(size.QuadPart) : 0, 0);
++    DWORD read = 0;
++    const bool readOK = validSize && ReadFile(file, g_valkyriaStaticFont.data(), static_cast<DWORD>(g_valkyriaStaticFont.size()), &read, nullptr) &&
++                        read == g_valkyriaStaticFont.size();
++    CloseHandle(file);
++    if (!readOK)
++    {
++      g_valkyriaStaticFont.clear();
++      return false;
++    }
++    DWORD fontCount = 0;
++    g_valkyriaStaticFontHandle = AddFontMemResourceEx(g_valkyriaStaticFont.data(), static_cast<DWORD>(g_valkyriaStaticFont.size()), nullptr, &fontCount);
++    if (!g_valkyriaStaticFontHandle || fontCount == 0)
++    {
++      g_valkyriaStaticFont.clear();
++      g_valkyriaStaticFontHandle = nullptr;
++      return false;
++    }
++    return true;
++  }
++}
++
+@@ -278,0 +391,13 @@ bool VALKYRIA::attach_function()
++  bool staticGlyphPresent = false;
++  if (standard && alternate && fallback && !loadValkyriaStaticGlyphs(&staticGlyphPresent))
++    return false;
++  if (staticGlyphPresent)
++  {
++    if (!loadValkyriaStaticFont())
++      return false;
++    HookParam font;
++    // 回填副本始终使用CP932字节，不能让客户系统的ANSI代码页先替换私用字形。
++    font.embed_hook_font = F_GetGlyphOutlineA | F_GetGlyphOutlineW |
++                           F_CreateFontIndirectA | F_CreateFontIndirectW | F_MultiByteToWideChar;
++    solvefont(font);
++  }
+@@ -280 +405 @@ bool VALKYRIA::attach_function()
+-}
+\ No newline at end of file
++}
+diff --git a/src/NativeImpl/LunaHook/LunaHook/hijackfuns.cc b/src/NativeImpl/LunaHook/LunaHook/hijackfuns.cc
+--- a/src/NativeImpl/LunaHook/LunaHook/hijackfuns.cc
++++ b/src/NativeImpl/LunaHook/LunaHook/hijackfuns.cc
+@@ -1,3 +1,37 @@
++
++#if defined(DANGO_VALKYRIA_ONLY)
++extern HANDLE g_valkyriaStaticFontHandle;
++extern std::wstring g_valkyriaStaticGlyphs;
++
++// 按资源生成时的高字节在前规则，查找VALKYRIA私用字位，避免与通用动态编码表冲突。
++bool decodeValkyriaStaticGlyph(UINT ch, wchar_t *glyph)
++{
++  if (!glyph || g_valkyriaStaticGlyphs.empty())
++    return false;
++  const unsigned int lead = (ch >> 8) & 0xff;
++  const unsigned int trail = ch & 0xff;
++  if (lead < 0xf0 || lead > 0xf9 ||
++      !((trail >= 0x40 && trail <= 0x7e) || (trail >= 0x80 && trail <= 0xfc)))
++    return false;
++  const size_t index = (lead - 0xf0) * 188 + (trail <= 0x7e ? trail - 0x40 : trail - 0x80 + 63);
++  if (index >= g_valkyriaStaticGlyphs.size() || !g_valkyriaStaticGlyphs[index])
++    return false;
++  *glyph = g_valkyriaStaticGlyphs[index];
++  return true;
++}
++
++// Windows的CP932把F0..F9映射成U+E000起的私用区；Wide入口按同一索引还原。
++bool decodeValkyriaUnicodePrivateGlyph(UINT ch, wchar_t *glyph)
++{
++  if (!glyph || ch < 0xe000 || ch >= 0xe000 + 1880)
++    return false;
++  const size_t index = ch - 0xe000;
++  if (index >= g_valkyriaStaticGlyphs.size() || !g_valkyriaStaticGlyphs[index])
++    return false;
++  *glyph = g_valkyriaStaticGlyphs[index];
++  return true;
++}
++#endif
+
+ #pragma intrinsic(_ReturnAddress)
+
+@@ -249,7 +283,7 @@
+     std::wstring newfontname;
+
+   public:
+-    explicit DCFontSwitcher(HDC hdc); // pass 0 to disable this class
++    explicit DCFontSwitcher(HDC hdc, bool valkyriaGlyph = false); // pass 0 to disable this class
+     ~DCFontSwitcher();
+   };
+
+@@ -274,7 +308,7 @@
+   {
+     return commonsharedmem->FontSizeRelative != 1;
+   }
+-  DCFontSwitcher::DCFontSwitcher(HDC hdc)
++  DCFontSwitcher::DCFontSwitcher(HDC hdc, bool valkyriaGlyph)
+       : hdc_(hdc), oldFont_(nullptr), newFont_(nullptr), newfontname(L"")
+   {
+     if (!hdc_)
+@@ -308,6 +342,14 @@
+     {
+       wcscpy(lf.lfFaceName, maybe_disabled_fontFamily());
+     }
++#if defined(DANGO_VALKYRIA_ONLY)
++    // 只在扩展中文和全角英数字形调用期间选择内置字体。
++    if (valkyriaGlyph)
++    {
++      wcscpy(lf.lfFaceName, L"Source Han Sans SC");
++      lf.lfCharSet = DEFAULT_CHARSET;
++    }
++#endif
+     newFont_ = fonts_.get(lf);
+     if ((!newFont_) || (newfontname != std::wstring(maybe_disabled_fontFamily())))
+     {
+@@ -477,6 +519,39 @@
+   if (CodePage == CP_THREAD_ACP || CodePage == CP_OEMCP)
+     CodePage = CP_ACP;
+   // CP_ACP(0), CP_MACCP(1), CP_OEMCP(2), CP_THREAD_ACP(3)
++#if defined(DANGO_VALKYRIA_ONLY)
++  // 在系统ACP转换之前，先按CP932解码包含资源私用字节的字符串。
++  if (::g_valkyriaStaticFontHandle && lpMultiByteStr && (CodePage <= 3 || CodePage == 932) &&
++      (cbMultiByte > 1 || cbMultiByte == -1))
++  {
++    const size_t inputSize = cbMultiByte == -1 ? ::strlen(lpMultiByteStr) : static_cast<size_t>(cbMultiByte);
++    bool hasStaticGlyph = false;
++    for (size_t i = 0; i + 1 < inputSize; ++i)
++    {
++      wchar_t glyph = 0;
++      const UINT code = (static_cast<unsigned char>(lpMultiByteStr[i]) << 8) |
++                        static_cast<unsigned char>(lpMultiByteStr[i + 1]);
++      if (decodeValkyriaStaticGlyph(code, &glyph))
++      {
++        hasStaticGlyph = true;
++        break;
++      }
++    }
++    if (hasStaticGlyph)
++    {
++      const int result = oldMultiByteToWideChar(932, dwFlags, lpMultiByteStr, cbMultiByte,
++                                                 lpWideCharStr, cchWideChar);
++      if (result > 0 && lpWideCharStr && cchWideChar > 0)
++        for (int i = 0; i < result; ++i)
++        {
++          wchar_t glyph = 0;
++          if (decodeValkyriaUnicodePrivateGlyph(lpWideCharStr[i], &glyph))
++            lpWideCharStr[i] = glyph;
++        }
++      return result;
++    }
++  }
++#endif
+   if ((CodePage <= 3 || CodePage == 932) && cchWideChar > 0 && cbMultiByte > 1)
+   {
+     bool dynamic;
+@@ -525,6 +600,16 @@
+     *dynamic = false;
+   if (ch > 0xff)
+   {
++#if defined(DANGO_VALKYRIA_ONLY)
++    // 必须先查VALKYRIA私用字位，再调用通用动态Shift-JIS解码器。
++    wchar_t staticGlyph = 0;
++    if (decodeValkyriaStaticGlyph(ch, &staticGlyph))
++    {
++      if (dynamic)
++        *dynamic = true;
++      return staticGlyph;
++    }
++#endif
+     bool t;
+     char data[3] = {(char)((BYTE)(ch >> 8) & 0xff), char((BYTE)ch & 0xff), 0};
+     auto text = dynamiccodec->decode(data, &t);
+@@ -619,14 +704,89 @@
+
+ DWORD WINAPI Hijack::newGetGlyphOutlineA(HDC hdc, UINT uChar, UINT uFormat, LPGLYPHMETRICS lpgm, DWORD cbBuffer, LPVOID lpvBuffer, const MAT2 *lpmat2)
+ {
+-  DCFontSwitcher fs(hdc);
+-
+-  DECODE_CHAR(uChar, oldGetGlyphOutlineW(hdc, ch, uFormat, lpgm, cbBuffer, lpvBuffer, lpmat2))
++#if defined(DANGO_VALKYRIA_ONLY)
++  // ANSI入口按资源生成时的CP932字节顺序解码，避免通用动态编码表改写私用字位。
++  if (::g_valkyriaStaticFontHandle)
++  {
++    bool staticGlyph = false;
++    UINT translated = decodeChar(uChar, &staticGlyph);
++    if (!staticGlyph && uChar > 0xff)
++    {
++      const char encoded[2] = {static_cast<char>(uChar >> 8), static_cast<char>(uChar)};
++      wchar_t standard = 0;
++      if (MultiByteToWideChar(932, MB_ERR_INVALID_CHARS, encoded, 2, &standard, 1) == 1)
++      {
++        if (standard >= 0xff01 && standard <= 0xff5e)
++        {
++          translated = standard - 0xfee0;
++          staticGlyph = true;
++        }
++        else if ((standard >= 0x3400 && standard <= 0x4dbf) ||
++                 (standard >= 0x4e00 && standard <= 0x9fff))
++        {
++          translated = standard;
++          staticGlyph = true;
++        }
++      }
++    }
++    if (staticGlyph)
++    {
++      // 扩展字绘制结束即恢复游戏字体，避免影响后续原生字符的字距和字形。
++      const HGDIOBJ gameFont = GetCurrentObject(hdc, OBJ_FONT);
++      DWORD result = GDI_ERROR;
++      {
++        DCFontSwitcher fs(hdc, true);
++        result = oldGetGlyphOutlineW(hdc, translated, uFormat, lpgm, cbBuffer, lpvBuffer, lpmat2);
++      }
++      if (gameFont && gameFont != HGDI_ERROR)
++        SelectObject(hdc, gameFont);
++      return result;
++    }
++  }
++#endif
++
++  DCFontSwitcher fs(hdc);
+   return oldGetGlyphOutlineA(hdc, uChar, uFormat, lpgm, cbBuffer, lpvBuffer, lpmat2);
+ }
+
+ DWORD WINAPI Hijack::newGetGlyphOutlineW(HDC hdc, UINT uChar, UINT uFormat, LPGLYPHMETRICS lpgm, DWORD cbBuffer, LPVOID lpvBuffer, const MAT2 *lpmat2)
+ {
++#if defined(DANGO_VALKYRIA_ONLY)
++  if (::g_valkyriaStaticFontHandle &&
++      ((uChar >= 0x3400 && uChar <= 0x4dbf) ||
++       (uChar >= 0x4e00 && uChar <= 0x9fff) ||
++       (uChar >= 0xff01 && uChar <= 0xff5e) ||
++       (uChar >= 0xe000 && uChar < 0xe000 + 1880) ||
++       (uChar >= 0xf000 && uChar <= 0xf9ff)))
++  {
++    UINT translated = uChar;
++    bool staticGlyph = false;
++    if (uChar >= 0xe000 && uChar < 0xe000 + 1880)
++    {
++      wchar_t glyph = 0;
++      staticGlyph = decodeValkyriaUnicodePrivateGlyph(uChar, &glyph);
++      if (staticGlyph)
++        translated = glyph;
++    }
++    else if (uChar >= 0xf000 && uChar <= 0xf9ff)
++      translated = decodeChar(uChar, &staticGlyph);
++    else
++      staticGlyph = true;
++    if (staticGlyph)
++    {
++      // Wide入口直接使用Unicode字位，仍需切换到随组件加载的中文字体。
++      const HGDIOBJ gameFont = GetCurrentObject(hdc, OBJ_FONT);
++      DWORD result = GDI_ERROR;
++      {
++        DCFontSwitcher fs(hdc, true);
++        result = oldGetGlyphOutlineW(hdc, translated, uFormat, lpgm, cbBuffer, lpvBuffer, lpmat2);
++      }
++      if (gameFont && gameFont != HGDI_ERROR)
++        SelectObject(hdc, gameFont);
++      return result;
++    }
++  }
++#endif
+
+   DCFontSwitcher fs(hdc);
+   return oldGetGlyphOutlineW(hdc, uChar, uFormat, lpgm, cbBuffer, lpvBuffer, lpmat2);

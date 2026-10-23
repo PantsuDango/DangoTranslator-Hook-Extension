@@ -1,0 +1,90 @@
+--- a/src/NativeImpl/LunaHook/LunaHost/LunaHostDll.cpp
++++ b/src/NativeImpl/LunaHook/LunaHost/LunaHostDll.cpp
+@@ -2 +2 @@
+-#define C_LUNA_API extern "C" __declspec(dllexport)
++#define C_HOOK_API extern "C" __declspec(dllexport)
+@@ -36 +36 @@ std::optional<T> checkoption(bool check, T &&t)
+-C_LUNA_API void Luna_Start(ProcessEvent Connect, ProcessEvent Disconnect, ThreadEvent_maybe_embed Create, ThreadEvent Destroy, OutputCallback Output, HostInfoHandler hostinfo, HookInsertHandler hookinsert, EmbedCallback embed, I18NQueryCallback i18nQueryCallback, EmuGameInfoCallback emuGameInfoCallback)
++C_HOOK_API void Hook_Start(ProcessEvent Connect, ProcessEvent Disconnect, ThreadEvent_maybe_embed Create, ThreadEvent Destroy, OutputCallback Output, HostInfoHandler hostinfo, HookInsertHandler hookinsert, EmbedCallback embed, I18NQueryCallback i18nQueryCallback, EmuGameInfoCallback emuGameInfoCallback)
+@@ -70 +70 @@ C_LUNA_API void Luna_Start(ProcessEvent Connect, ProcessEvent Disconnect, Thread
+-C_LUNA_API void Luna_ConnectAndInjectProcess(DWORD pid)
++C_HOOK_API void Hook_ConnectAndInjectProcess(DWORD pid)
+@@ -75 +75 @@ C_LUNA_API void Luna_ConnectAndInjectProcess(DWORD pid)
+-C_LUNA_API bool Luna_CheckIfNeedInject(DWORD pid)
++C_HOOK_API bool Hook_CheckIfNeedInject(DWORD pid)
+@@ -79 +79 @@ C_LUNA_API bool Luna_CheckIfNeedInject(DWORD pid)
+-C_LUNA_API void Luna_ConnectProcess(DWORD pid)
++C_HOOK_API void Hook_ConnectProcess(DWORD pid)
+@@ -83 +83 @@ C_LUNA_API void Luna_ConnectProcess(DWORD pid)
+-C_LUNA_API void Luna_DetachProcess(DWORD pid)
++C_HOOK_API void Hook_DetachProcess(DWORD pid)
+@@ -87 +87 @@ C_LUNA_API void Luna_DetachProcess(DWORD pid)
+-C_LUNA_API void *Luna_AllocString(const wchar_t *str)
++C_HOOK_API void *Hook_AllocString(const wchar_t *str)
+@@ -96 +96 @@ C_LUNA_API void *Luna_AllocString(const wchar_t *str)
+-C_LUNA_API void Luna_Settings(int flushDelay, bool filterRepetition, int defaultCodepage, int maxBufferSize, int maxHistorySize, bool enablePCHooks)
++C_HOOK_API void Hook_Settings(int flushDelay, bool filterRepetition, int defaultCodepage, int maxBufferSize, int maxHistorySize, bool enablePCHooks)
+@@ -105 +105 @@ C_LUNA_API void Luna_Settings(int flushDelay, bool filterRepetition, int default
+-C_LUNA_API void Luna_SettingsEx(DWORD pid, UINT32 waittime, UINT8 fontCharSet, bool fontCharSetEnabled, wchar_t *fontFamily, Displaymode displaymode, bool fastskipignore, bool clearText, bool changeFontSize, float FontSizeRelative, bool tryvehhook)
++C_HOOK_API void Hook_SettingsEx(DWORD pid, UINT32 waittime, UINT8 fontCharSet, bool fontCharSetEnabled, wchar_t *fontFamily, Displaymode displaymode, bool fastskipignore, bool clearText, bool changeFontSize, float FontSizeRelative, bool tryvehhook)
+@@ -120 +120 @@ C_LUNA_API void Luna_SettingsEx(DWORD pid, UINT32 waittime, UINT8 fontCharSet, b
+-C_LUNA_API void Luna_ResetLang()
++C_HOOK_API void Hook_ResetLang()
+@@ -124 +124 @@ C_LUNA_API void Luna_ResetLang()
+-C_LUNA_API void Luna_InsertPCHooks(DWORD pid, int which)
++C_HOOK_API void Hook_InsertPCHooks(DWORD pid, int which)
+@@ -128 +128 @@ C_LUNA_API void Luna_InsertPCHooks(DWORD pid, int which)
+-C_LUNA_API bool Luna_InsertHookCode(DWORD pid, LPCWSTR hookcode)
++C_HOOK_API bool Hook_InsertHookCode(DWORD pid, LPCWSTR hookcode)
+@@ -135 +135 @@ C_LUNA_API bool Luna_InsertHookCode(DWORD pid, LPCWSTR hookcode)
+-C_LUNA_API void Luna_QueryThreadHistory(ThreadParam tp, bool latest, void (*callback)(const wchar_t *))
++C_HOOK_API void Hook_QueryThreadHistory(ThreadParam tp, bool latest, void (*callback)(const wchar_t *))
+@@ -142 +142 @@ C_LUNA_API void Luna_QueryThreadHistory(ThreadParam tp, bool latest, void (*call
+-C_LUNA_API void Luna_RemoveHook(DWORD pid, uint64_t addr)
++C_HOOK_API void Hook_RemoveHook(DWORD pid, uint64_t addr)
+@@ -146 +146 @@ C_LUNA_API void Luna_RemoveHook(DWORD pid, uint64_t addr)
+-C_LUNA_API void Luna_FindHooks(DWORD pid, SearchParam sp, findhookcallback_t findhookcallback, LPCWSTR addresses)
++C_HOOK_API void Hook_FindHooks(DWORD pid, SearchParam sp, findhookcallback_t findhookcallback, LPCWSTR addresses)
+@@ -154 +154 @@ C_LUNA_API void Luna_FindHooks(DWORD pid, SearchParam sp, findhookcallback_t fin
+-C_LUNA_API bool Luna_CheckIsUsingEmbed(ThreadParam tp)
++C_HOOK_API bool Hook_CheckIsUsingEmbed(ThreadParam tp)
+@@ -158 +158 @@ C_LUNA_API bool Luna_CheckIsUsingEmbed(ThreadParam tp)
+-C_LUNA_API void Luna_UseEmbed(ThreadParam tp, bool use)
++C_HOOK_API void Hook_UseEmbed(ThreadParam tp, bool use)
+@@ -182 +182 @@ C_LUNA_API void Luna_UseEmbed(ThreadParam tp, bool use)
+-C_LUNA_API void Luna_EmbedCallback(ThreadParam tp, LPCWSTR text, LPCWSTR trans)
++C_HOOK_API void Hook_EmbedCallback(ThreadParam tp, LPCWSTR text, LPCWSTR trans)
+@@ -194 +194 @@ C_LUNA_API void Luna_EmbedCallback(ThreadParam tp, LPCWSTR text, LPCWSTR trans)
+-C_LUNA_API void Luna_SyncThread(ThreadParam tp, bool sync)
++C_HOOK_API void Hook_SyncThread(ThreadParam tp, bool sync)
+--- a/src/NativeImpl/LunaHook/include/defs.h
++++ b/src/NativeImpl/LunaHook/include/defs.h
+@@ -8,2 +8,2 @@
+-constexpr auto HOOK_PIPE = L"\\\\.\\pipe\\LUNA_HOOK";
+-constexpr auto HOST_PIPE = L"\\\\.\\pipe\\LUNA_HOST";
++constexpr auto HOOK_PIPE = L"\\\\.\\pipe\\TEXT_HOOK";
++constexpr auto HOST_PIPE = L"\\\\.\\pipe\\TEXT_HOST";
+@@ -18,2 +18,2 @@ constexpr auto HOOK_SEARCH_SHARED_MEM = L"HOOK_SEARCH_SHARED_MEM";
+-constexpr auto ITH_HOOKMAN_MUTEX_ = L"LUNA_VNR_HOOKMAN_"; // ITH_HOOKMAN_%d
+-constexpr auto CONNECTING_MUTEX = L"LUNA_CONNECTING_PIPES";
++constexpr auto ITH_HOOKMAN_MUTEX_ = L"TEXT_VNR_HOOKMAN_"; // ITH_HOOKMAN_%d
++constexpr auto CONNECTING_MUTEX = L"TEXT_CONNECTING_PIPES";
+@@ -22 +22 @@ constexpr auto CONNECTING_MUTEX = L"LUNA_CONNECTING_PIPES";
+-constexpr auto LUNA_EMBED_notify_event = "LUNA_NOTIFY.%lu.%llu";
++constexpr auto LUNA_EMBED_notify_event = "TEXT_NOTIFY.%lu.%llu";
+@@ -24 +24 @@ constexpr auto LUNA_EMBED_notify_event = "LUNA_NOTIFY.%lu.%llu";
+-constexpr auto PIPE_AVAILABLE_EVENT = L"LUNA_PIPE_AVAILABLE";
++constexpr auto PIPE_AVAILABLE_EVENT = L"TEXT_PIPE_AVAILABLE";
+@@ -27,2 +27,2 @@ constexpr auto PIPE_AVAILABLE_EVENT = L"LUNA_PIPE_AVAILABLE";
+-constexpr auto LUNA_HOOK_DLL_64 = L"LunaHook64";
+-constexpr auto LUNA_HOOK_DLL_32 = L"LunaHook32";
++constexpr auto LUNA_HOOK_DLL_64 = L"TextHook64";
++constexpr auto LUNA_HOOK_DLL_32 = L"TextHook32";
+--- a/src/NativeImpl/LunaHook/LunaHook/resource.rc
++++ b/src/NativeImpl/LunaHook/LunaHook/resource.rc
+@@ -17,5 +16,0 @@ compound_chars_Robotics_Notes_Dash COMPOUND_CHARS "resource/compound_chars_Robot
+-renpy_hook_font PYSOURCE "resource/renpy_hook_font.py"
+-renpy_hook_text PYSOURCE "resource/renpy_hook_text.py"
+-
+-lunajspatch JSSOURCE "resource/lunajspatch.js"
+-

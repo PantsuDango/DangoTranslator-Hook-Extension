@@ -1,0 +1,86 @@
+--- a/src/NativeImpl/LunaHook/LunaHook/engine32/KiriKiri.cpp
++++ b/src/NativeImpl/LunaHook/LunaHook/engine32/KiriKiri.cpp
+@@ -218,8 +218,36 @@ bool FindKiriKiriHook(DWORD fun, DWORD size, DWORD pt, DWORD flag) // jichi 10/2
+   return false;
+ }
+ 
++bool HasConflictingKiriKiriTranslationWrapper()
++{
++  std::wstring executablePath(MAX_PATH, L'\0');
++  DWORD pathLength = GetModuleFileNameW(nullptr, executablePath.data(), static_cast<DWORD>(executablePath.size()));
++  if (pathLength == 0 || pathLength >= executablePath.size())
++    return false;
++  executablePath.resize(pathLength);
++  const auto separator = executablePath.find_last_of(L"\\/");
++  if (separator == std::wstring::npos)
++    return false;
++  const std::wstring gameDirectory = executablePath.substr(0, separator);
++  const std::wstring translationDataFile = gameDirectory + L"\\TrsData.bin";
++  const std::wstring injectionPathFile = gameDirectory + L"\\injectPath";
++  const std::wstring proxyLibrary = gameDirectory + L"\\winmm.dll";
++  const DWORD translationDataAttributes = GetFileAttributesW(translationDataFile.c_str());
++  const DWORD injectionPathAttributes = GetFileAttributesW(injectionPathFile.c_str());
++  const DWORD proxyLibraryAttributes = GetFileAttributesW(proxyLibrary.c_str());
++  return translationDataAttributes != INVALID_FILE_ATTRIBUTES &&
++         injectionPathAttributes != INVALID_FILE_ATTRIBUTES &&
++         proxyLibraryAttributes != INVALID_FILE_ATTRIBUTES;
++}
++
+ bool InsertKiriKiriHook() // 9/20/2014 jichi: change return type to bool
+ {
++#if defined(DANGO_KIRIKIRI_ONLY)
++  // 外部翻译注入层会修改相同的绘制链路，重复安装KiriKiri1/2会触发内存访问异常
++  // 此类游戏保留更上游的Krkr2wcs完整文本Hook
++  if (HasConflictingKiriKiriTranslationWrapper())
++    return false;
++#endif
+   bool k1 = FindKiriKiriHook((DWORD)GetGlyphOutlineW, processStopAddress - processStartAddress, processStartAddress, 0),     // KiriKiri1
+       k2 = FindKiriKiriHook((DWORD)GetTextExtentPoint32W, processStopAddress - processStartAddress, processStartAddress, 1); // KiriKiri2
+   // RegisterEngineType(ENGINE_KIRIKIRI);
+@@ -1325,7 +1325,10 @@ namespace
+     }
+     newText += saveend;
+     auto text = (LPWSTR)s->esi;
+-    wcscpy(text, newText.c_str());
++    if (!text || newText.size() > wcslen(text))
++      return;
++    // 该入口只能覆写现有UTF-16缓冲区，超长译文必须整句保留原文。
++    wmemcpy(text, newText.c_str(), newText.size() + 1);
+   }
+   void hookBefore(hook_context *s, HookParam *hp, TextBuffer *buffer, uintptr_t *role)
+   {
+@@ -1653,7 +1657,10 @@ namespace
+     };
+     hp.embed_fun = [](hook_context *s, TextBuffer buffer, HookParam *)
+     {
+-      auto t = std::wstring((wchar_t *)s->stack[off / 4]);
++      auto target = (wchar_t *)s->stack[off / 4];
++      if (!target)
++        return;
++      auto t = std::wstring(target);
+       if (t[0] == L'@')
+         return;
+       auto newText = buffer.strW();
+@@ -1661,7 +1668,10 @@ namespace
+         newText = newText + L"[np]";
+       if (t.size() > 3 && t.substr(t.size() - 3) == L"[r]")
+         newText = newText + L"[r]"; // 揺り籠より天使まで
+-      wcscpy((wchar_t *)s->stack[off / 4], newText.c_str());
++      if (newText.size() > t.size())
++        return;
++      // 只在原字符串容量内写入，避免破坏相邻的KiriKiri对象内存。
++      wmemcpy(target, newText.c_str(), newText.size() + 1);
+     };
+     hp.embed_hook_font = F_GetTextExtentPoint32W | F_GetGlyphOutlineW;
+     return NewHook(hp, "Krkr2wcs");
+@@ -1754,5 +1764,10 @@ bool KiriKiri::attach_function()
+       return true;
+   }
++#if defined(DANGO_KIRIKIRI_ONLY)
++  // 冲突环境只安装已经验证可读取完整对话的字符串复制Hook
++  if (HasConflictingKiriKiriTranslationWrapper())
++    return wcslen_wcscpy();
++#endif
+   bool b1 = attachkr2(processStartAddress, processStopAddress);
+   bool _3 = wcslen_wcscpy();
+   auto _ = InsertKiriKiriHook() || InsertKiriKiriZHook() || b1 || _3;

@@ -1,0 +1,262 @@
+--- a/src/NativeImpl/LunaHook/LunaHook/engine32/VALKYRIA.cpp
++++ b/src/NativeImpl/LunaHook/LunaHook/engine32/VALKYRIA.cpp
+@@ -1,67 +1,184 @@
+ #include "VALKYRIA.h"
++
++namespace
++{
++  uintptr_t messageBuffer = 0;
++  uintptr_t bodyLayoutReturn = 0;
++  uintptr_t bodyCopyReturn = 0;
++  uintptr_t storyLayoutStandardReturn = 0;
++  uintptr_t storyLayoutAlternateReturn = 0;
++  uintptr_t storyCopyReturn = 0;
++  thread_local bool storyLayoutObserved = false;
++}
+ 
+ bool VALKYRIA::attach_function()
+ {
+-  auto addr = findiatcallormov((DWORD)GetTextExtentPoint32A, processStartAddress, processStartAddress, processStopAddress);
+-  if (!addr)
++  BYTE signature[] = {
++      0x8d, 0x84, 0x24, 0x84, 0x01, 0x00, 0x00, // lea eax,[esp+0x184]
++      0x50, 0x68, 0x00, 0x02, 0x00, 0x00,       // push eax; push 512
++      0x68, XX4,                               // push display buffer
++      0x89, 0x3d, XX4,
++      0xc7, 0x05, XX4, 0xff, 0x00, 0x00, 0x00,
++      0x89, 0x3d, XX4,
++      0xc7, 0x05, XX4, 0x01, 0x00, 0x00, 0x00,
++      0xe8, XX4,                               // bounded string copy
++      0x8a, 0x4c, 0x24, 0x24};                 // following instruction
++  auto address = MemDbg::findBytes(signature, sizeof(signature), processStartAddress, processStopAddress);
++  if (!address || MemDbg::findBytes(signature, sizeof(signature), address + 1, processStopAddress))
+     return false;
+-  BYTE sehstart[] = {
+-      0x6a, 0xff,
+-      0x68, XX4,
+-      0x64, 0xa1, 0, 0, 0, 0,
+-      0x50,
+-      0x81, 0xec, XX4,
+-      0xa1, XX4};
+-  addr = reverseFindBytes(sehstart, sizeof(sehstart), addr - 0x400, addr, 0, true);
+-  if (!addr)
++
++  messageBuffer = *reinterpret_cast<DWORD *>(address + 14);
++  if (messageBuffer < processStartAddress || messageBuffer + 0x200 > processStopAddress)
+     return false;
++
++  // Opening notices use 0x4290ff; scenario dialogue uses 0x434cc5 or
++  // 0x434ca8. All three calls occur before the display-buffer copy.
++  const auto bodyLayoutCall = address - 0xbbe7;
++  const auto bodyCopyCall = address - 0xba44;
++  const auto storyStandardCall = address - 0x21;
++  const auto storyAlternateCall = address - 0x3e;
++  const auto storyCopyCall = address + 0x32;
++  if (bodyLayoutCall < processStartAddress ||
++      storyCopyCall + 5 >= processStopAddress ||
++      *reinterpret_cast<BYTE *>(bodyLayoutCall) != 0xe8 ||
++      *reinterpret_cast<BYTE *>(bodyCopyCall) != 0xe8 ||
++      *reinterpret_cast<BYTE *>(storyStandardCall) != 0xe8 ||
++      *reinterpret_cast<BYTE *>(storyAlternateCall) != 0xe8 ||
++      *reinterpret_cast<BYTE *>(storyCopyCall) != 0xe8 ||
++      *reinterpret_cast<BYTE *>(bodyCopyCall - 5) != 0x68 ||
++      *reinterpret_cast<DWORD *>(bodyCopyCall - 4) != messageBuffer)
++    return false;
++  const auto layoutAddress = bodyLayoutCall + 5 + *reinterpret_cast<int32_t *>(bodyLayoutCall + 1);
++  const auto storyLayoutAddress = storyStandardCall + 5 + *reinterpret_cast<int32_t *>(storyStandardCall + 1);
++  const auto alternateLayoutAddress = storyAlternateCall + 5 + *reinterpret_cast<int32_t *>(storyAlternateCall + 1);
++  if (layoutAddress < processStartAddress || layoutAddress >= processStopAddress ||
++      storyLayoutAddress != layoutAddress ||
++      alternateLayoutAddress < processStartAddress || alternateLayoutAddress >= processStopAddress)
++    return false;
++  bodyLayoutReturn = bodyLayoutCall + 5;
++  bodyCopyReturn = bodyCopyCall + 5;
++  storyLayoutStandardReturn = storyStandardCall + 5;
++  storyLayoutAlternateReturn = storyAlternateCall + 5;
++  storyCopyReturn = storyCopyCall + 5;
++  // The engine treats every slash byte as a control command, including DBCS trail bytes.
++  dynamiccodec->setMinimumSecondByte(0x2f);
++
+   HookParam hp;
+-  hp.address = addr;
+-  hp.type = USING_STRING;
+-  hp.offset = stackoffset(5);
+-  hp.filter_fun = [](TextBuffer *buffer, HookParam *hp)
++  hp.address = layoutAddress;
++  hp.type = USING_STRING | EMBED_ABLE | EMBED_DYNA_SJIS | NO_CONTEXT;
++  hp.codepage = 932;
++  hp.lineSeparator = L"/r";
++  hp.embed_hook_font = F_GetGlyphOutlineA | F_CreateFontIndirectA;
++  hp.text_fun = [](hook_context *context, HookParam *, TextBuffer *buffer, uintptr_t *split)
+   {
+-    // 实际上是单字符
+-    auto str = buffer->strA();
+-    static bool isspace = false;
+-    if (isspace && str == "\x81\x40")
+-      buffer->clear();
+-    else if (str == "\\r" || str == "\\R")
++    const auto caller = context->retaddr;
++    const bool storyCall = caller == storyLayoutStandardReturn || caller == storyLayoutAlternateReturn;
++    if (caller != bodyLayoutReturn && !storyCall)
++      return;
++    if (storyCall)
++      storyLayoutObserved = false;
++    const auto *text = reinterpret_cast<const char *>(context->stack[1]);
++    if (!text)
++      return;
++    size_t length = 0;
++    while (length < 0x200 && text[length])
++      ++length;
++    if (length == 0 || length == 0x200)
++      return;
++    if (storyCall)
++      storyLayoutObserved = true;
++    *split = context->retaddr;
++    buffer->from(text, length);
++  };
++  hp.embed_fun = [](hook_context *context, TextBuffer buffer, HookParam *)
++  {
++    if (context->retaddr != bodyLayoutReturn &&
++        context->retaddr != storyLayoutStandardReturn &&
++        context->retaddr != storyLayoutAlternateReturn)
++      return;
++    auto *displayText = reinterpret_cast<char *>(context->stack[1]);
++    const auto translation = buffer.strA();
++    if (!displayText || translation.empty())
++      return;
++    for (size_t index = 0; index < translation.size();)
++    {
++      const auto byte = static_cast<unsigned char>(translation[index]);
++      if (byte == '/')
++      {
++        if (index + 1 >= translation.size() || translation[index + 1] != 'r')
++          return;
++        index += 2;
++        continue;
++      }
++      if (byte == '&')
++      {
++        if (index + 1 >= translation.size() || translation[index + 1] != '0')
++          return;
++        index += 2;
++        continue;
++      }
++      if (byte == '@' || byte == '-' || byte == '+' || byte == '*')
++        return;
++      if (IsDBCSLeadByteEx(932, byte) || byte == 0x80 || byte == 0xa0 || byte >= 0xf0)
++      {
++        if (index + 1 >= translation.size() || translation[index + 1] == '/')
++          return;
++        index += 2;
++        continue;
++      }
++      ++index;
++    }
++    std::string displayTranslation;
++    displayTranslation.reserve(translation.size());
++    for (const char character : translation)
+     {
+-      isspace = true;
+-      buffer->clear();
+-      // buffer->from("\n");
++      if (character == '\n')
++        displayTranslation.append("/r");
++      else
++        displayTranslation.push_back(character);
+     }
+-    else
++    const bool messageStart = displayText[0] == '/' && displayText[1] == 's';
++    const size_t prefixLength = messageStart ? 2 : 0;
++    if (displayTranslation.size() + prefixLength >= 0x100)
++      return;
++    if (messageStart)
+     {
+-      isspace = false;
++      displayText[0] = '/';
++      displayText[1] = 's';
+     }
+-    //   switch ( v12 )
+-    // {
+-    //   case 'U':
+-    //   case 'u':
+-    //     String[0] = strtol(a6 + 2, 0, 16);
+-    //     String[1] = 0;
+-    //     HIBYTE(v92) = v14;
+-    //     LOWORD(v92) = a4;
+-    //     BYTE2(v92) = BYTE2(a4);
+-    //     return sub_454C40(a2, a3, v92, a5, String, (int)lprcDst, a8);
+-    //   case 'R':
+-    //   case 'r':
+-    //     sub_453E20();
+-    //     return 0;
+-    //   case '\\':
+-    //     wcscpy(String, L"\\");
+-    //     HIBYTE(v91) = HIBYTE(this);
+-    //     LOWORD(v91) = a4;
+-    //     BYTE2(v91) = BYTE2(a4);
+-    //     return sub_454C40(a2, a3, v91, a5, String, (int)a7, a8);
+-    // }
++    ::memcpy(displayText + prefixLength, displayTranslation.c_str(), displayTranslation.size() + 1);
+   };
+-  if (NewHook(hp, "VALKYRIA"))
++  const bool standard = NewHook(hp, "ValkyriaMessage");
++  hp.address = alternateLayoutAddress;
++  const bool alternate = NewHook(hp, "ValkyriaMessage");
++  const auto copyAddress = storyCopyCall + 5 + *reinterpret_cast<int32_t *>(storyCopyCall + 1);
++  HookParam probe;
++  probe.address = copyAddress;
++  probe.type = USING_STRING | NO_CONTEXT;
++  probe.codepage = 932;
++  probe.text_fun = [](hook_context *context, HookParam *, TextBuffer *buffer, uintptr_t *split)
+   {
+-    PcHooks::hookGDIFunctions(GetTextExtentPoint32W);
+-    return true;
+-  }
+-  return false;
++    if (context->stack[1] != messageBuffer)
++      return;
++    if (context->retaddr == storyCopyReturn && storyLayoutObserved)
++    {
++      storyLayoutObserved = false;
++      return;
++    }
++    const auto parent = context->stack[4];
++    if (parent == bodyCopyReturn)
++      return;
++    const auto *source = reinterpret_cast<const char *>(context->stack[3]);
++    if (!source)
++      return;
++    size_t length = 0;
++    while (length < 0x200 && source[length])
++      ++length;
++    if (length == 0 || length == 0x200)
++      return;
++    *split = parent >= processStartAddress && parent < processStopAddress ? parent : context->retaddr;
++    buffer->from(source, length);
++  };
++  const bool fallback = NewHook(probe, "ValkyriaMessage");
++  return standard && alternate && fallback;
+ }
+--- a/src/NativeImpl/LunaHook/LunaHook/engine32/VALKYRIA.h
++++ b/src/NativeImpl/LunaHook/LunaHook/engine32/VALKYRIA.h
+@@ -1,16 +1,17 @@
+-
++#pragma once
+ 
+ class VALKYRIA : public ENGINE
+ {
+ public:
+     VALKYRIA()
+     {
+-
+         check_by = CHECK_BY::CUSTOM;
+         is_engine_certain = true;
+         check_by_target = []()
+         {
+-            return Util::SearchResourceString(L"Copyright(C)VALKYRIA") && Util::CheckFile(L"data0*-00.dat");
++            return Util::SearchResourceString(L"VALKYRIA") &&
++                   Util::CheckFile(L"data00.odn") &&
++                   Util::CheckFile(L"data\\System.odn");
+         };
+     }
+     bool attach_function();

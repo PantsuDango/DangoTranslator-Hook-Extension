@@ -1,0 +1,4 @@
+# Preserve imported source snapshot bytes and their manifest hashes.
+* -text
+*.patch text eol=lf
+*.otf binary

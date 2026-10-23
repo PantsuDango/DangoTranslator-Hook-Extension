@@ -1,0 +1,17 @@
+--- a/src/NativeImpl/LunaHook/LunaHook/main.cc
++++ b/src/NativeImpl/LunaHook/LunaHook/main.cc
+@@ -4,0 +5,3 @@
++#if defined(DANGO_NSCRIPTER_ONLY)
++bool NScripterPrepareDetach();
++#endif
+@@ -165,5 +168,9 @@
++#if defined(DANGO_NSCRIPTER_ONLY)
++        if (!NScripterPrepareDetach()) { host_connected = false; return Pipe(0); }
++#endif
+ 		isDetachClear = true;
+-		MH_Uninitialize();
+ 		for (auto &hook : *hooks)
+ 			hook.Clear();
++        // 等待每个Hook退出后再释放MinHook跳板，避免断连时返回已释放地址
++		MH_Uninitialize();
+ 		FreeLibraryAndExitThread(GetModuleHandleW(LUNA_HOOK_DLL), 0);

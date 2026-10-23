@@ -1,0 +1,61 @@
+[
+  {
+    "class": "Yarn.Unity.DialogueRunner",
+    "name": "SetDialogueViews",
+    "signature": "20|void|1d:12:Yarn.Unity.DialogueViewBase",
+    "code": "030a160b2b2306079a0c081428000000002d120802fe060000000073000000007d000000000717580b07068e6932d702037d000000002a",
+    "tokens": {
+      "13": "member:UnityEngine.Object:op_Equality:00|bool|12:UnityEngine.Object|12:UnityEngine.Object",
+      "23": "method:Yarn.Unity.DialogueRunner:OnViewRequestedInterrupt:20|void",
+      "28": "member:System.Action:.ctor:20|void|object|nativeint",
+      "33": "field:Yarn.Unity.DialogueViewBase:requestInterrupt:06:12:System.Action",
+      "50": "field:Yarn.Unity.DialogueRunner:dialogueViews:06:1d:12:Yarn.Unity.DialogueViewBase"
+    },
+    "locals": "07|1d:12:Yarn.Unity.DialogueViewBase|int|12:Yarn.Unity.DialogueViewBase",
+    "exceptions": ""
+  },
+  {
+    "class": "Yarn.Unity.LocalizedLine",
+    "name": "get_CharacterName",
+    "signature": "20|string",
+    "code": "0228000000000b12017200000000120028000000002c1d12002800000000720000000012026f000000002c08120228000000002a142a",
+    "tokens": {
+      "10": "str:63006800610072006100630074006500720000",
+      "17": "member:Yarn.Markup.MarkupParseResult:TryGetAttributeWithName:20|bool|string|10:11:Yarn.Markup.MarkupAttribute",
+      "2": "method:Yarn.Unity.LocalizedLine:get_Text:20|11:Yarn.Markup.MarkupParseResult",
+      "26": "member:Yarn.Markup.MarkupAttribute:get_Properties:20|12:System.Collections.Generic.IReadOnlyDictionary`2\u003cstring,11:Yarn.Markup.MarkupValue\u003e",
+      "31": "str:6e0061006d00650000",
+      "38": "member:12:System.Collections.Generic.IReadOnlyDictionary`2\u003cstring,11:Yarn.Markup.MarkupValue\u003e:TryGetValue:20|bool|13:0|10:13:1",
+      "47": "member:Yarn.Markup.MarkupValue:get_StringValue:20|string"
+    },
+    "locals": "07|11:Yarn.Markup.MarkupAttribute|11:Yarn.Markup.MarkupParseResult|11:Yarn.Markup.MarkupValue",
+    "exceptions": ""
+  },
+  {
+    "class": "Yarn.Unity.LocalizedLine",
+    "name": "get_Text",
+    "signature": "20|11:Yarn.Markup.MarkupParseResult",
+    "code": "027b000000002a",
+    "tokens": {
+      "2": "field:Yarn.Unity.LocalizedLine:\u003cText\u003ek__BackingField:06:11:Yarn.Markup.MarkupParseResult"
+    },
+    "locals": "",
+    "exceptions": ""
+  },
+  {
+    "class": "Yarn.Unity.LocalizedLine",
+    "name": "get_TextWithoutCharacterName",
+    "signature": "20|11:Yarn.Markup.MarkupParseResult",
+    "code": "0228000000000b12017200000000120028000000002c100228000000000b12010628000000002a0228000000002a",
+    "tokens": {
+      "10": "str:63006800610072006100630074006500720000",
+      "17": "member:Yarn.Markup.MarkupParseResult:TryGetAttributeWithName:20|bool|string|10:11:Yarn.Markup.MarkupAttribute",
+      "2": "method:Yarn.Unity.LocalizedLine:get_Text:20|11:Yarn.Markup.MarkupParseResult",
+      "25": "method:Yarn.Unity.LocalizedLine:get_Text:20|11:Yarn.Markup.MarkupParseResult",
+      "34": "member:Yarn.Markup.MarkupParseResult:DeleteRange:20|11:Yarn.Markup.MarkupParseResult|11:Yarn.Markup.MarkupAttribute",
+      "41": "method:Yarn.Unity.LocalizedLine:get_Text:20|11:Yarn.Markup.MarkupParseResult"
+    },
+    "locals": "07|11:Yarn.Markup.MarkupAttribute|11:Yarn.Markup.MarkupParseResult",
+    "exceptions": ""
+  }
+]

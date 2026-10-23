@@ -1,0 +1,6 @@
+--- a/src/NativeImpl/LunaHook/LunaHook/engine32/Siglus.cpp
++++ b/src/NativeImpl/LunaHook/LunaHook/engine32/Siglus.cpp
+@@ -1,0 +2 @@
++#include "SiglusDisplay.h"
+@@ -1901,0 +1903 @@
++  return DangoSiglus::attach();

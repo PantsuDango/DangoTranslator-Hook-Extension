@@ -1,0 +1,14 @@
+--- a/src/NativeImpl/version.cmake
++++ b/src/NativeImpl/version.cmake
+@@ -26,2 +26,3 @@ generate_product_version(
+-   NAME "LunaTranslator"
+-   COMPANY_COPYRIGHT "Copyright (C) 2026 HIllya51"
++   NAME "Bolero ADV System"
++   BUNDLE "Bolero ADV System"
++   COMPANY_COPYRIGHT "Copyright (C) 2026 HIllya51"
+@@ -33 +34,4 @@ generate_product_version(
+-   COMPANY_NAME "HIllya51"
++   COMPANY_NAME "Open-source contributors"
++   ORIGINAL_FILENAME "Bolero Hook Component"
++   INTERNAL_NAME "Bolero ADV System"
++   FILE_DESCRIPTION "Bolero ADV System Hook Component"

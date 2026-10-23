@@ -1,0 +1,111 @@
+--- a/src/NativeImpl/LunaHook/LunaHook/engine32/VALKYRIA.cpp
++++ b/src/NativeImpl/LunaHook/LunaHook/engine32/VALKYRIA.cpp
+@@ -9,6 +9,18 @@
+   uintptr_t storyLayoutAlternateReturn = 0;
+   uintptr_t storyCopyReturn = 0;
+   thread_local bool storyLayoutObserved = false;
++  thread_local std::string choiceDisplayTranslation;
++  constexpr uintptr_t choiceCopyReturnOffsets[] = {
++      0x29940, 0x29d05, 0x29f10, 0x2a50e, 0x2ac80, 0x2aff3, 0x2b63e,
++      0x35170, 0x35350, 0x35993, 0x36032, 0x36370, 0x36950};
++
++  bool isChoiceCopyReturn(uintptr_t address)
++  {
++    for (const auto offset : choiceCopyReturnOffsets)
++      if (address == processStartAddress + offset)
++        return true;
++    return false;
++  }
+ }
+ 
+ bool VALKYRIA::attach_function()
+@@ -171,5 +183,89 @@
+     buffer->from(source, length);
+   };
+   const bool fallback = NewHook(probe, "ValkyriaMessage");
++  // In this executable the option builders copy each label into a temporary
++  // display string before calling the text layout function. The copy source
++  // remains owned by the script and is also used by menu control flow.
++  // Replace only the argument of these verified display-copy calls.
++  if (address == processStartAddress + 0x34ce6)
++  {
++    const auto choiceCopyAddress = processStartAddress + 0x23540;
++    const BYTE choiceCopySignature[] = {0x8b, 0x44, 0x24, 0x08, 0x8b, 0x4c, 0x24, 0x04};
++    bool choiceLayoutValid = choiceCopyAddress + sizeof(choiceCopySignature) < processStopAddress &&
++                             ::memcmp(reinterpret_cast<void *>(choiceCopyAddress), choiceCopySignature, sizeof(choiceCopySignature)) == 0;
++    for (const auto offset : choiceCopyReturnOffsets)
++    {
++      const auto call = processStartAddress + offset - 5;
++      if (call + 5 >= processStopAddress || *reinterpret_cast<BYTE *>(call) != 0xe8 ||
++          call + 5 + *reinterpret_cast<int32_t *>(call + 1) != choiceCopyAddress)
++      {
++        choiceLayoutValid = false;
++        break;
++      }
++    }
++    // Diagnostic build: keep the verified option layout check but do not
++    // install the option write hook while isolating the Ctrl black screen.
++    constexpr bool enableChoiceForDiagnostic = false;
++    if (choiceLayoutValid && enableChoiceForDiagnostic)
++    {
++      HookParam choice;
++      choice.address = choiceCopyAddress;
++      choice.type = USING_STRING | EMBED_ABLE | EMBED_DYNA_SJIS | NO_CONTEXT;
++      choice.codepage = 932;
++      choice.embed_hook_font = F_GetGlyphOutlineA | F_CreateFontIndirectA;
++      choice.text_fun = [](hook_context *context, HookParam *, TextBuffer *buffer, uintptr_t *split)
++      {
++        if (!isChoiceCopyReturn(context->retaddr))
++          return;
++        const auto *source = reinterpret_cast<const char *>(context->stack[2]);
++        if (!source)
++          return;
++        size_t length = 0;
++        while (length < 0xc8 && source[length])
++          ++length;
++        if (length == 0 || length == 0xc8)
++          return;
++        *split = context->retaddr;
++        buffer->from(source, length);
++      };
++      choice.embed_fun = [](hook_context *context, TextBuffer buffer, HookParam *)
++      {
++        if (!isChoiceCopyReturn(context->retaddr))
++          return;
++        const auto *original = reinterpret_cast<const char *>(context->stack[2]);
++        const auto translated = buffer.strA();
++        if (!original || translated.empty())
++          return;
++        size_t originalLength = 0;
++        while (originalLength < 0xc8 && original[originalLength])
++          ++originalLength;
++        if (originalLength == 0 || originalLength == 0xc8)
++          return;
++        std::string display;
++        if (originalLength >= 2 && original[0] == '/' && original[1] == 's')
++          display = "/s";
++        for (size_t index = 0; index < translated.size();)
++        {
++          const auto byte = static_cast<unsigned char>(translated[index]);
++          if (byte == '/' || byte == '&' || byte == '@' || byte == '-' || byte == '+' || byte == '*' || byte < 0x20 || byte == 0x7f)
++            return;
++          if (IsDBCSLeadByteEx(932, byte) || byte == 0x80 || byte == 0xa0 || byte >= 0xf0)
++          {
++            if (index + 1 >= translated.size() || translated[index + 1] == '/')
++              return;
++            index += 2;
++          }
++          else
++            ++index;
++        }
++        display.append(translated);
++        if (display.size() > originalLength || display.size() >= 0x100)
++          return;
++        choiceDisplayTranslation = std::move(display);
++        context->stack[2] = reinterpret_cast<uintptr_t>(choiceDisplayTranslation.c_str());
++      };
++      NewHook(choice, "ValkyriaChoice");
++    }
++  }
+   return standard && alternate && fallback;
+ }

@@ -1,0 +1,14 @@
+--- a/src/NativeImpl/version.cmake
++++ b/src/NativeImpl/version.cmake
+@@ -26,2 +26,3 @@ generate_product_version(
+-   NAME "LunaTranslator"
+-   COMPANY_COPYRIGHT "Copyright (C) 2026 HIllya51"
++   NAME "SiglusEngine"
++   BUNDLE "SiglusEngine"
++   COMPANY_COPYRIGHT "Copyright (C) 2026 HIllya51"
+@@ -33 +34,4 @@ generate_product_version(
+-   COMPANY_NAME "HIllya51"
++   COMPANY_NAME "Open-source contributors"
++   ORIGINAL_FILENAME "Siglus Hook Component"
++   INTERNAL_NAME "SiglusEngine"
++   FILE_DESCRIPTION "SiglusEngine Hook Component"

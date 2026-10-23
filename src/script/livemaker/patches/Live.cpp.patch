@@ -1,0 +1,24 @@
+--- a/src/NativeImpl/LunaHook/LunaHook/engine32/Live.cpp
++++ b/src/NativeImpl/LunaHook/LunaHook/engine32/Live.cpp
+@@ -82,16 +82,10 @@ static bool live2()
+-  hp.type = USING_STRING | NO_CONTEXT;
++  hp.type = USING_STRING | NO_CONTEXT | FULL_STRING;
+   hp.filter_fun = [](TextBuffer *buffer, HookParam *)
+   {
+     static std::string last;
+-    auto s = buffer->strA();
+-    if (startWith(s, last))
+-    {
+-      auto _ = s.substr(last.size());
+-      buffer->from(Trim(_));
+-    }
+-    else
+-    {
+-      buffer->from(Trim(s));
+-    }
++    auto s = Trim(buffer->strA());
++    if (s.empty() || s == last)
++      return buffer->clear();
+     last = s;
++    buffer->from(s);
+   };

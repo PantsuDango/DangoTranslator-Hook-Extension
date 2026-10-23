@@ -1,0 +1,18 @@
+--- a/src/NativeImpl/LunaHook/LunaHook/hijackfuns.cc
++++ b/src/NativeImpl/LunaHook/LunaHook/hijackfuns.cc
+@@ -198,1 +198,4 @@
++#if defined(DANGO_YURIS_ONLY)
++#include "engine32/YurisGdiFont.h"
++#else
+   // LogFont manager
+@@ -319,1 +322,2 @@
++#endif
+ } // unnamed namespace
+@@ -329,1 +333,4 @@
++#if defined(DANGO_YURIS_ONLY)
++  return createYurisFontIndirect(lplf);
++#else
+ 
+@@ -364,1 +371,2 @@
+   return oldCreateFontIndirectA(lplf);
++#endif
