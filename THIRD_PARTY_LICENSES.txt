@@ -7,6 +7,11 @@ GNU General Public License, version 3
 -------------------------------------
 Source: LICENSE
 
+LunaHook-derived native components are adapted from LunaTranslator/LunaHook.
+Upstream copyright: Copyright (C) 2026 HIllya51
+Upstream project: https://github.com/HIllya51/LunaTranslator
+Engine-specific component names do not replace this upstream attribution.
+
                     GNU GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
 

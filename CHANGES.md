@@ -1,5 +1,14 @@
 # Changes
 
+## 2026-10-31 — DangoTranslator 7.0.3
+
+- Synchronized the Unity Mono Hook runtime with the 7.0.3 release.
+- Added the managed `LiveReader.cs` runtime used by the real-time display path.
+- Updated `Reader.cs`, `teamnimbus.hpp`, and the Unity Mono build references for
+  older Mono runtimes and modular Unity assemblies.
+- Kept the repository scoped to Hook runtimes and their build inputs; the
+  independent resource tools and desktop client remain outside this repository.
+
 ## 2026-10-23
 
 - Added standalone build entry points for 33 LunaHook-derived engine adapters.

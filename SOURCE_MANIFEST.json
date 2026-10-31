@@ -1,8 +1,8 @@
 {
-  "snapshotDate": "2026-10-23",
+  "snapshotDate": "2026-10-31",
   "sourceProject": "Golang-DangoTranslator",
-  "sourceGitHead": "7b84bb0cc77ad3ed66439bf7a2cc2309b0e65cd6",
-  "sourceState": "Hook integration source snapshot; standalone build changes recorded per file",
+  "sourceGitHead": "5a4a6ff29992bccd5cc33be90404ec8419052cfc",
+  "sourceState": "Hook integration source snapshot synchronized with DangoTranslator 7.0.3; independent resource tools and desktop client remain outside this repository",
   "lunaUpstream": "https://github.com/HIllya51/LunaTranslator",
   "lunaUpstreamCommit": null,
   "lunaCommitNote": "The upstream source snapshot has no verified Git commit identity. File SHA-256 values identify the included snapshot.",
@@ -1362,9 +1362,9 @@
     {
       "path": "src/script/unity_mono/build.ps1",
       "origin": "DangoTranslator working tree",
-      "sha256": "65c094b4e01468a01e603fb08a73da838590a28ab31c1540c58268dd1b8d3c07",
+      "sha256": "43d04cda397868cfcc657502c5b424b51b41349d21ab8c6a40c05ff399cb0d3b",
       "importedSha256": "365c4008ec218edec9156d373ef122b5e87ab27de329d729f8ba7564837f789a",
-      "modification": "Hook-only build configuration, public component documentation, source comment clarification or LF patch formatting; see CHANGES.md"
+      "modification": "Unity Mono managed Reader build synchronization for DangoTranslator 7.0.3; independent resource tooling remains excluded"
     },
     {
       "path": "src/script/unity_mono/CMakeLists.txt",
@@ -1389,22 +1389,30 @@
     {
       "path": "src/script/unity_mono/Reader.cs",
       "origin": "DangoTranslator working tree",
-      "sha256": "41a978b1cb9bdd949a8645989e3b6e120621b7461658b8cc8328e422200b2d6a",
-      "importedSha256": "41a978b1cb9bdd949a8645989e3b6e120621b7461658b8cc8328e422200b2d6a"
+      "sha256": "7764e2fa3805f21e229c9672585c6b295238bebb798c6d4714afdb3b8329dbac",
+      "importedSha256": "41a978b1cb9bdd949a8645989e3b6e120621b7461658b8cc8328e422200b2d6a",
+      "modification": "Unity Mono runtime synchronization for DangoTranslator 7.0.3; see CHANGES.md"
+    },
+    {
+      "path": "src/script/unity_mono/LiveReader.cs",
+      "origin": "DangoTranslator working tree",
+      "sha256": "e5f08f8fb3c46a333387cee81d68379d713b57c210bbdb04bed42be4344bb408",
+      "importedSha256": "e5f08f8fb3c46a333387cee81d68379d713b57c210bbdb04bed42be4344bb408",
+      "modification": "Managed real-time display runtime added for DangoTranslator 7.0.3"
     },
     {
       "path": "src/script/unity_mono/README.md",
       "origin": "DangoTranslator working tree",
-      "sha256": "53ddfc473a2289fb7e80a9084e266b0c65ce5bd2a2f93b6592600d76b8bcfb02",
+      "sha256": "b387dc6d9757f26f78a24caebb6794c0d8fc4636137d0694dbb43e9383abcbf8",
       "importedSha256": "93be38c179c9a9443c2eb9f24b3cc19fc58262d2d4a19be388921951f292c34d",
       "modification": "Hook-only build configuration, public component documentation, source comment clarification or LF patch formatting; see CHANGES.md"
     },
     {
       "path": "src/script/unity_mono/teamnimbus.hpp",
       "origin": "DangoTranslator working tree",
-      "sha256": "7cc7df91897705690c12ad98b9cdfd5d16e2e7c3650af538de117f587c12ba8a",
+      "sha256": "ab5805e4942e1762443e3f313dc9aaeecd7f6b55f68c8426e3be966f60fd8881",
       "importedSha256": "12fe38b8f2efb083835b7687a55fe6690ce2b221ce4a74520e7f38fe69c4aacd",
-      "modification": "Hook-only build configuration, public component documentation, source comment clarification or LF patch formatting; see CHANGES.md"
+      "modification": "Unity Mono runtime synchronization for DangoTranslator 7.0.3; see CHANGES.md"
     },
     {
       "path": "src/script/unity_scenario/CMakeLists.txt",
@@ -5951,7 +5959,7 @@
     {
       "path": "THIRD_PARTY_LICENSES.txt",
       "origin": "Existing Hook distribution license collection",
-      "sha256": "057baf40bf5fc128098babfdbf241789bc737bd6a8ba2dc41613b43082927e83",
+      "sha256": "809b43a75e11fb83f8c987bddf14c715f6a9b32f60d18a13a4fc54e5d651a16b",
       "importedSha256": "2af5f1202c7509f8fc547d8897cfa8a11c3c55e112949079881e37ef04c1a1e7",
       "modification": "Hook-only build configuration, public component documentation, source comment clarification or LF patch formatting; see CHANGES.md"
     }
@@ -5979,7 +5987,7 @@
     },
     {
       "path": "CHANGES.md",
-      "sha256": "21a1d1672bc4b9b7c8dcdb5b6c95cb9b6ba8a28777e0735692b57a4c53ab625b",
+      "sha256": "686e53057e5883cf46795e0041f9c8872179744519e4d9e98e898044226ea2ad",
       "origin": "Hook repository build entry point or public documentation"
     },
     {
@@ -5989,7 +5997,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "34c06ef57e6ec268ba82ee02af63dbec2ca58c3c339c1a5c6bc4739dfb9fdfc6",
+      "sha256": "0d8cee4ffddcbff6fba09ebf256cea7ac1ea740942a0545b52db719100efcab1",
       "origin": "Hook repository build entry point or public documentation"
     },
     {
@@ -6063,7 +6071,9 @@
     "src/script/yuris/README.md",
     "src/script/hook_common/build_first_text.ps1",
     "src/script/hook_common/README.md",
-    "THIRD_PARTY_LICENSES.txt"
+    "THIRD_PARTY_LICENSES.txt",
+    "src/script/unity_mono/Reader.cs",
+    "src/script/unity_mono/LiveReader.cs"
   ],
   "repositoryScope": "Hook runtimes, managed bridges, native build dependencies and licensed display font"
 }

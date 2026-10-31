@@ -1,5 +1,9 @@
 # Unity Mono Hook
 
+该版本同步 DangoTranslator 7.0.3 的 Unity Mono Hook 运行时。`Reader.cs` 与
+`LiveReader.cs` 编译为托管读取器并嵌入 Hook，前者负责全量显示协议，后者负责
+经过租约和页面校验的实时显示协议。
+
 该目录提供 Unity Mono 的 Hook 适配源码和构建配置，目标架构为 x86 / x64。
 
 ## 构建
@@ -14,14 +18,14 @@
 
 ## 源码与输出
 
-本目录直接参与构建的文件包括 `CMakeLists.txt`、`Reader.cs`、`teamnimbus.hpp`。引擎补丁位于 `patches/`，公共 Host/Injector 实现和握手补丁由其他引擎目录及 `hook_common/` 共享。
+本目录直接参与构建的文件包括 `CMakeLists.txt`、`Reader.cs`、`LiveReader.cs`、`teamnimbus.hpp`。引擎补丁位于 `patches/`，公共 Host/Injector 实现和握手补丁由其他引擎目录及 `hook_common/` 共享。
 
 原生输出：
 
 - `UnityMonoHost32.exe`、`UnityMonoInjector32.exe`、`UnityMonoBridge32.dll`、`UnityMonoHook32.dll`。
 - `UnityMonoHost64.exe`、`UnityMonoInjector64.exe`、`UnityMonoBridge64.dll`、`UnityMonoHook64.dll`。
 
-`Reader.cs` 编译为托管读取器并嵌入 Hook；同时生成 x86/x64 原生组件。共享运行时协议由 `teamnimbus.hpp` 实现。
+`Reader.cs` 和 `LiveReader.cs` 使用托管引用编译为同一个读取器并嵌入 Hook；旧版 Mono 的读取器引用可通过 `-ReaderManagedReferenceRoot` 单独指定。构建同时生成 x86/x64 原生组件。共享运行时协议由 `teamnimbus.hpp` 实现。
 
 ## 集成范围
 

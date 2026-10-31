@@ -1,18 +1,23 @@
 param(
     [Parameter(Mandatory=$true)][string]$ManagedReferenceRoot,
+    # Reader 使用旧版完整 UnityEngine.dll 编译，避免向旧版 Mono 引入模块化 AssemblyRef。
+    [string]$ReaderManagedReferenceRoot,
     [string]$ReferenceRoot=(Join-Path $PSScriptRoot '../../../third_party/LunaTranslator'),
     [string]$BuildRoot
 )
 $ErrorActionPreference='Stop'
 if(-not $BuildRoot){$BuildRoot=Join-Path $env:TEMP ('dango-unitymono-'+[Guid]::NewGuid().ToString('N'))}
 $repo=(Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../../..')).Path
+$readerRoot=$ReaderManagedReferenceRoot
+if(-not $readerRoot){$readerRoot=$ManagedReferenceRoot}
+$readerRoot=(Resolve-Path -LiteralPath $readerRoot).Path
 $engine=Join-Path $BuildRoot 'unity_mono'
 New-Item -ItemType Directory -Path $engine -Force | Out-Null
 $managed=Join-Path $engine 'Dango.UnityMono.Reader.dll'
 $argsList=@('/nologo','/noconfig','/nostdlib','/target:library','/optimize+',('/out:'+$managed))
-foreach($name in @('mscorlib.dll','System.dll','System.Core.dll','UnityEngine.dll')){$argsList+='/r:'+(Join-Path $ManagedReferenceRoot $name)}
-foreach($name in @('UnityEngine.CoreModule.dll','UnityEngine.UIModule.dll','UnityEngine.TextRenderingModule.dll')) { $ref=Join-Path $ManagedReferenceRoot $name;if(Test-Path -LiteralPath $ref){$argsList+='/r:'+$ref} }
+foreach($name in @('mscorlib.dll','System.dll','System.Core.dll','UnityEngine.dll')){$argsList+='/r:'+(Join-Path $readerRoot $name)}
 $argsList+=(Join-Path $PSScriptRoot 'Reader.cs')
+$argsList+=(Join-Path $PSScriptRoot 'LiveReader.cs')
 & (Join-Path $env:WINDIR 'Microsoft.NET/Framework64/v4.0.30319/csc.exe') @argsList
 if($LASTEXITCODE -ne 0){throw 'Shared Mono bridge compilation failed'}
 $bytes=[IO.File]::ReadAllBytes($managed)

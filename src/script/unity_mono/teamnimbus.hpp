@@ -20,6 +20,7 @@ namespace teamnimbus
     inline bool installed = false;
     inline std::wstring resourceStatus;
     inline thread_local bool invoking = false;
+    inline ULONGLONG nextHealthCheck = 0;
 
     // stringValue 使用旧Mono公开转换接口，不依赖未导出的字符串宏或对象偏移
     std::wstring stringValue(MonoString *value, size_t limit)
@@ -90,6 +91,10 @@ namespace teamnimbus
         struct Guard { ~Guard() { invoking = false; } } guard;
         auto packet = stringValue(reinterpret_cast<MonoString *>(invoke(frame, nullptr)), (TEXT_BUFFER_SIZE / 2) - 1);
         if (!packet.empty()) buffer->from(packet);
+        // 文本仍逐帧读取，状态与诊断不重复跨Mono边界轮询
+        auto now = GetTickCount64();
+        if (now < nextHealthCheck) return;
+        nextHealthCheck = now + 250;
         auto state = stringValue(reinterpret_cast<MonoString *>(invoke(status, nullptr)), 80);
         if (!state.empty() && state != resourceStatus) { Msg::Log("TeamNimbus resources %S", state.c_str()); resourceStatus = state; }
         auto detail = stringValue(reinterpret_cast<MonoString *>(invoke(diagnostic, nullptr)), 160);
@@ -101,7 +106,7 @@ namespace teamnimbus
     void findDomain(MonoDomain *candidate, void *state)
     {
         if (!candidate || unloading(candidate) || !mono_domain_set(candidate, 0)) return;
-        struct Images { MonoImage *image = nullptr; unsigned count = 0; } images;
+        struct Images { MonoImage *image = nullptr; std::set<MonoClass *> canvases; } images;
         std::vector<MonoAssembly *> inventory;
         assemblies([](void *assembly, void *state) {
             reinterpret_cast<std::vector<MonoAssembly *> *>(state)->push_back(reinterpret_cast<MonoAssembly *>(assembly));
@@ -109,11 +114,13 @@ namespace teamnimbus
         // 旧Mono枚举回调持有运行库锁，类型解析和程序集加载必须在回调返回后执行
         for (auto assembly : inventory) {
             auto image = mono_assembly_get_image(assembly);
-            if (image && mono_class_from_name(image, "UnityEngine", "Canvas")) {
-                images.image = image; images.count++;
+            auto canvas = image ? mono_class_from_name(image, "UnityEngine", "Canvas") : nullptr;
+            // 模块化Unity的转发程序集与定义程序集可能返回同一Canvas，按实际类型身份去重
+            if (canvas && images.canvases.insert(canvas).second) {
+                images.image = image;
             }
         }
-        if (images.count != 1) return;
+        if (images.canvases.size() != 1) return;
         int code = 0;
         auto image = mono_image_open_from_data_full(teamNimbusReader, sizeof(teamNimbusReader), 1, &code, 0);
         auto assembly = image && !code ? mono_assembly_load_from_full(image, "Dango.UnityMono.Reader", &code, 0) : nullptr;
@@ -125,7 +132,7 @@ namespace teamnimbus
         found->domain = candidate; found->image = images.image; found->reader = bridge; found->count++;
     }
 
-    // install 先验证方法和JIT身份，再成组安装，失败撤销已安装入口
+    // install 先验证方法和JIT身份，再成组安装，失败撤销本轮入口
     bool install()
     {
         if (installed) return true;
@@ -133,9 +140,13 @@ namespace teamnimbus
         if (!module) module = GetModuleHandleW(L"mono-2.0-bdwgc.dll");
         if (!module || GetModuleHandleW(L"GameAssembly.dll")) return false;
         monofunctions::init(module);
+        // 新Mono公开mono_free，旧Mono公开g_free，必须使用当前运行库配套的释放接口
+        freeString = reinterpret_cast<decltype(freeString)>(GetProcAddress(module, "mono_free"));
+        if (!freeString) freeString = reinterpret_cast<decltype(freeString)>(GetProcAddress(module, "g_free"));
+        if (!freeString) { Msg::Log("UnityMono missing Mono string allocator release API"); return false; }
         if (!resolve(module, domains, "mono_domain_foreach") || !resolve(module, assemblies, "mono_assembly_foreach") ||
             !resolve(module, unloading, "mono_domain_is_unloading") || !resolve(module, objectDomain, "mono_object_get_domain") ||
-            !resolve(module, stringUTF16, "mono_string_to_utf16") || !resolve(module, freeString, "g_free") ||
+            !resolve(module, stringUTF16, "mono_string_to_utf16") ||
             !resolve(module, jitMethod, "mono_jit_info_get_method") || !resolve(module, jitStart, "mono_jit_info_get_code_start") || !resolve(module, methodFlags, "mono_method_get_flags") ||
             !resolve(module, mono_jit_info_table_find, "mono_jit_info_table_find") || !resolve(module, mono_method_get_name, "mono_method_get_name") ||
             !mono_get_root_domain || !mono_thread_attach || !mono_thread_detach || !mono_domain_set || !mono_domain_get || !mono_runtime_invoke || !mono_object_unbox || !mono_jit_info_table_find ||
