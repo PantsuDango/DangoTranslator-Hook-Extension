@@ -2,7 +2,7 @@
 +++ b/src/NativeImpl/LunaHook/LunaHost/CMakeLists.txt
 @@ -10 +10 @@ target_precompile_headers(LunaHostDll REUSE_FROM pch)
 -set_target_properties(LunaHostDll PROPERTIES OUTPUT_NAME "LunaHost${bitappendix}")
-+set_target_properties(LunaHostDll PROPERTIES OUTPUT_NAME "RenPyBridge64")
++set_target_properties(LunaHostDll PROPERTIES OUTPUT_NAME "RenPyBridge${bitappendix}")
 --- a/src/NativeImpl/LunaHook/include/defs.h
 +++ b/src/NativeImpl/LunaHook/include/defs.h
 @@ -27,2 +27,2 @@ constexpr auto PIPE_AVAILABLE_EVENT = L"TEXT_PIPE_AVAILABLE";

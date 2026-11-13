@@ -102,6 +102,68 @@ namespace teamnimbus
     }
 
     struct Candidate { MonoDomain *domain = nullptr; MonoImage *image = nullptr; MonoClass *reader = nullptr; unsigned count = 0; };
+
+    // frameRelayCalls 让中继函数保持唯一实体，避免链接器合并同体函数
+    inline volatile LONG frameRelayCalls = 0;
+    // frameRelay 由托管帧中继调用，自身作为Hook入口复用既有文本链路
+    __declspec(noinline) inline void __stdcall frameRelay() { InterlockedIncrement(&frameRelayCalls); }
+
+    // RelayStub 持有托管侧调用的常驻跳板，DLL卸载时清空目标，跳板退化为直接返回
+    struct RelayStub
+    {
+        BYTE *code = nullptr;
+        void *volatile *slot = nullptr;
+        ~RelayStub() { if (slot) InterlockedExchangePointer(reinterpret_cast<PVOID volatile *>(slot), nullptr); }
+    };
+    inline RelayStub relayStub;
+
+    // createRelayStub 生成“读取目标、为空返回、否则跳转”的跳板，内存有意常驻不释放
+    void *createRelayStub(void *target)
+    {
+        if (!relayStub.code)
+        {
+            auto code = static_cast<BYTE *>(VirtualAlloc(nullptr, 64, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE));
+            if (!code) return nullptr;
+#ifdef _WIN64
+            // mov rax,[rip+9]; test rax,rax; jz ret; jmp rax; ret; int3; 目标槽位于+16
+            const BYTE body[] = {0x48, 0x8B, 0x05, 0x09, 0x00, 0x00, 0x00, 0x48, 0x85, 0xC0, 0x74, 0x02, 0xFF, 0xE0, 0xC3, 0xCC};
+            memcpy(code, body, sizeof(body));
+            relayStub.slot = reinterpret_cast<void *volatile *>(code + 16);
+#else
+            // mov eax,[slot]; test eax,eax; jz ret; jmp eax; ret; 目标槽位于+12
+            BYTE body[] = {0xA1, 0, 0, 0, 0, 0x85, 0xC0, 0x74, 0x02, 0xFF, 0xE0, 0xC3};
+            auto slot = code + 12;
+            memcpy(body + 1, &slot, sizeof(slot));
+            memcpy(code, body, sizeof(body));
+            relayStub.slot = reinterpret_cast<void *volatile *>(slot);
+#endif
+            FlushInstructionCache(GetCurrentProcess(), code, 64);
+            relayStub.code = code;
+        }
+        InterlockedExchangePointer(reinterpret_cast<PVOID volatile *>(relayStub.slot), target);
+        return relayStub.code;
+    }
+
+    // installRelay 在JIT入口Hook失败时改用托管帧中继，帧时机不变且仍经公共Hook链路回调capture
+    bool installRelay(HookParam hp)
+    {
+        auto attach = mono_class_get_method_from_name(reader, "AttachFrame", 1);
+        if (!attach) return false;
+        hp.address = reinterpret_cast<uintptr_t>(&frameRelay);
+        hp.jittype = JITTYPE::PC;
+        if (!NewHook(hp, "TeamNimbusDialogue")) return false;
+        auto stub = createRelayStub(reinterpret_cast<void *>(&frameRelay));
+        int64_t address = static_cast<int64_t>(reinterpret_cast<intptr_t>(stub));
+        void *args[] = {&address};
+        auto result = stub ? invoke(attach, args) : nullptr;
+        if (result && *reinterpret_cast<BYTE *>(mono_object_unbox(result)))
+        {
+            Msg::Log("UnityMono frame relay ready");
+            return true;
+        }
+        RemoveHook(hp.address, 0);
+        return false;
+    }
     // findDomain 通过当前执行域反射验证程序集归属，兼容没有domain_assembly_foreach的旧Mono
     void findDomain(MonoDomain *candidate, void *state)
     {
@@ -185,7 +247,8 @@ namespace teamnimbus
         if (!info || jitMethod(info) != entry || jitStart(info) != reinterpret_cast<void *>(address)) return false;
         HookParam hp; hp.address = address; hp.jittype = JITTYPE::UNITY;
         hp.type = USING_STRING | CODEC_UTF16 | FULL_STRING | NO_CONTEXT; hp.text_fun = capture;
-        if (!NewHook(hp, "TeamNimbusDialogue")) return false;
+        // 地址空间拥挤时MinHook无法在JIT代码附近分配跳转内存，改走托管帧中继
+        if (!NewHook(hp, "TeamNimbusDialogue") && !installRelay(hp)) return false;
         installed = true;
 
         Msg::Log("TeamNimbus read-only ready");

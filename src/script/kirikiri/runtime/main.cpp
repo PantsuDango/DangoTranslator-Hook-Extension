@@ -132,9 +132,13 @@ static void serve(SOCKET socket,const Endpoint& endpoint,HANDLE owner){
 // worker 会话断开后等待新令牌，支持同一游戏进程中的客户端重连
 static DWORD WINAPI worker(void*){
     WSADATA wsa={};if(WSAStartup(MAKEWORD(2,2),&wsa)!=0)return 0;
-    auto get=reinterpret_cast<void*(WINAPI*)()>(GetProcAddress(GetModuleHandleW(nullptr),"TVPGetFunctionExporter"));
-    if(!get){WSACleanup();return 0;}
-    void* exporter=get();sdk=negotiateSdk(exporter);if(!sdk){WSACleanup();return 0;}
+    void* exporter=locateExporter();
+#if defined(_WIN64)
+    // x64引擎从插件取得导出器，注入可能早于插件链接，有限等待
+    for(int attempt=0;!exporter && attempt<120;attempt++){Sleep(500);exporter=locateExporter();}
+#endif
+    if(!exporter){WSACleanup();return 0;}
+    sdk=negotiateSdk(exporter);if(!sdk){WSACleanup();return 0;}
     std::array<char,32> previous={};
     for(;;){
         Endpoint endpoint={};

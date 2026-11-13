@@ -48,7 +48,6 @@ constexpr int kProtocolVersion = 1;
 constexpr DWORD kInjectorTimeoutMs = 60000;
 constexpr DWORD kInjectorSuccessExitCode = 1;
 constexpr int kKiriKiriTextFlushDelayMs = 0;
-constexpr int kCatSystem2TextFlushDelayMs = 0;
 constexpr int kAZSystemTextFlushDelayMs = 8;
 #if defined(DANGO_PJADV_ONLY)
 constexpr std::uint64_t kPJADVFastSkipFollowupMs = 250;
@@ -497,16 +496,6 @@ std::string canonicalSupportedHookName(const char *hookName)
     {
         return name;
     }
-#elif defined(DANGO_CATSYSTEM2_ONLY)
-    if (!name.empty() && name.front() == 'E')
-    {
-        return "EmbedCS2";
-    }
-    if (name == "CatSystem2" || name == "CatSystem2new" ||
-        name == "EmbedCS2" || name == "catsystem")
-    {
-        return name;
-    }
 #elif defined(DANGO_AZSYSTEM_ONLY)
     if (name == "EmbedAZSystem" || (!name.empty() && name.front() == 'E'))
     {
@@ -678,8 +667,6 @@ std::string engineDisplayName()
     return "SiglusEngine";
 #elif defined(DANGO_BGI_ONLY)
     return "BGI";
-#elif defined(DANGO_CATSYSTEM2_ONLY)
-    return "CatSystem2";
 #elif defined(DANGO_AZSYSTEM_ONLY)
     return "AZSystem";
 #elif defined(DANGO_UTAGE_ONLY)
@@ -743,8 +730,6 @@ std::wstring engineFilePrefix()
     return L"Siglus";
 #elif defined(DANGO_BGI_ONLY)
     return L"BGI";
-#elif defined(DANGO_CATSYSTEM2_ONLY)
-    return L"CatSystem2";
 #elif defined(DANGO_AZSYSTEM_ONLY)
     return L"AZSystem";
 #elif defined(DANGO_UTAGE_ONLY)
@@ -801,7 +786,7 @@ bool nativeEmbedSupported()
 #if defined(DANGO_PJADV_ONLY) || defined(DANGO_BOLERO_ONLY) || defined(DANGO_YURIS_ONLY) || defined(DANGO_QLIE_ONLY) || defined(DANGO_WILLPLUS_ONLY) || defined(DANGO_VALKYRIA_ONLY)
     return true;
 #elif defined(DANGO_RENPY_ONLY) || defined(DANGO_UTAGE_ONLY) || defined(DANGO_UNITY_EVENTSCRIPT_ONLY) || defined(DANGO_BGI_ONLY) || defined(DANGO_SIGLUS_ONLY) || \
-    defined(DANGO_WOLF_ONLY) || defined(DANGO_TASKFORCE2_ONLY) || defined(DANGO_CATSYSTEM2_ONLY) || defined(DANGO_AZSYSTEM_ONLY) || defined(DANGO_MIDAREAGEHA_ONLY)
+    defined(DANGO_WOLF_ONLY) || defined(DANGO_TASKFORCE2_ONLY) || defined(DANGO_AZSYSTEM_ONLY) || defined(DANGO_MIDAREAGEHA_ONLY)
     return true;
 #else
     return false;
@@ -830,8 +815,6 @@ bool nativeEmbedHookSupported(const std::string &hook)
     return hook == "EmbedWolf";
 #elif defined(DANGO_TASKFORCE2_ONLY)
     return hook == "EmbedTaskforce";
-#elif defined(DANGO_CATSYSTEM2_ONLY)
-    return hook == "EmbedCS2";
 #elif defined(DANGO_UNITY_EVENTSCRIPT_ONLY)
     return hook == "SaiminTextWindow:AddText";
 #elif defined(DANGO_MIDAREAGEHA_ONLY)
@@ -2330,9 +2313,6 @@ void __cdecl onHookInsert(DWORD processId, std::uint64_t address, const wchar_t 
 #if defined(DANGO_MIDAREAGEHA_ONLY)
     // 只有带写入标志的显示入口可以报告全量回填就绪
     const std::string canonicalHookName = !utf8HookName.empty() && utf8HookName.front() == 'E' ? "EmbedMIDAREAGEHA" : "MIDAREAGEHA";
-#elif defined(DANGO_CATSYSTEM2_ONLY)
-    // 只有通过字符处理检查的原生写入入口才能报告全量回填就绪
-    const std::string canonicalHookName = !utf8HookName.empty() && utf8HookName.front() == 'E' ? "EmbedCS2" : "CatSystem2";
 #elif defined(DANGO_AZSYSTEM_ONLY)
     // 仅带嵌入标志的参数入口可以提前报告写入就绪，普通监听入口不能冒充注入能力
     const std::string canonicalHookName = !utf8HookName.empty() && utf8HookName.front() == 'E' ? "EmbedAZSystem" : "AZSystem";
@@ -2570,6 +2550,16 @@ void __cdecl onHostInfo(int level, const wchar_t *message)
             emitEvent("teamnimbus_resources_ready", {{"code", digest}});
     }
     if (utf8.find("TeamNimbus resources failed") != std::string::npos) emitEvent("teamnimbus_resources_failed");
+    const std::string teamLoading = "TeamNimbus resources loading ";
+    if (const auto pos = utf8.find(teamLoading); pos != std::string::npos) {
+        auto progress = utf8.substr(pos + teamLoading.size());
+        const auto end = progress.find_last_not_of(" \t\r\n");
+        progress.resize(end == std::string::npos ? 0 : end + 1);
+        if (progress.size() > 65 && progress.size() < 85 && progress[64] == ' ' &&
+            progress.substr(0,64).find_first_not_of("0123456789abcdef") == std::string::npos &&
+            progress.substr(65).find_first_not_of("0123456789") == std::string::npos)
+            emitEvent("teamnimbus_resources_loading", {{"code", progress}});
+    }
 #endif
 #if defined(DANGO_DDWORKS_ONLY)
     if (utf8.find("DDWorks resource snapshot ready") != std::string::npos)
@@ -2990,9 +2980,6 @@ int wmain(int argc, wchar_t **argv)
 #if defined(DANGO_KIRIKIRI_ONLY)
     // KiriKiri字符流必须即时交给主程序聚合，避免快速跳过时在Host内跨页堆叠
     hookSettings(kKiriKiriTextFlushDelayMs, false, 932, 3000, 1000000, false);
-#elif defined(DANGO_CATSYSTEM2_ONLY)
-    // CatSystem2完整场景Hook必须逐句立即提交，避免持续快进时在Host内堆叠多页文本
-    hookSettings(kCatSystem2TextFlushDelayMs, false, 932, 3000, 1000000, false);
 #elif defined(DANGO_MIDAREAGEHA_ONLY)
     // MIDAREAGEHA直接读取完整对话，无需等待逐字文本合并
     hookSettings(0, false, 932, 3000, 1000000, false);

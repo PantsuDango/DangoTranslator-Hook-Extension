@@ -17,10 +17,6 @@ public:
 
     bool attach_function_()
     {
-#ifdef _WIN64
         return InsertRenpy3Hook();
-#else
-        return false;
-#endif
     }
 };

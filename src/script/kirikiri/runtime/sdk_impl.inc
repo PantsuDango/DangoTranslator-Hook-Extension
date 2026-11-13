@@ -110,7 +110,8 @@ public:
         if(count==4){
             if(!displayActive || !displayPlan || args[0]->Type()!=tvtString || args[1]->Type()!=tvtString || args[2]->Type()!=tvtInteger || args[3]->Type()!=tvtInteger)return TJS_S_OK;
             auto replaced=args[2]->AsInteger();auto serial=args[3]->AsInteger();
-            if((replaced!=0 && replaced!=1) || serial<0 || serial>tjs_int64(1)<<53)return TJS_S_OK;
+            // 位0表示本页实际显示了译文，位1表示[l]等待点击时的半页
+            if(replaced<0 || replaced>3 || serial<0 || serial>tjs_int64(1)<<53)return TJS_S_OK;
             try {
                 DisplayEvent event{GetTickCount64(),uint64_t(serial),uint32_t(replaced),{}, {}};
                 if(!displayUtf8(ttstr(*args[0]).c_str(),event.original) || !displayUtf8(ttstr(*args[1]).c_str(),event.display) || event.original.empty())return TJS_S_OK;

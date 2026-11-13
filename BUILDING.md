@@ -26,7 +26,7 @@ $engines = (Get-Content ./SOURCE_MANIFEST.json -Raw | ConvertFrom-Json).engines
 ./build.ps1 -Engines kirikiri -BuildRoot ./build/kirikiri
 ```
 
-通常生成四个文件：`<Prefix>Host<bits>.exe`、`<Prefix>Injector<bits>.exe`、`<Prefix>Bridge<bits>.dll` 和 `<Prefix>Hook<bits>.dll`。KiriKiri 额外生成 `KiriKiriRuntime32.dll`。Utage 同时构建 x86/x64 组件。
+通常生成四个文件：`<Prefix>Host<bits>.exe`、`<Prefix>Injector<bits>.exe`、`<Prefix>Bridge<bits>.dll` 和 `<Prefix>Hook<bits>.dll`。KiriKiri 额外生成 `KiriKiriRuntime32.dll`，并以 x64 工具链单独构建 `KiriKiriInjector64.exe` 和 `KiriKiriRuntime64.dll`。Utage 和 Ren’Py 同时构建 x86/x64 组件。
 
 输出目录为 `<BuildRoot>/release/<engine>`；未指定 `-BuildRoot` 时使用系统临时目录。构建不会执行组件安装或游戏注入。
 

@@ -2,7 +2,7 @@
 
 基于 [LunaTranslator / LunaHook](https://github.com/HIllya51/LunaTranslator) 的游戏文本 Hook 组件。
 
-本项目提供 33 组引擎适配的原生源码、补丁、Host/Injector 和托管桥，面向组件开发与集成。当前源码与 DangoTranslator 7.0.3 发布的 Hook 组件同步；构建所需的 LunaHook、MinHook 源码及共享布局数据随仓库提供。
+本项目提供 32 组引擎适配的原生源码、补丁、Host/Injector 和托管桥，面向组件开发与集成。当前源码与 DangoTranslator 7.0.4 发布的 Hook 组件同步；构建所需的 LunaHook、MinHook 源码及共享布局数据随仓库提供。
 
 ## 构建
 

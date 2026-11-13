@@ -13,7 +13,7 @@ LR"DANGO((function(){
         if(!preserveTokens) {state.tokens.clear();state.tokenHead=0;}
         state.armed=armed===void?true:armed;
         for(var i=0;i<this.layers.count;i++) {
-            var layer=this.layers[i];layer.original='';layer.display='';layer.replaced=false;layer.overflow=false;
+            var layer=this.layers[i];layer.original='';layer.display='';layer.replaced=false;layer.overflow=false;layer.emitted=0;
         }
         this.serial++;state.serial=this.serial;
     } incontextof cfg;
@@ -75,7 +75,7 @@ LR"DANGO(    cfg.installDispatch=function(state){
             state.execution=token;
             if(this.cfg.bound && this.cfg.active) {
                 if(tag.tagname=='r') this.cfg.newline();
-                else if(tag.tagname=='p' || tag.tagname=='l' || tag.tagname=='s' || tag.tagname=='cm' || tag.tagname=='er' || tag.tagname=='ct' || tag.tagname=='jump' || tag.tagname=='call' || tag.tagname=='return') {this.cfg.flush();state.armed=true;}
+                else if(tag.tagname=='p' || tag.tagname=='l' || tag.tagname=='s' || tag.tagname=='cm' || tag.tagname=='er' || tag.tagname=='ct' || tag.tagname=='jump' || tag.tagname=='call' || tag.tagname=='return') {this.cfg.flush(tag.tagname=='l');state.armed=true;}
             }
             try {var result=(this.old incontextof this.target)(...);state.execution=previous;return result;}
             catch(e) {state.execution=previous;throw e;}
@@ -118,7 +118,7 @@ LR"DANGO(    cfg.installConductor=function(c){
             var obj=(this.old incontextof c)();
             if(this.dispatch===void && this.cfg.bound && this.cfg.active && obj!==void) {
                 if(obj.tagname=='r') this.cfg.newline();
-                else if(obj.tagname=='p' || obj.tagname=='l' || obj.tagname=='s' || obj.tagname=='cm' || obj.tagname=='er' || obj.tagname=='ct' || obj.tagname=='jump' || obj.tagname=='call' || obj.tagname=='return') {this.cfg.flush();this.armed=true;}
+                else if(obj.tagname=='p' || obj.tagname=='l' || obj.tagname=='s' || obj.tagname=='cm' || obj.tagname=='er' || obj.tagname=='ct' || obj.tagname=='jump' || obj.tagname=='call' || obj.tagname=='return') {this.cfg.flush(obj.tagname=='l');this.armed=true;}
             }
             this.slot=void;this.source=void;this.tag=obj;
             this.cfg.serial++;this.serial=this.cfg.serial;
@@ -142,7 +142,7 @@ LR"DANGO(    cfg.installConductor=function(c){
     } incontextof cfg;
     cfg.installLayer=function(layer,owner){
         for(var i=0;i<this.layers.count;i++) if(this.layers[i].target===layer) return;
-        var state=%["target"=>layer,"old"=>layer.processCh,"owner"=>owner,"cfg"=>this,"binding"=>void,"completedSerial"=>-1,"capturedSerial"=>-1,"original"=>'',"display"=>'',"replaced"=>false,"overflow"=>false,"wrapper"=>void];
+        var state=%["target"=>layer,"old"=>layer.processCh,"owner"=>owner,"cfg"=>this,"binding"=>void,"completedSerial"=>-1,"capturedSerial"=>-1,"original"=>'',"display"=>'',"replaced"=>false,"overflow"=>false,"emitted"=>0,"wrapper"=>void];
         state.wrapper=function(ch){
             var conductor=this.owner.conductor;
             var state=void;
@@ -185,7 +185,7 @@ LR"DANGO(    cfg.capture=function(layer,original,display,replaced,serial){
         if(!this.bound || !this.active || this.native===void || layer.overflow || layer.owner.current!==layer.target || layer.capturedSerial===serial) return;
         if(typeof original!='String' || typeof display!='String') return;
         layer.capturedSerial=serial;
-        if(layer.original.length+original.length>32768 || layer.display.length+display.length>32768) {layer.original='';layer.display='';layer.replaced=false;layer.overflow=true;return;}
+        if(layer.original.length+original.length>32768 || layer.display.length+display.length>32768) {layer.original='';layer.display='';layer.replaced=false;layer.overflow=true;layer.emitted=0;return;}
         layer.original+=original;layer.display+=display;layer.replaced=layer.replaced || replaced;
     } incontextof cfg;
     cfg.newline=function(){
@@ -194,11 +194,16 @@ LR"DANGO(    cfg.capture=function(layer,original,display,replaced,serial){
             if(layer.original!='') {layer.original+='\n';layer.display+='\n';}
         }
     } incontextof cfg;
-    cfg.flush=function(){
+    // [l]只等待点击不清页，保留已累积文字并以半页提交，分页时再提交整页使原文与全文缓存的整页一致
+    cfg.flush=function(partial){
         for(var i=0;i<this.layers.count;i++) {
             var layer=this.layers[i];
+            if(partial) {
+                if(layer.original.length>layer.emitted) {this.native(layer.original,layer.display,+layer.replaced+2,this.serial);layer.emitted=layer.original.length;}
+                continue;
+            }
             if(layer.original!='') this.native(layer.original,layer.display,+layer.replaced,this.serial);
-            layer.original='';layer.display='';layer.replaced=false;layer.overflow=false;
+            layer.original='';layer.display='';layer.replaced=false;layer.overflow=false;layer.emitted=0;
         }
     } incontextof cfg;
 )DANGO"
@@ -281,7 +286,7 @@ LR"DANGO(    cfg.refresh=function(){
         var pages=[global.kag.fore,global.kag.back];
         for(var i=0;i<pages.count;i++) {
             var messages=pages[i].messages;
-            if(messages.count<1 || messages.count>32) throw new global.Exception('layer-count');
+            if(messages.count<1 || messages.count>256) throw new global.Exception('layer-count');
             for(var j=0;j<messages.count;j++) {
                 var layer=messages[j];var found=false;
                 if(typeof layer.processCh!='Object') throw new global.Exception('message-entry');

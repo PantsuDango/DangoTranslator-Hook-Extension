@@ -1,5 +1,20 @@
 # Changes
 
+## 2026-11-13 — DangoTranslator 7.0.4
+
+- Synchronized the KiriKiri runtime with the 7.0.4 release and added the
+  64-bit KiriKiri Z SDK runtime (`KiriKiriRuntime64.dll`) and injector
+  (`KiriKiriInjector64.exe`); the 64-bit path does not build a LunaHook-derived
+  Host/Bridge/Hook chain.
+- Ren'Py now builds x86 and x64 components; updated the Ren'Py patches,
+  Python 2.7/3 interpreter entry points and the injected Python bridge.
+- Updated the shared Host source (`livemaker/main.cpp`) and the Unity Mono
+  reader (`Reader.cs`, `teamnimbus.hpp`), and added `TimelineReader.cs` and the
+  compile-only `UnityEngineReference.cs` reference stub.
+- Removed the CatSystem2 adapter: its Hook components were replaced by an
+  independent implementation that no longer contains LunaHook code. The previous
+  LunaHook-derived CatSystem2 sources remain available in the 7.0.3 history.
+
 ## 2026-10-31 — DangoTranslator 7.0.3
 
 - Synchronized the Unity Mono Hook runtime with the 7.0.3 release.

@@ -1,8 +1,11 @@
 #include "python.h"
 
-#ifdef _WIN64
 bool InsertRenpy3Hook()
 {
+    if (HMODULE module = GetModuleHandleW(L"python27.dll"))
+    {
+        return hookrenpy(module);
+    }
     wchar_t pythonPattern[] = L"python3%d.dll";
     wchar_t libPythonPattern[] = L"libpython3.%d.dll";
     wchar_t moduleName[64] = {0};
@@ -19,4 +22,3 @@ bool InsertRenpy3Hook()
     }
     return false;
 }
-#endif

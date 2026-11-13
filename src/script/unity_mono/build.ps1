@@ -18,6 +18,7 @@ $argsList=@('/nologo','/noconfig','/nostdlib','/target:library','/optimize+',('/
 foreach($name in @('mscorlib.dll','System.dll','System.Core.dll','UnityEngine.dll')){$argsList+='/r:'+(Join-Path $readerRoot $name)}
 $argsList+=(Join-Path $PSScriptRoot 'Reader.cs')
 $argsList+=(Join-Path $PSScriptRoot 'LiveReader.cs')
+$argsList+=(Join-Path $PSScriptRoot 'TimelineReader.cs')
 & (Join-Path $env:WINDIR 'Microsoft.NET/Framework64/v4.0.30319/csc.exe') @argsList
 if($LASTEXITCODE -ne 0){throw 'Shared Mono bridge compilation failed'}
 $bytes=[IO.File]::ReadAllBytes($managed)

@@ -13,7 +13,7 @@ LR"DANGO((function(proof){var reference=void;try{
     var pages=[kag.fore,kag.back];var layers=0;var compatible=0;
     for(var i=0;i<pages.count;i++) {
         var messages=pages[i].messages;
-        if(messages.count<1 || messages.count>32) {invalidate reference;reference=void;return 'layout=0;reason=layer-count';}
+        if(messages.count<1 || messages.count>256) {invalidate reference;reference=void;return 'layout=0;reason=layer-count';}
         for(var j=0;j<messages.count;j++) {
             var layer=messages[j];layers++;
             if(resolve(proof,nativeWidth,layer.lineLayer)!==void) compatible++;

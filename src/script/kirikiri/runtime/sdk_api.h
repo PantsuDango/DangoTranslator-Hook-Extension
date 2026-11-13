@@ -24,4 +24,6 @@ const SdkApi* legacySdk();
 const SdkApi* currentSdk();
 // negotiateSdk 按公开接口实际清栈行为核对调用约定
 const SdkApi* negotiateSdk(void* exporter);
+// locateExporter 取得引擎插件接口导出器，x64引擎未导出时从已链接插件中定位
+void* locateExporter();
 }

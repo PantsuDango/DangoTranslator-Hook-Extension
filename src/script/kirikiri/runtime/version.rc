@@ -15,8 +15,13 @@ BEGIN
    VALUE "CompanyName", "DangoTranslator\0"
    VALUE "FileDescription", "Dango KiriKiri SDK Runtime\0"
    VALUE "FileVersion", "1.0.0.0\0"
+#ifdef DANGO_KRKR_RUNTIME64
+   VALUE "InternalName", "KiriKiriRuntime64\0"
+   VALUE "OriginalFilename", "KiriKiriRuntime64.dll\0"
+#else
    VALUE "InternalName", "KiriKiriRuntime32\0"
    VALUE "OriginalFilename", "KiriKiriRuntime32.dll\0"
+#endif
    VALUE "ProductName", "DangoTranslator Hook\0"
    VALUE "ProductVersion", "1.0.0.0\0"
   END

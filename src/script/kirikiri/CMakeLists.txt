@@ -2,6 +2,30 @@ cmake_minimum_required(VERSION 3.16)
 
 project(DangoKiriKiriHookHost LANGUAGES CXX)
 
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+    # 64位吉里吉里Z只使用自研SDK运行时与注入器，不构建Luna派生的Host链路
+    enable_language(RC)
+    add_executable(KiriKiriInjector64 ../livemaker/injector.cpp)
+    add_library(KiriKiriRuntime64 SHARED runtime/main.cpp runtime/display_plan.cpp runtime/sdk_abi.cpp runtime/sdk_current.cpp runtime/sdk_legacy.cpp runtime/version.rc)
+    set_property(SOURCE runtime/sdk_current.cpp APPEND PROPERTY OBJECT_DEPENDS
+        "${CMAKE_CURRENT_SOURCE_DIR}/runtime/sdk_impl.inc"
+        "${CMAKE_CURRENT_SOURCE_DIR}/runtime/display_entry.inc"
+        "${CMAKE_CURRENT_SOURCE_DIR}/runtime/display_inspect.inc"
+        "${CMAKE_CURRENT_SOURCE_DIR}/runtime/display_script.inc"
+    )
+    target_compile_features(KiriKiriRuntime64 PRIVATE cxx_std_17)
+    target_compile_features(KiriKiriInjector64 PRIVATE cxx_std_17)
+    target_compile_definitions(KiriKiriRuntime64 PRIVATE UNICODE _UNICODE WIN32_LEAN_AND_MEAN NOMINMAX DANGO_KRKR_RUNTIME64=1)
+    target_compile_definitions(KiriKiriInjector64 PRIVATE UNICODE _UNICODE WIN32_LEAN_AND_MEAN NOMINMAX)
+    target_link_libraries(KiriKiriRuntime64 PRIVATE ws2_32 iphlpapi bcrypt)
+    target_compile_options(KiriKiriRuntime64 PRIVATE /utf-8 /W3 /EHsc)
+    target_compile_options(KiriKiriInjector64 PRIVATE /utf-8 /W4 /EHsc)
+    set_property(TARGET KiriKiriRuntime64 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    set_property(TARGET KiriKiriInjector64 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    set_target_properties(KiriKiriInjector64 PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+    return()
+endif()
+
 add_executable(KiriKiriHost32 ../livemaker/main.cpp)
 add_executable(KiriKiriInjector32 ../livemaker/injector.cpp)
 add_library(KiriKiriRuntime32 SHARED runtime/main.cpp runtime/display_plan.cpp runtime/sdk_abi.cpp runtime/sdk_current.cpp runtime/sdk_legacy.cpp runtime/version.rc)

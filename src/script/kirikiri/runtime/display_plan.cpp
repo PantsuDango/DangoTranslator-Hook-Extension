@@ -86,7 +86,8 @@ static bool inputTag(const std::wstring& tag){
     auto expression=tag.substr(start,pos-start);
     if(expression.size()>128 || (expression.compare(0,3,L"sf.")!=0 && expression.compare(0,2,L"f.")!=0))return false;
     size_t index=expression[1]==L'f'?3:2;
-    auto letter=[](wchar_t ch){return (ch>=L'A' && ch<=L'Z') || (ch>=L'a' && ch<=L'z') || ch==L'_';};
+    // TJS标识符允许日文等Unicode文字，例如sf.名前
+    auto letter=[](wchar_t ch){return (ch>=L'A' && ch<=L'Z') || (ch>=L'a' && ch<=L'z') || ch==L'_' || (ch>0x7f && !(ch>=0xd800 && ch<=0xdfff) && IsCharAlphaW(ch));};
     bool first=true;
     for(;index<expression.size();index++){
         wchar_t ch=expression[index];
@@ -99,15 +100,33 @@ static bool inputTag(const std::wstring& tag){
     space();return pos+1==tag.size() && tag[pos]==L']';
 }
 
+// tagEnd 跳过引号内容查找标签结尾，未闭合返回npos
+static size_t tagEnd(const std::wstring& value,size_t start){
+    wchar_t quote=0;
+    for(size_t pos=start+1;pos<value.size();pos++){
+        wchar_t ch=value[pos];
+        if(quote){if(ch==quote)quote=0;continue;}
+        if(ch==L'\"' || ch==L'\'')quote=ch;
+        else if(ch==L']')return pos;
+        else if(ch==L'[')return std::wstring::npos;
+    }
+    return std::wstring::npos;
+}
+
 // expandedPositions 仅在整行字面锚点唯一对应时映射游标，动态值与原控制标签不分配译文
+// KAG调用宏时把宏体拼入当前行缓冲，原标签位置只允许由若干完整标签替代，不能吸收可见文字
 static std::vector<uint32_t> expandedPositions(const std::wstring& original,const std::wstring& actual){
     if(actual.size()>32768 || !visibleText(actual,true))return {};
-    std::vector<std::pair<size_t,size_t>> holes;
+    struct Hole {size_t first,second;bool input;};
+    std::vector<Hole> holes;
     for(size_t pos=0;pos<original.size();pos++){
-        if(original.compare(pos,4,L"[emb")!=0)continue;
-        size_t end=original.find(L']',pos);
-        if(end==std::wstring::npos || !inputTag(original.substr(pos,end-pos+1)) || holes.size()>=8)return {};
-        holes.emplace_back(pos,end+1);pos=end;
+        if(original[pos]!=L'[')continue;
+        if(pos+1<original.size() && original[pos+1]==L'['){pos++;continue;}
+        size_t end=tagEnd(original,pos);
+        if(end==std::wstring::npos || holes.size()>=32)return {};
+        bool input=original.compare(pos,4,L"[emb")==0;
+        if(input && !inputTag(original.substr(pos,end-pos+1)))return {};
+        holes.push_back({pos,end+1,input});pos=end;
     }
     if(holes.empty())return {};
     struct Anchor {size_t source,actual,length;};
@@ -134,11 +153,21 @@ static std::vector<uint32_t> expandedPositions(const std::wstring& original,cons
             auto marker=holes[hole];size_t tagLength=marker.second-marker.first;
             if(actual.compare(target,tagLength,original,marker.first,tagLength)==0){
                 visit(hole+1,marker.second,target+tagLength);
-            }else{
+            }else if(marker.input){
                 size_t limit=std::min<size_t>(256,actual.size()-target);
                 for(size_t width=0;width<=limit && solutions<2 && budget;width++){
                     if(width){wchar_t ch=actual[target+width-1];if(ch<32 || (ch>=127 && ch<=159) || ch==L'[' || ch==L']')break;}
                     visit(hole+1,marker.second,target+width);
+                }
+            }else{
+                // 宏展开只由完整标签组成，逐个标签边界尝试，允许展开为空
+                size_t cursor=target;
+                for(size_t count=0;count<=64 && solutions<2 && budget;count++){
+                    visit(hole+1,marker.second,cursor);
+                    if(cursor>=actual.size() || actual[cursor]!=L'[' || (cursor+1<actual.size() && actual[cursor+1]==L'['))break;
+                    size_t end=tagEnd(actual,cursor);
+                    if(end==std::wstring::npos)break;
+                    cursor=end+1;
                 }
             }
         }

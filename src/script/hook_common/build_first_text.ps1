@@ -1,7 +1,7 @@
 ﻿param(
     [string]$ReferenceRoot,
     [string]$BuildRoot,
-    [string[]]$Engines = @('yuris', 'azsystem', 'catsystem2', 'midareageha', 'bolero', 'wolf', 'taskforce2', 'bgi', 'unity_eventscript', 'utage', 'renpy', 'siglus', 'qlie', 'willplus', 'valkyria'),
+    [string[]]$Engines = @('yuris', 'azsystem', 'midareageha', 'bolero', 'wolf', 'taskforce2', 'bgi', 'unity_eventscript', 'utage', 'renpy', 'siglus', 'qlie', 'willplus', 'valkyria'),
     [switch]$PrepareOnly
 )
 
@@ -36,7 +36,6 @@ $configurations = @{
     siglus = @{ Prefix = 'Siglus'; Platforms = @('Win32'); Patches = @('SiglusBranding', 'SiglusOnly', 'SiglusDisplay') }
     yuris = @{ Prefix = 'Yuris'; Platforms = @('Win32'); Patches = @('YurisBranding', 'YurisOnly', 'YurisBackfill', 'YurisEncoding', 'YurisGdiFont') }
     azsystem = @{ Prefix = 'AZSystem'; Platforms = @('Win32'); Patches = @('AZSystemBranding', 'AZSystemOnly', 'AZSystemLegacy', 'AZSystemEncoding') }
-    catsystem2 = @{ Prefix = 'CatSystem2'; Platforms = @('Win32'); Patches = @('CatSystem2Branding', 'CatSystem2Only', 'CatSystem2Backfill', 'CatSystem2Encoding') }
     midareageha = @{ Prefix = 'Midareageha'; Platforms = @('Win32'); Patches = @('MidareagehaBranding', 'MidareagehaOnly', 'MidareagehaBackfill', 'MidareagehaEncoding') }
     bolero = @{ Prefix = 'Bolero'; Platforms = @('Win32'); Patches = @('BoleroBranding', 'BoleroOnly', 'BoleroBackfill', 'BoleroEncoding') }
     wolf = @{ Prefix = 'Wolf'; Platforms = @('Win32'); Patches = @('WolfBranding', 'WolfOnly') }
@@ -44,7 +43,7 @@ $configurations = @{
     bgi = @{ Prefix = 'BGI'; Platforms = @('x64'); Patches = @('BGIBranding', 'BGIOnly') }
     unity_eventscript = @{ Prefix = 'UnityEventScript'; Platforms = @('x64'); Patches = @('UnityEventScriptBranding', 'UnityEventScriptOnly', 'UnityEventScriptMono') }
     utage = @{ Prefix = 'Utage'; Platforms = @('Win32', 'x64'); Patches = @('UtageBranding', 'UtageOnly', 'UtageMono') }
-    renpy = @{ Prefix = 'RenPy'; Platforms = @('x64'); Patches = @('RenPyBranding', 'RenPyOnly', 'RenPyResource') }
+    renpy = @{ Prefix = 'RenPy'; Platforms = @('Win32', 'x64'); Patches = @('RenPyBranding', 'RenPyOnly', 'RenPyResource') }
     qlie = @{ Prefix = 'QLIE'; Platforms = @('Win32'); Patches = @('QLIEBranding', 'QLIEOnly') }
     willplus = @{ Prefix = 'WillPlus'; Platforms = @('Win32'); Patches = @('WillPlusBranding', 'WillPlusOnly', 'WillPlusEmbed') }
     ddworks = @{ Prefix = 'DDWorks'; Platforms = @('Win32'); Patches = @('DDWorksBranding', 'DDWorksOnly', 'DDWorksEngine') }
@@ -91,7 +90,7 @@ foreach ($engine in $Engines) {
         if ($engine -eq 'lcse') { $patches += Join-Path $engineScript 'patches/LCSEControl.patch' }
         foreach ($patch in $patches) {
             $patchArguments = @('apply', '--unidiff-zero')
-            if ($engine -eq 'unity_mono' -or $engine -eq 'siglus' -or $engine -eq 'valkyria' -or $engine -eq 'lcse' -or ($engine -in @('dxcompiled', 'abel_ast', 'constructor_ssf', 'gsx'))) { $patchArguments += '--ignore-space-change' }
+            if ($engine -eq 'renpy' -or $engine -eq 'unity_mono' -or $engine -eq 'siglus' -or $engine -eq 'valkyria' -or $engine -eq 'lcse' -or ($engine -in @('dxcompiled', 'abel_ast', 'constructor_ssf', 'gsx'))) { $patchArguments += '--ignore-space-change' }
             & git -C $engineRoot @patchArguments $patch
             if ($LASTEXITCODE -ne 0) { throw "应用补丁失败: $patch" }
         }
@@ -107,6 +106,7 @@ foreach ($engine in $Engines) {
         }
         if ($engine -eq 'renpy') {
             Copy-Item -LiteralPath (Join-Path $engineScript 'resource/Renpy.h') -Destination (Join-Path $sourceRoot 'LunaHook/engine64/Renpy.h')
+            Copy-Item -LiteralPath (Join-Path $engineScript 'resource/Renpy.h') -Destination (Join-Path $sourceRoot 'LunaHook/engines/python/Renpy.h')
             foreach ($file in @('python.cpp', 'python3.cpp')) {
                 Copy-Item -LiteralPath (Join-Path $engineScript ('resource/' + $file)) -Destination (Join-Path $sourceRoot ('LunaHook/engines/python/' + $file))
             }
@@ -147,6 +147,12 @@ foreach ($engine in $Engines) {
     if ($engine -eq 'adventure_creator' -or $engine -eq 'rpgmaker_unite' -or $engine -eq 'unity_scenario' -or $engine -eq 'nemk_novel' -or $engine -eq 'yarn_spinner' -or $engine -eq 'teamnimbus' -or $engine -eq 'unity_mono') {
         $header = if ($engine -eq 'adventure_creator') { 'adventure_creator.hpp' } elseif ($engine -eq 'unity_scenario') { 'unity_scenario.hpp' } elseif ($engine -eq 'nemk_novel') { 'nemk_novel.hpp' } elseif ($engine -eq 'yarn_spinner') { 'yarn_spinner.hpp' } elseif ($engine -eq 'teamnimbus' -or $engine -eq 'unity_mono') { 'teamnimbus.hpp' } else { 'rpgmaker_unite.hpp' }
         Copy-Item -LiteralPath (Join-Path $engineScript $header) -Destination (Join-Path $sourceRoot ('LunaHook/engines/mono/' + $header)) -Force
+    }
+    if ($engine -eq 'renpy') {
+        foreach ($file in @('python.cpp', 'python3.cpp')) {
+            Copy-Item -LiteralPath (Join-Path $engineScript ('resource/' + $file)) -Destination (Join-Path $sourceRoot ('LunaHook/engines/python/' + $file)) -Force
+        }
+        Copy-Item -LiteralPath (Join-Path $engineScript 'resource/renpy_hook_text.py') -Destination (Join-Path $sourceRoot 'LunaHook/resource/renpy_hook_text.py') -Force
     }
     if ($engine -eq 'nemk_novel') { Copy-Item -LiteralPath (Join-Path $engineScript 'NemkControl.h') -Destination (Join-Path $sourceRoot 'LunaHook/engines/mono/NemkControl.h') -Force }
     if ($engine -eq 'teamnimbus' -or $engine -eq 'unity_mono') {
@@ -385,6 +391,16 @@ foreach ($engine in $Engines) {
                 Copy-Item -LiteralPath (Join-Path $hostBuild 'Release/KiriKiriRuntime32.dll') -Destination $releaseRoot
             }
         }
+        if ($engine -eq 'kirikiri') {
+            # 64位吉里吉里Z只使用独立SDK运行时与注入器，不构建Luna派生的64位Host链路
+            $runtime64Build = Join-Path $engineRoot 'host-x64'
+            & cmake -S $engineScript -B $runtime64Build -G 'Visual Studio 17 2022' -A x64
+            if ($LASTEXITCODE -ne 0) { throw 'KiriKiri x64 runtime configure failed' }
+            & cmake --build $runtime64Build --config Release -- /m:2 /verbosity:minimal
+            if ($LASTEXITCODE -ne 0) { throw 'KiriKiri x64 runtime build failed' }
+            Copy-Item -LiteralPath (Join-Path $runtime64Build 'bin/Release/KiriKiriInjector64.exe') -Destination $releaseRoot
+            Copy-Item -LiteralPath (Join-Path $runtime64Build 'Release/KiriKiriRuntime64.dll') -Destination $releaseRoot
+        }
     }
     $engineDependency = $dependency
     if ($engine -eq 'unity_scenario') {
@@ -434,7 +450,7 @@ foreach ($engine in $Engines) {
         & cmake -S $sourceRoot -B $buildDirectory -G 'Visual Studio 17 2022' -A $platform -DBUILD_GUI=OFF -DWIN10ABOVE=ON "-DFETCHCONTENT_SOURCE_DIR_MINHOOK=$engineDependency" *> $log
         if ($LASTEXITCODE -ne 0) { Get-Content -LiteralPath $log -Tail 25; throw "配置失败: $engine $platform" }
         $buildArguments = @('--build', $buildDirectory, '--config', 'Release', '--target', 'LunaHook', 'LunaHostDll')
-        if ($engine -eq 'yuris' -or $engine -eq 'pjadv' -or $engine -eq 'ddworks' -or $engine -eq 'lcse' -or $engine -eq 'csystem' -or $engine -eq 'nscripter' -or ($engine -in @('dxcompiled', 'abel_ast', 'constructor_ssf', 'gsx')) -or $engine -eq 'adventure_creator' -or $engine -eq 'rpgmaker_unite' -or $engine -eq 'unity_scenario' -or $engine -eq 'nemk_novel' -or $engine -eq 'yarn_spinner' -or $engine -eq 'teamnimbus' -or $engine -eq 'unity_mono') { $buildArguments += '--clean-first' }
+        if ($engine -eq 'renpy' -or $engine -eq 'yuris' -or $engine -eq 'pjadv' -or $engine -eq 'ddworks' -or $engine -eq 'lcse' -or $engine -eq 'csystem' -or $engine -eq 'nscripter' -or ($engine -in @('dxcompiled', 'abel_ast', 'constructor_ssf', 'gsx')) -or $engine -eq 'adventure_creator' -or $engine -eq 'rpgmaker_unite' -or $engine -eq 'unity_scenario' -or $engine -eq 'nemk_novel' -or $engine -eq 'yarn_spinner' -or $engine -eq 'teamnimbus' -or $engine -eq 'unity_mono') { $buildArguments += '--clean-first' }
         $buildStartedAt = Get-Date
         & cmake @buildArguments -- /m:2 /verbosity:minimal *>> $log
         if ($LASTEXITCODE -ne 0) { Get-Content -LiteralPath $log -Tail 35; throw "构建失败: $engine $platform" }

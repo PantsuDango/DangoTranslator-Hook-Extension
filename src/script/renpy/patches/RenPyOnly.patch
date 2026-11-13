@@ -47,7 +47,7 @@
 @@ -40,9 +60,15 @@ target_precompile_headers(LunaHook REUSE_FROM pchhook)
  
 -set_target_properties(LunaHook PROPERTIES OUTPUT_NAME "LunaHook${bitappendix}")
-+set_target_properties(LunaHook PROPERTIES OUTPUT_NAME "RenPyHook64")
++set_target_properties(LunaHook PROPERTIES OUTPUT_NAME "RenPyHook${bitappendix}")
  
 -target_link_libraries(LunaHook PRIVATE trhelper VERSION_DEF Version httpapi ws2_32 Shlwapi pch minhook commonengine emulators utils ${YY_Thunks})
 +target_link_libraries(LunaHook PRIVATE trhelper VERSION_DEF Version httpapi ws2_32 Shlwapi pch minhook utils ${YY_Thunks})
@@ -83,6 +83,14 @@
 \ No newline at end of file
 +#endif
 +}
+--- a/src/NativeImpl/LunaHook/LunaHook/enginecollection32.cpp
++++ b/src/NativeImpl/LunaHook/LunaHook/enginecollection32.cpp
+@@ -229,0 +230,3 @@
++#ifdef DANGO_RENPY_ONLY
++    return {new Renpy};
++#else
+@@ -504,0 +508,1 @@
++#endif
 --- a/src/NativeImpl/LunaHook/LunaHook/main.cc
 +++ b/src/NativeImpl/LunaHook/LunaHook/main.cc
 @@ -399 +399 @@ void delayinsertNewHook(uint32_t em_address)

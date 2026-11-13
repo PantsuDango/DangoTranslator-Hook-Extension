@@ -1,6 +1,6 @@
 # KiriKiri Hook
 
-该目录提供 KiriKiri 的 Hook 适配源码和构建配置，目标架构为 x86。
+该目录提供 KiriKiri 的 Hook 适配源码和构建配置，目标架构为 x86 / x64。
 
 ## 构建
 
@@ -19,8 +19,9 @@
 原生输出：
 
 - `KiriKiriHost32.exe`、`KiriKiriInjector32.exe`、`KiriKiriBridge32.dll`、`KiriKiriHook32.dll`。
+- `KiriKiriInjector64.exe`、`KiriKiriRuntime64.dll`。
 
-除 Host、Injector、Bridge 和 Hook 外，还构建 `KiriKiriRuntime32.dll`。`runtime/` 包含显示脚本、布局检查及 SDK ABI 适配，SDK 原始许可位于 `runtime/sdk/license.txt`。
+除 Host、Injector、Bridge 和 Hook 外，还构建 `KiriKiriRuntime32.dll`。64 位吉里吉里Z只构建 `runtime/` 中的 SDK 运行时与注入器，不构建 64 位 Host/Bridge/Hook 链路；`CMakeLists.txt` 按工具链位数选择对应目标。`runtime/` 包含显示脚本、布局检查及 SDK ABI 适配，SDK 原始许可位于 `runtime/sdk/license.txt`。
 
 ## 集成范围
 

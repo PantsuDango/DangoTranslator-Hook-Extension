@@ -1,6 +1,6 @@
 # Ren’Py Hook
 
-该目录提供 Ren’Py 的 Hook 适配源码和构建配置，目标架构为 x64。
+该目录提供 Ren’Py 的 Hook 适配源码和构建配置，目标架构为 x86 / x64。
 
 ## 构建
 
@@ -18,9 +18,10 @@
 
 原生输出：
 
+- `RenPyHost32.exe`、`RenPyInjector32.exe`、`RenPyBridge32.dll`、`RenPyHook32.dll`。
 - `RenPyHost64.exe`、`RenPyInjector64.exe`、`RenPyBridge64.dll`、`RenPyHook64.dll`。
 
-`resource/renpy_hook_text.py` 是注入运行时使用的 Python 桥，由原生组件集成；`python.cpp`、`python3.cpp` 和 `Renpy.h` 对接相应解释器入口。
+`resource/renpy_hook_text.py` 是注入运行时使用的 Python 桥，由原生组件集成；`python.cpp`（Python 2.7）、`python3.cpp`（Python 3）和 `Renpy.h` 对接相应解释器入口，x86 与 x64 组件按游戏进程架构选用。
 
 ## 集成范围
 

@@ -1,8 +1,8 @@
 {
-  "snapshotDate": "2026-10-31",
+  "snapshotDate": "2026-11-13",
   "sourceProject": "Golang-DangoTranslator",
-  "sourceGitHead": "5a4a6ff29992bccd5cc33be90404ec8419052cfc",
-  "sourceState": "Hook integration source snapshot synchronized with DangoTranslator 7.0.3; independent resource tools and desktop client remain outside this repository",
+  "sourceGitHead": "20161c59f7142cc1ccb7ff2e003bc1727913933a",
+  "sourceState": "Hook integration source snapshot synchronized with DangoTranslator 7.0.4; independent resource tools and desktop client remain outside this repository",
   "lunaUpstream": "https://github.com/HIllya51/LunaTranslator",
   "lunaUpstreamCommit": null,
   "lunaCommitNote": "The upstream source snapshot has no verified Git commit identity. File SHA-256 values identify the included snapshot.",
@@ -12,7 +12,6 @@
     "azsystem",
     "bgi",
     "bolero",
-    "catsystem2",
     "constructor_ssf",
     "csystem",
     "ddworks",
@@ -254,49 +253,6 @@
       "origin": "DangoTranslator working tree",
       "sha256": "f2313bd847efc6e94d94354787f5fa7d7f3c7ab5a6db71b26a67cec49e01d7b3",
       "importedSha256": "fd7a2a93f20108ef653ce5dc33db1dba35ddd2789e508dfa07e1a899df8b7439",
-      "modification": "Hook-only build configuration, public component documentation, source comment clarification or LF patch formatting; see CHANGES.md"
-    },
-    {
-      "path": "src/script/catsystem2/CatSystem2Backfill.h",
-      "origin": "DangoTranslator working tree",
-      "sha256": "2306ec505ab5d1c54a0639e7eda687fd6cc223a9f575bd257a51ae2dc540e30a",
-      "importedSha256": "2306ec505ab5d1c54a0639e7eda687fd6cc223a9f575bd257a51ae2dc540e30a"
-    },
-    {
-      "path": "src/script/catsystem2/CMakeLists.txt",
-      "origin": "DangoTranslator working tree",
-      "sha256": "b26685a2ede5ad5f4f5ede93ac634e0aa1d9fedf707e3aca56df0f4fd94af4e9",
-      "importedSha256": "b26685a2ede5ad5f4f5ede93ac634e0aa1d9fedf707e3aca56df0f4fd94af4e9"
-    },
-    {
-      "path": "src/script/catsystem2/patches/CatSystem2Backfill.patch",
-      "origin": "DangoTranslator working tree",
-      "sha256": "d07cd956b7ef2a2fc34ee3da378b4b3989b04e99e6c6eb36ad08cdd7767d6f98",
-      "importedSha256": "d07cd956b7ef2a2fc34ee3da378b4b3989b04e99e6c6eb36ad08cdd7767d6f98"
-    },
-    {
-      "path": "src/script/catsystem2/patches/CatSystem2Branding.patch",
-      "origin": "DangoTranslator working tree",
-      "sha256": "563730891633842733d92375c8d603721508a6180ccd600a2d3efb4c2ec689fc",
-      "importedSha256": "563730891633842733d92375c8d603721508a6180ccd600a2d3efb4c2ec689fc"
-    },
-    {
-      "path": "src/script/catsystem2/patches/CatSystem2Encoding.patch",
-      "origin": "DangoTranslator working tree",
-      "sha256": "b6021771f5386b00d5ac49b3031508215f4595ed6ac39fee514094b6feb24ad7",
-      "importedSha256": "b6021771f5386b00d5ac49b3031508215f4595ed6ac39fee514094b6feb24ad7"
-    },
-    {
-      "path": "src/script/catsystem2/patches/CatSystem2Only.patch",
-      "origin": "DangoTranslator working tree",
-      "sha256": "03748144a850482c817bd70b53ac2bc0bd352367de680946fb8c4bfd043e20cb",
-      "importedSha256": "03748144a850482c817bd70b53ac2bc0bd352367de680946fb8c4bfd043e20cb"
-    },
-    {
-      "path": "src/script/catsystem2/README.md",
-      "origin": "DangoTranslator working tree",
-      "sha256": "e5179766ebc079c9e2f6516466b5175db8f4981a57e4003c64351f4854ae1924",
-      "importedSha256": "11077fac49c12122b8d2d3a78814044beed8607bcb6d4f1e40b4a3f158162a20",
       "modification": "Hook-only build configuration, public component documentation, source comment clarification or LF patch formatting; see CHANGES.md"
     },
     {
@@ -644,8 +600,8 @@
     {
       "path": "src/script/kirikiri/CMakeLists.txt",
       "origin": "DangoTranslator working tree",
-      "sha256": "82a78e531e05245daaabb67a18eeef3dbd8fbc094b4ff2d83288f3c8f7c8a746",
-      "importedSha256": "82a78e531e05245daaabb67a18eeef3dbd8fbc094b4ff2d83288f3c8f7c8a746"
+      "sha256": "2c608b92a96f3e85983fd78a9eb8097404575f1450db302a33341cf14fabb33d",
+      "importedSha256": "2c608b92a96f3e85983fd78a9eb8097404575f1450db302a33341cf14fabb33d"
     },
     {
       "path": "src/script/kirikiri/patches/KiriKiri.cpp.patch",
@@ -668,7 +624,7 @@
     {
       "path": "src/script/kirikiri/README.md",
       "origin": "DangoTranslator working tree",
-      "sha256": "c118ee16fa28734186934836e55cf37120a7f3d3b8cdd543717514eb75219688",
+      "sha256": "ee9e11068f0da5238d74f99265d6b71c457b1917617c6f9a8917a01ab4d6d0db",
       "importedSha256": "4223462e9e4b6503ee4d1c0dab7f5e6c42a2d118959d41337e78c6209e242fb0",
       "modification": "Hook-only build configuration, public component documentation, source comment clarification or LF patch formatting; see CHANGES.md"
     },
@@ -681,14 +637,14 @@
     {
       "path": "src/script/kirikiri/runtime/display_inspect.inc",
       "origin": "DangoTranslator working tree",
-      "sha256": "339b54935dfbd6e063e8077d3f81b740dbc480450faf5ca942180e0f6707262b",
-      "importedSha256": "339b54935dfbd6e063e8077d3f81b740dbc480450faf5ca942180e0f6707262b"
+      "sha256": "0a8942179927f567941759c62bec9acbfabab0cba4b5cb4661638e074dd95797",
+      "importedSha256": "0a8942179927f567941759c62bec9acbfabab0cba4b5cb4661638e074dd95797"
     },
     {
       "path": "src/script/kirikiri/runtime/display_plan.cpp",
       "origin": "DangoTranslator working tree",
-      "sha256": "de189f533a504acae3e3d33e42f2552acd7511d59454fbf7463c5800436aa453",
-      "importedSha256": "de189f533a504acae3e3d33e42f2552acd7511d59454fbf7463c5800436aa453"
+      "sha256": "f531c885955795bc3c073e4d46133e951be6b5f81c32b1d47397df79401a34ef",
+      "importedSha256": "f531c885955795bc3c073e4d46133e951be6b5f81c32b1d47397df79401a34ef"
     },
     {
       "path": "src/script/kirikiri/runtime/display_plan.h",
@@ -699,14 +655,14 @@
     {
       "path": "src/script/kirikiri/runtime/display_script.inc",
       "origin": "DangoTranslator working tree",
-      "sha256": "3b1d28175b563c355adc5d91afe41b9b33cbb57b5d8a243fd31bc1c44d2ee902",
-      "importedSha256": "3b1d28175b563c355adc5d91afe41b9b33cbb57b5d8a243fd31bc1c44d2ee902"
+      "sha256": "78ea2f61be7e2d84fc4861dbbd1d03f2de0716dac9d2b2be67069ae30c7f268e",
+      "importedSha256": "78ea2f61be7e2d84fc4861dbbd1d03f2de0716dac9d2b2be67069ae30c7f268e"
     },
     {
       "path": "src/script/kirikiri/runtime/main.cpp",
       "origin": "DangoTranslator working tree",
-      "sha256": "365284ba0fca7226984c93727e1d4b0781ca4451c465d3612d55e7e21ac66859",
-      "importedSha256": "365284ba0fca7226984c93727e1d4b0781ca4451c465d3612d55e7e21ac66859"
+      "sha256": "bf4cc9f01a3d26caf6424a2e799475874b0972582586bf2c78bfe7447547f73e",
+      "importedSha256": "bf4cc9f01a3d26caf6424a2e799475874b0972582586bf2c78bfe7447547f73e"
     },
     {
       "path": "src/script/kirikiri/runtime/sdk/license.txt",
@@ -729,38 +685,38 @@
     {
       "path": "src/script/kirikiri/runtime/sdk_abi.cpp",
       "origin": "DangoTranslator working tree",
-      "sha256": "853201cdac9945faaa2ac00bf05acd172281d8a808a31c11651293c5d0c8dd0f",
-      "importedSha256": "853201cdac9945faaa2ac00bf05acd172281d8a808a31c11651293c5d0c8dd0f"
+      "sha256": "f39aca52fb6076c525a3fdf4367be76318d0e244350aeafadeb73bf7ed16c47e",
+      "importedSha256": "f39aca52fb6076c525a3fdf4367be76318d0e244350aeafadeb73bf7ed16c47e"
     },
     {
       "path": "src/script/kirikiri/runtime/sdk_api.h",
       "origin": "DangoTranslator working tree",
-      "sha256": "745ddb9af4bf373d26a7c0b309059e77ea33d87f81cef76dfce4b53132da65e3",
-      "importedSha256": "745ddb9af4bf373d26a7c0b309059e77ea33d87f81cef76dfce4b53132da65e3"
+      "sha256": "e2a0287242ec01acd80cb8a5b67224489ba097575f049554eb6ebc0dea570dc6",
+      "importedSha256": "e2a0287242ec01acd80cb8a5b67224489ba097575f049554eb6ebc0dea570dc6"
     },
     {
       "path": "src/script/kirikiri/runtime/sdk_current.cpp",
       "origin": "DangoTranslator working tree",
-      "sha256": "bd5ce0abd54a1a2b8df01af0dc7560fb09c742ff79688573404f5fafdc4f038e",
-      "importedSha256": "bd5ce0abd54a1a2b8df01af0dc7560fb09c742ff79688573404f5fafdc4f038e"
+      "sha256": "3423fde4df51d64308d83a16a738155f062337b2201b675b066ff739e830c6ae",
+      "importedSha256": "3423fde4df51d64308d83a16a738155f062337b2201b675b066ff739e830c6ae"
     },
     {
       "path": "src/script/kirikiri/runtime/sdk_impl.inc",
       "origin": "DangoTranslator working tree",
-      "sha256": "1c243fe53af1fd800f44a6e68fad974cc74b2d2fa1be390867e70e63952104a7",
-      "importedSha256": "1c243fe53af1fd800f44a6e68fad974cc74b2d2fa1be390867e70e63952104a7"
+      "sha256": "5e76de392cda6f6a31f7864f55cba9d22b82eb4730b393c507ae290ebff03df9",
+      "importedSha256": "5e76de392cda6f6a31f7864f55cba9d22b82eb4730b393c507ae290ebff03df9"
     },
     {
       "path": "src/script/kirikiri/runtime/sdk_legacy.cpp",
       "origin": "DangoTranslator working tree",
-      "sha256": "f9db602f40f40dae507361b723d0721361e6a0e7c61e990489504fc6132f0d0c",
-      "importedSha256": "f9db602f40f40dae507361b723d0721361e6a0e7c61e990489504fc6132f0d0c"
+      "sha256": "d85e9dde9ea64137f1706cd755c163833bc72359764c7a3fef3f01077210b592",
+      "importedSha256": "d85e9dde9ea64137f1706cd755c163833bc72359764c7a3fef3f01077210b592"
     },
     {
       "path": "src/script/kirikiri/runtime/version.rc",
       "origin": "DangoTranslator working tree",
-      "sha256": "2484b26b48965d81f23e34c93e62cdf4820ec5a1220f0fa7b407aaac343fec12",
-      "importedSha256": "2484b26b48965d81f23e34c93e62cdf4820ec5a1220f0fa7b407aaac343fec12"
+      "sha256": "3fd6ba40b0321e7945f2fd946257ef4dd8fd078cdb5dbcd4bd541fdd3ad1b2be",
+      "importedSha256": "3fd6ba40b0321e7945f2fd946257ef4dd8fd078cdb5dbcd4bd541fdd3ad1b2be"
     },
     {
       "path": "src/script/lcse/CMakeLists.txt",
@@ -857,8 +813,8 @@
     {
       "path": "src/script/livemaker/main.cpp",
       "origin": "DangoTranslator working tree",
-      "sha256": "f4271149391e01fd22604428d12d79bad3c8327f6d3e5667bca4622a1111c4b4",
-      "importedSha256": "f4271149391e01fd22604428d12d79bad3c8327f6d3e5667bca4622a1111c4b4"
+      "sha256": "d0d05504b9c8df003b0bbf9ddb11073bcdd76708f92a188911648e1ea3a5e766",
+      "importedSha256": "d0d05504b9c8df003b0bbf9ddb11073bcdd76708f92a188911648e1ea3a5e766"
     },
     {
       "path": "src/script/livemaker/patches/Live.cpp.patch",
@@ -1128,20 +1084,22 @@
     {
       "path": "src/script/renpy/CMakeLists.txt",
       "origin": "DangoTranslator working tree",
-      "sha256": "3ec28581951dd0a534b53068bcbe4398e90e1983e76c708ba59bf9f339c5fd91",
-      "importedSha256": "3ec28581951dd0a534b53068bcbe4398e90e1983e76c708ba59bf9f339c5fd91"
+      "sha256": "31a88c6519e3f35a1d2bb7c715000e3b2d703ae0e2c64815b0ceec94774e5ac6",
+      "importedSha256": "31a88c6519e3f35a1d2bb7c715000e3b2d703ae0e2c64815b0ceec94774e5ac6"
     },
     {
       "path": "src/script/renpy/patches/RenPyBranding.patch",
       "origin": "DangoTranslator working tree",
-      "sha256": "3a41b25f4797f88a031555dbd6cf0e2f87141cc7798da6a224a432eb512d8a0a",
-      "importedSha256": "3a41b25f4797f88a031555dbd6cf0e2f87141cc7798da6a224a432eb512d8a0a"
+      "sha256": "9b00d72835c3aaf0edb3be75c9365e00d6bba23db7b5c6aa0ad46e027c93a26c",
+      "importedSha256": "de1d2edc7be9698018127ad6efa73f9f0aaac607941e5bcf944da84d14434b41",
+      "modification": "Hook-only build configuration, public component documentation, source comment clarification or LF patch formatting; see CHANGES.md"
     },
     {
       "path": "src/script/renpy/patches/RenPyOnly.patch",
       "origin": "DangoTranslator working tree",
-      "sha256": "cef7bc87c3904dcf7bc473f65eef0209f357d047dd45e48be4a6a60964645d82",
-      "importedSha256": "cef7bc87c3904dcf7bc473f65eef0209f357d047dd45e48be4a6a60964645d82"
+      "sha256": "d392c69bf2c6ef76fce61bc0ee10d6bbc6d95a4460af64f1205398424bff03ff",
+      "importedSha256": "4ae01e2300383433e5765986b516ac23b282fce15ba33a13645b05908090dca3",
+      "modification": "Hook-only build configuration, public component documentation, source comment clarification or LF patch formatting; see CHANGES.md"
     },
     {
       "path": "src/script/renpy/patches/RenPyResource.patch",
@@ -1152,33 +1110,33 @@
     {
       "path": "src/script/renpy/README.md",
       "origin": "DangoTranslator working tree",
-      "sha256": "0a509928511c85bbfa43d55fea5c2245be9b79419518e25ff2a95a95ce505496",
+      "sha256": "4e1aeb65cc1b59f66a416930ba54ac7e62d4d051b2de5f8923dd208cfd0b9789",
       "importedSha256": "25c8b61ab63873e145dfffc62ee4e8103898d1911f3f4f6be2c432cfa7ced40b",
       "modification": "Hook-only build configuration, public component documentation, source comment clarification or LF patch formatting; see CHANGES.md"
     },
     {
       "path": "src/script/renpy/resource/python.cpp",
       "origin": "DangoTranslator working tree",
-      "sha256": "59b3a16d1f2a36b1243cb067d6ed91f6e82e7df151286dd0ce2502fc51658a3f",
-      "importedSha256": "59b3a16d1f2a36b1243cb067d6ed91f6e82e7df151286dd0ce2502fc51658a3f"
+      "sha256": "578219df09acd84fb4e5139c0e59329a9a7de54f192ea182d1d890b581a2dde5",
+      "importedSha256": "578219df09acd84fb4e5139c0e59329a9a7de54f192ea182d1d890b581a2dde5"
     },
     {
       "path": "src/script/renpy/resource/python3.cpp",
       "origin": "DangoTranslator working tree",
-      "sha256": "ace7a02c69149075cf3fe1b79a7b52ab5aaddf74f144e513b1c63a219f6f4e91",
-      "importedSha256": "ace7a02c69149075cf3fe1b79a7b52ab5aaddf74f144e513b1c63a219f6f4e91"
+      "sha256": "2b8c357d30ee57bd8e3cc4c6999a544854385b680d39c36b6b1f6181c9ee6ffe",
+      "importedSha256": "2b8c357d30ee57bd8e3cc4c6999a544854385b680d39c36b6b1f6181c9ee6ffe"
     },
     {
       "path": "src/script/renpy/resource/Renpy.h",
       "origin": "DangoTranslator working tree",
-      "sha256": "09765dcabb9f21bf0cebeab47aebdeb330279dc3f732870ceb7b7c64ead3453f",
-      "importedSha256": "09765dcabb9f21bf0cebeab47aebdeb330279dc3f732870ceb7b7c64ead3453f"
+      "sha256": "fc812e21a0ec51320a84b3c455158cc4fdbf2077cf17926b01e06fb05f739707",
+      "importedSha256": "fc812e21a0ec51320a84b3c455158cc4fdbf2077cf17926b01e06fb05f739707"
     },
     {
       "path": "src/script/renpy/resource/renpy_hook_text.py",
       "origin": "DangoTranslator working tree",
-      "sha256": "f8ca1fd609e0e35dabd6c3413777b2f8a294d63a455b60f80709c215ec03f1f6",
-      "importedSha256": "f8ca1fd609e0e35dabd6c3413777b2f8a294d63a455b60f80709c215ec03f1f6"
+      "sha256": "9c30d034aa1b8eebbc5322c7971a966de896db462525747d24cc8402777e6e40",
+      "importedSha256": "9c30d034aa1b8eebbc5322c7971a966de896db462525747d24cc8402777e6e40"
     },
     {
       "path": "src/script/rpgmaker_unite/.gitignore",
@@ -1362,9 +1320,9 @@
     {
       "path": "src/script/unity_mono/build.ps1",
       "origin": "DangoTranslator working tree",
-      "sha256": "43d04cda397868cfcc657502c5b424b51b41349d21ab8c6a40c05ff399cb0d3b",
-      "importedSha256": "365c4008ec218edec9156d373ef122b5e87ab27de329d729f8ba7564837f789a",
-      "modification": "Unity Mono managed Reader build synchronization for DangoTranslator 7.0.3; independent resource tooling remains excluded"
+      "sha256": "27a757c0782e51c46a83cb99a06611422e4564899e38a27084918e9296f82713",
+      "importedSha256": "5b8a738657288929185020717094b0c2d26e8317341043454e967185e05273bf",
+      "modification": "Unity Mono managed Reader build synchronization for DangoTranslator 7.0.4; independent resource tooling remains excluded"
     },
     {
       "path": "src/script/unity_mono/CMakeLists.txt",
@@ -1389,9 +1347,8 @@
     {
       "path": "src/script/unity_mono/Reader.cs",
       "origin": "DangoTranslator working tree",
-      "sha256": "7764e2fa3805f21e229c9672585c6b295238bebb798c6d4714afdb3b8329dbac",
-      "importedSha256": "41a978b1cb9bdd949a8645989e3b6e120621b7461658b8cc8328e422200b2d6a",
-      "modification": "Unity Mono runtime synchronization for DangoTranslator 7.0.3; see CHANGES.md"
+      "sha256": "4db64f4d41e4837a80581040cdd40e78e27c1c8035868f5b6d23be549baf55a0",
+      "importedSha256": "4db64f4d41e4837a80581040cdd40e78e27c1c8035868f5b6d23be549baf55a0"
     },
     {
       "path": "src/script/unity_mono/LiveReader.cs",
@@ -1401,18 +1358,29 @@
       "modification": "Managed real-time display runtime added for DangoTranslator 7.0.3"
     },
     {
+      "path": "src/script/unity_mono/TimelineReader.cs",
+      "origin": "DangoTranslator working tree",
+      "sha256": "aeee9376b8ebf9c4a47e5421d2e5f56c200fc9d60f32f47cfa44ad71f1f47a76",
+      "importedSha256": "aeee9376b8ebf9c4a47e5421d2e5f56c200fc9d60f32f47cfa44ad71f1f47a76"
+    },
+    {
+      "path": "src/script/unity_mono/UnityEngineReference.cs",
+      "origin": "DangoTranslator working tree",
+      "sha256": "9e218d08cab1d7857a5d80d2fb0052a1186f8ae340546e15936052aa73053b0b",
+      "importedSha256": "9e218d08cab1d7857a5d80d2fb0052a1186f8ae340546e15936052aa73053b0b"
+    },
+    {
       "path": "src/script/unity_mono/README.md",
       "origin": "DangoTranslator working tree",
-      "sha256": "b387dc6d9757f26f78a24caebb6794c0d8fc4636137d0694dbb43e9383abcbf8",
+      "sha256": "5ad6d639457258e6b91a1543b254eea105419ef4561c1d92db231221a90c3761",
       "importedSha256": "93be38c179c9a9443c2eb9f24b3cc19fc58262d2d4a19be388921951f292c34d",
       "modification": "Hook-only build configuration, public component documentation, source comment clarification or LF patch formatting; see CHANGES.md"
     },
     {
       "path": "src/script/unity_mono/teamnimbus.hpp",
       "origin": "DangoTranslator working tree",
-      "sha256": "ab5805e4942e1762443e3f313dc9aaeecd7f6b55f68c8426e3be966f60fd8881",
-      "importedSha256": "12fe38b8f2efb083835b7687a55fe6690ce2b221ce4a74520e7f38fe69c4aacd",
-      "modification": "Unity Mono runtime synchronization for DangoTranslator 7.0.3; see CHANGES.md"
+      "sha256": "f64a1d16f48076ff5b297f1a556f28c1b4ea2bdfa97669541a9330f2a5c45c9b",
+      "importedSha256": "f64a1d16f48076ff5b297f1a556f28c1b4ea2bdfa97669541a9330f2a5c45c9b"
     },
     {
       "path": "src/script/unity_scenario/CMakeLists.txt",
@@ -1703,8 +1671,8 @@
     {
       "path": "src/script/hook_common/build_first_text.ps1",
       "origin": "DangoTranslator working tree",
-      "sha256": "9440c1a32daa6dff22ecf3fce4762ea0fb57e5aea99f3b81fb0733b56b781495",
-      "importedSha256": "137222331e46195eb0c38163e57b4dfeee63fefa3061cfa3c2677ac8e696e3d6",
+      "sha256": "3a48d60e7f7dec8a09510e463a932ec84b419f46663b9bc63044c16fd1ff8c38",
+      "importedSha256": "db769b38c74bab3d2d6ffe67918a76d7462b957c8890827c5cf3476045b03f4a",
       "modification": "Hook-only build configuration, public component documentation, source comment clarification or LF patch formatting; see CHANGES.md"
     },
     {
@@ -5982,12 +5950,12 @@
     },
     {
       "path": "BUILDING.md",
-      "sha256": "53041a3865fea12caae5c8f01f151834174189d42f76ad6e61274cd05be957a8",
+      "sha256": "13d47a0fd742e414f4f34c5920988a7a4404f8f770130c95f919df829e91c14d",
       "origin": "Hook repository build entry point or public documentation"
     },
     {
       "path": "CHANGES.md",
-      "sha256": "686e53057e5883cf46795e0041f9c8872179744519e4d9e98e898044226ea2ad",
+      "sha256": "26dc40d4293dfa199b9c1e03dd986549540f11f3fb205d889a02797f6739519c",
       "origin": "Hook repository build entry point or public documentation"
     },
     {
@@ -5997,7 +5965,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "0d8cee4ffddcbff6fba09ebf256cea7ac1ea740942a0545b52db719100efcab1",
+      "sha256": "d76c757630457591be71818d03e8d2681310286d01fe2b1e930dabf3fbb7fd62",
       "origin": "Hook repository build entry point or public documentation"
     },
     {
@@ -6019,7 +5987,6 @@
     "src/script/azsystem/README.md",
     "src/script/bgi/README.md",
     "src/script/bolero/README.md",
-    "src/script/catsystem2/README.md",
     "src/script/constructor_ssf/patches/ConstructorSSFBranding.patch",
     "src/script/constructor_ssf/patches/ConstructorSSFDisplayDetach.patch",
     "src/script/constructor_ssf/patches/ConstructorSSFEngine.patch",
@@ -6058,7 +6025,6 @@
     "src/script/unity_mono/patches/UnityMono.patch",
     "src/script/unity_mono/patches/UnityMonoFlags.patch",
     "src/script/unity_mono/README.md",
-    "src/script/unity_mono/teamnimbus.hpp",
     "src/script/unity_scenario/README.md",
     "src/script/utage/README.md",
     "src/script/valkyria/patches/ValkyriaBranding.patch",
@@ -6072,8 +6038,9 @@
     "src/script/hook_common/build_first_text.ps1",
     "src/script/hook_common/README.md",
     "THIRD_PARTY_LICENSES.txt",
-    "src/script/unity_mono/Reader.cs",
-    "src/script/unity_mono/LiveReader.cs"
+    "src/script/unity_mono/LiveReader.cs",
+    "src/script/renpy/patches/RenPyBranding.patch",
+    "src/script/renpy/patches/RenPyOnly.patch"
   ],
   "repositoryScope": "Hook runtimes, managed bridges, native build dependencies and licensed display font"
 }
