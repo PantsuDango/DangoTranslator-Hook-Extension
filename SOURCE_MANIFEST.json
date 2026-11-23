@@ -1,8 +1,8 @@
 {
-  "snapshotDate": "2026-11-13",
+  "snapshotDate": "2026-11-24",
   "sourceProject": "Golang-DangoTranslator",
-  "sourceGitHead": "20161c59f7142cc1ccb7ff2e003bc1727913933a",
-  "sourceState": "Hook integration source snapshot synchronized with DangoTranslator 7.0.4; independent resource tools and desktop client remain outside this repository",
+  "sourceGitHead": "ecc9b2c7b0be46234fc9a2e9328d50ef023d0d24",
+  "sourceState": "Hook integration source snapshot synchronized with DangoTranslator 7.1.0; independent resource tools and desktop client remain outside this repository",
   "lunaUpstream": "https://github.com/HIllya51/LunaTranslator",
   "lunaUpstreamCommit": null,
   "lunaCommitNote": "The upstream source snapshot has no verified Git commit identity. File SHA-256 values identify the included snapshot.",
@@ -1040,8 +1040,8 @@
     {
       "path": "src/script/pjadv/PJADVLayout.h",
       "origin": "DangoTranslator working tree",
-      "sha256": "51ac09a744b612f0a6d8e0578a3898237dd8e026c3bc32a0ab0fb05fde17d3d0",
-      "importedSha256": "51ac09a744b612f0a6d8e0578a3898237dd8e026c3bc32a0ab0fb05fde17d3d0"
+      "sha256": "bc911c4130a714023a20a8fe06f3c3728d3d6707310a1cf0e5d3a9d48f52ae26",
+      "importedSha256": "bc911c4130a714023a20a8fe06f3c3728d3d6707310a1cf0e5d3a9d48f52ae26"
     },
     {
       "path": "src/script/pjadv/PJADVRuntime.h",
@@ -1135,8 +1135,8 @@
     {
       "path": "src/script/renpy/resource/renpy_hook_text.py",
       "origin": "DangoTranslator working tree",
-      "sha256": "9c30d034aa1b8eebbc5322c7971a966de896db462525747d24cc8402777e6e40",
-      "importedSha256": "9c30d034aa1b8eebbc5322c7971a966de896db462525747d24cc8402777e6e40"
+      "sha256": "b1c748865ce7c0462adca2616b0001fd77ebb015376a45152f7b18e201c64f8b",
+      "importedSha256": "b1c748865ce7c0462adca2616b0001fd77ebb015376a45152f7b18e201c64f8b"
     },
     {
       "path": "src/script/rpgmaker_unite/.gitignore",
@@ -1322,7 +1322,7 @@
       "origin": "DangoTranslator working tree",
       "sha256": "27a757c0782e51c46a83cb99a06611422e4564899e38a27084918e9296f82713",
       "importedSha256": "5b8a738657288929185020717094b0c2d26e8317341043454e967185e05273bf",
-      "modification": "Unity Mono managed Reader build synchronization for DangoTranslator 7.0.4; independent resource tooling remains excluded"
+      "modification": "Unity Mono managed Reader build synchronization for DangoTranslator 7.1.0; independent resource tooling remains excluded"
     },
     {
       "path": "src/script/unity_mono/CMakeLists.txt",
@@ -1422,8 +1422,8 @@
     {
       "path": "src/script/utage/patches/UtageMono.patch",
       "origin": "DangoTranslator working tree",
-      "sha256": "c8f5f4bc0e6512fc76f96df72fd87c0399d0672c56804f30d6f5358fd5fdd2fe",
-      "importedSha256": "c8f5f4bc0e6512fc76f96df72fd87c0399d0672c56804f30d6f5358fd5fdd2fe"
+      "sha256": "09ad8f179691747b279cd86e928fdcd8ba385118a5ef9d773de95eed49de8999",
+      "importedSha256": "09ad8f179691747b279cd86e928fdcd8ba385118a5ef9d773de95eed49de8999"
     },
     {
       "path": "src/script/utage/patches/UtageOnly.patch",
@@ -1799,8 +1799,8 @@
     {
       "path": "src/utils/hook/pjadv_layout.json",
       "origin": "DangoTranslator build data",
-      "sha256": "8e8071d58fc74f6deef40ef05b29a920f6e933b18d5ade8c5bfb239a3999923f",
-      "importedSha256": "8e8071d58fc74f6deef40ef05b29a920f6e933b18d5ade8c5bfb239a3999923f"
+      "sha256": "ad02ba1bee876d42ec123eeece017ad674f3347c78495814c229bad425efaf74",
+      "importedSha256": "ad02ba1bee876d42ec123eeece017ad674f3347c78495814c229bad425efaf74"
     },
     {
       "path": "config/SourceHanSansSC-Regular.otf",
@@ -5955,7 +5955,7 @@
     },
     {
       "path": "CHANGES.md",
-      "sha256": "26dc40d4293dfa199b9c1e03dd986549540f11f3fb205d889a02797f6739519c",
+      "sha256": "b7816806a6787dcc527c32d85b0f6e4d1faebf17605b97144e370c72b1a32b1d",
       "origin": "Hook repository build entry point or public documentation"
     },
     {
@@ -5965,7 +5965,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "d76c757630457591be71818d03e8d2681310286d01fe2b1e930dabf3fbb7fd62",
+      "sha256": "a44d8ac2c8338338e3475dbe3f75af49c71998096bade58a2b8a76256a4ff27c",
       "origin": "Hook repository build entry point or public documentation"
     },
     {

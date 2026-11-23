@@ -70,13 +70,10 @@ inline bool readableRange(const unsigned char *begin, size_t size)
   return true;
 }
 
-// findEntry 在模块的可执行节中唯一定位入口，与Go预检使用同一份结构特征
+// findEntry 在模块的可执行节中唯一定位入口，与Go预检使用同一份结构特征；同名多布局特征合并后仍须唯一
 inline uintptr_t findEntry(HMODULE module, const char *name)
 {
-  const DangoPJADVFunctionSpec *spec = nullptr;
-  for (const auto &candidate : dangoPJADVFunctions)
-    if (strcmp(candidate.name, name) == 0) spec = &candidate;
-  if (!spec || !module) return 0;
+  if (!module) return 0;
   const auto base = reinterpret_cast<const unsigned char *>(module);
   if (!readableRange(base, sizeof(IMAGE_DOS_HEADER))) return 0;
   const auto dos = reinterpret_cast<const IMAGE_DOS_HEADER *>(base);
@@ -87,27 +84,34 @@ inline uintptr_t findEntry(HMODULE module, const char *name)
       header->OptionalHeader.Magic != IMAGE_NT_OPTIONAL_HDR32_MAGIC || header->FileHeader.NumberOfSections > 96) return 0;
   const auto sections = IMAGE_FIRST_SECTION(header);
   if (!readableRange(reinterpret_cast<const unsigned char *>(sections), sizeof(IMAGE_SECTION_HEADER) * header->FileHeader.NumberOfSections)) return 0;
-  const auto pattern = parsePattern(spec->pattern);
-  const auto check = parsePattern(spec->check);
-  if (pattern.bytes.empty() || (*spec->check && check.bytes.empty())) return 0;
   uintptr_t result = 0;
-  for (size_t sectionIndex = 0; sectionIndex < header->FileHeader.NumberOfSections; ++sectionIndex)
+  bool declared = false;
+  for (const auto &spec : dangoPJADVFunctions)
   {
-    const auto &section = sections[sectionIndex];
-    if (!(section.Characteristics & IMAGE_SCN_MEM_EXECUTE)) continue;
-    const size_t size = (std::min)(section.Misc.VirtualSize, section.SizeOfRawData);
-    if (section.SizeOfRawData > 32u * 1024u * 1024u ||
-        static_cast<uint64_t>(section.VirtualAddress) + section.SizeOfRawData > header->OptionalHeader.SizeOfImage) return 0;
-    const auto data = base + section.VirtualAddress;
-    if (!readableRange(data, size)) return 0;
-    for (size_t offset = 0; offset + pattern.bytes.size() <= size; ++offset)
+    if (strcmp(spec.name, name) != 0) continue;
+    declared = true;
+    const auto pattern = parsePattern(spec.pattern);
+    const auto check = parsePattern(spec.check);
+    if (pattern.bytes.empty() || (*spec.check && check.bytes.empty())) return 0;
+    for (size_t sectionIndex = 0; sectionIndex < header->FileHeader.NumberOfSections; ++sectionIndex)
     {
-      if (!matchPattern(data + offset, size - offset, pattern) || spec->checkOffset > size - offset ||
-          !matchPattern(data + offset + spec->checkOffset, size - offset - spec->checkOffset, check)) continue;
-      if (result) return 0;
-      result = reinterpret_cast<uintptr_t>(data + offset);
+      const auto &section = sections[sectionIndex];
+      if (!(section.Characteristics & IMAGE_SCN_MEM_EXECUTE)) continue;
+      const size_t size = (std::min)(section.Misc.VirtualSize, section.SizeOfRawData);
+      if (section.SizeOfRawData > 32u * 1024u * 1024u ||
+          static_cast<uint64_t>(section.VirtualAddress) + section.SizeOfRawData > header->OptionalHeader.SizeOfImage) return 0;
+      const auto data = base + section.VirtualAddress;
+      if (!readableRange(data, size)) return 0;
+      for (size_t offset = 0; offset + pattern.bytes.size() <= size; ++offset)
+      {
+        if (!matchPattern(data + offset, size - offset, pattern) || spec.checkOffset > size - offset ||
+            !matchPattern(data + offset + spec.checkOffset, size - offset - spec.checkOffset, check)) continue;
+        const auto address = reinterpret_cast<uintptr_t>(data + offset);
+        if (result && result != address) return 0;
+        result = address;
+      }
     }
   }
-  return result;
+  return declared ? result : 0;
 }
 }

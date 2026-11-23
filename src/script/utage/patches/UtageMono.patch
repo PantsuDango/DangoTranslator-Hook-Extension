@@ -20,7 +20,7 @@
 +}
 --- a/src/NativeImpl/LunaHook/LunaHook/engines/mono/monocommon.hpp
 +++ b/src/NativeImpl/LunaHook/LunaHook/engines/mono/monocommon.hpp
-@@ -80,6 +80,117 @@ namespace
+@@ -80,6 +80,319 @@ namespace
          buffer.from(s);
      }
  }
@@ -81,8 +81,210 @@
 +        return nullptr;
 +    }
 +
++    FARPROC Utage_MonoExport(const char *name)
++    {
++        for (auto moduleName : {L"mono-2.0-bdwgc.dll", L"mono.dll"})
++            if (auto module = GetModuleHandleW(moduleName))
++                if (auto proc = GetProcAddress(module, name))
++                    return proc;
++        return nullptr;
++    }
++
++    // 上游初始化不解析 mono_method_get_name
++    const char *Utage_MethodName(MonoMethod *method)
++    {
++        using GetName = const char *(*)(MonoMethod *);
++        static auto getName = reinterpret_cast<GetName>(Utage_MonoExport("mono_method_get_name"));
++        return getName && method ? getName(method) : nullptr;
++    }
++
++    // Utage_TypeMatches 比较运行库类型名，兼容完整名称与 C# 简写两种输出
++    bool Utage_TypeMatches(const char *actual, const char *expected)
++    {
++        if (!actual || !expected)
++            return false;
++        if (!strcmp(actual, expected))
++            return true;
++        return (!strcmp(expected, "System.Char") && !strcmp(actual, "char")) ||
++               (!strcmp(expected, "System.String") && !strcmp(actual, "string"));
++    }
++
++    // Utage_FindMethod 按名称、参数个数和首个参数类型取唯一方法，避免同名重载歧义
++    MonoMethod *Utage_FindMethod(MonoClass *klass, const char *name, int count, const char *firstType)
++    {
++        if (!klass || !mono_class_get_methods || !mono_method_signature ||
++            !mono_signature_get_param_count || !mono_signature_get_params || !mono_type_get_name)
++            return nullptr;
++        void *iterator = nullptr;
++        MonoMethod *found = nullptr;
++        while (auto method = mono_class_get_methods(klass, &iterator))
++        {
++            auto methodName = Utage_MethodName(method);
++            if (!methodName || strcmp(methodName, name))
++                continue;
++            auto signature = mono_method_signature(method);
++            if (!signature || int(mono_signature_get_param_count(signature)) != count)
++                continue;
++            if (count > 0)
++            {
++                void *parameter = nullptr;
++                auto type = mono_signature_get_params(signature, &parameter);
++                // 类型名只在首次建立回退字体时查询少量次数，运行库分配的名称不再回收
++                auto typeName = type ? mono_type_get_name(type) : nullptr;
++                if (!Utage_TypeMatches(typeName, firstType))
++                    continue;
++            }
++            if (found)
++                return nullptr;
++            found = method;
++        }
++        return found;
++    }
++
++    // Utage_Invoke 调用托管方法，出现托管异常时返回空
++    MonoObject *Utage_Invoke(MonoMethod *method, void *self, void **parameters)
++    {
++        if (!method || !mono_runtime_invoke)
++            return nullptr;
++        MonoObject *exception = nullptr;
++        auto result = mono_runtime_invoke(method, self, parameters, &exception);
++        return exception ? nullptr : result;
++    }
++
++    // Utage_FontCoversChinese 用 TMP 字体资产逐字检查常用简体字，允许动态字体按需补字
++    bool Utage_FontCoversChinese(MonoMethod *hasCharacter, MonoObject *font)
++    {
++        if (!hasCharacter || !font || !mono_object_unbox)
++            return false;
++        for (wchar_t character : std::wstring_view(L"这们说时么还远传产经发"))
++        {
++            uint16_t value = uint16_t(character);
++            uint8_t searchFallbacks = 0, tryAddCharacter = 1;
++            void *parameters[] = {&value, &searchFallbacks, &tryAddCharacter};
++            auto result = Utage_Invoke(hasCharacter, font, parameters);
++            if (!result || !*reinterpret_cast<uint8_t *>(mono_object_unbox(result)))
++                return false;
++        }
++        return true;
++    }
++
++    bool Utage_AddFallback(MonoObject *list, MonoObject *font)
++    {
++        auto klass = list ? mono_object_get_class(list) : nullptr;
++        if (!klass || !font)
++            return false;
++        auto contains = mono_class_get_method_from_name(klass, "Contains", 1);
++        auto add = mono_class_get_method_from_name(klass, "Add", 1);
++        void *parameters[] = {font};
++        auto found = Utage_Invoke(contains, list, parameters);
++        if (!found || !add || !mono_object_unbox)
++            return false;
++        if (*reinterpret_cast<uint8_t *>(mono_object_unbox(found)))
++            return true;
++        MonoObject *exception = nullptr;
++        mono_runtime_invoke(add, list, parameters, &exception);
++        return !exception;
++    }
++
++    // Utage_FallbackTried 记录中文回退字体是否已经尝试，文本回调都在游戏主线程执行
++    bool Utage_FallbackTried = false;
++
++    // Utage_EnsureChineseFallback 首次处理文本时在游戏主线程用系统中文字体建立 TMP 全局回退字体
++    //
++    // 游戏自带字体缺少简体字时，注入的译文会显示为方框；回退字体只在原字体缺字时生效，
++    // 不改原字体、剧情或存档。只尝试一次，失败时保持游戏原样
++    void Utage_EnsureChineseFallback()
++    {
++        if (Utage_FallbackTried)
++            return;
++        Utage_FallbackTried = true;
++        if (!mono_assembly_foreach || !mono_assembly_get_image || !mono_image_get_name || !mono_class_from_name ||
++            !mono_object_get_class || !mono_class_get_method_from_name || !mono_gchandle_new)
++        {
++            Msg::Log("Utage Chinese fallback font: Mono API incomplete");
++            return;
++        }
++        std::vector<MonoImage *> images;
++        mono_assembly_foreach([](void *assembly, void *state)
++                              {
++            if (auto image = mono_assembly_get_image(reinterpret_cast<MonoAssembly *>(assembly)))
++                reinterpret_cast<std::vector<MonoImage *> *>(state)->push_back(image); }, &images);
++        MonoClass *fontClass = nullptr, *settingsClass = nullptr, *osFontClass = nullptr;
++        for (auto image : images)
++        {
++            auto name = mono_image_get_name(image);
++            if (!name)
++                continue;
++            if (!strcmp(name, "Unity.TextMeshPro"))
++            {
++                fontClass = mono_class_from_name(image, "TMPro", "TMP_FontAsset");
++                settingsClass = mono_class_from_name(image, "TMPro", "TMP_Settings");
++            }
++            else if (!osFontClass && (!strcmp(name, "UnityEngine.TextRenderingModule") || !strcmp(name, "UnityEngine")))
++                osFontClass = mono_class_from_name(image, "UnityEngine", "Font");
++        }
++        auto hasCharacter = Utage_FindMethod(fontClass, "HasCharacter", 3, "System.Char");
++        auto getFallbacks = settingsClass ? mono_class_get_method_from_name(settingsClass, "get_fallbackFontAssets", 0) : nullptr;
++        if (!fontClass || !hasCharacter || !getFallbacks)
++        {
++            Msg::Log("Utage Chinese fallback font: TMP entries not found (font=%d hasCharacter=%d fallbacks=%d)", fontClass != nullptr, hasCharacter != nullptr, getFallbacks != nullptr);
++            return;
++        }
++        auto createByName = Utage_FindMethod(fontClass, "CreateFontAsset", 3, "System.String");
++        auto createByFont = Utage_FindMethod(fontClass, "CreateFontAsset", 1, "UnityEngine.Font");
++        auto createOSFont = Utage_FindMethod(osFontClass, "CreateDynamicFontFromOSFont", 2, "System.String");
++        MonoObject *chinese = nullptr;
++        for (auto face : {L"Microsoft YaHei", L"Microsoft YaHei UI", L"DengXian", L"SimHei", L"SimSun"})
++        {
++            auto family = create_string_csharp(face);
++            if (!family)
++                continue;
++            MonoObject *font = nullptr;
++            if (createByName)
++            {
++                auto style = create_string_csharp(L"Regular");
++                int32_t pointSize = 90;
++                void *parameters[] = {family, style, &pointSize};
++                font = style ? Utage_Invoke(createByName, nullptr, parameters) : nullptr;
++            }
++            if (!font && createByFont && createOSFont)
++            {
++                // 旧版 TMP 没有按字体名创建的接口，先由系统字体生成 Unity 动态字体
++                int32_t size = 90;
++                void *osParameters[] = {family, &size};
++                if (auto osFont = Utage_Invoke(createOSFont, nullptr, osParameters))
++                {
++                    void *parameters[] = {osFont};
++                    font = Utage_Invoke(createByFont, nullptr, parameters);
++                }
++            }
++            if (font && Utage_FontCoversChinese(hasCharacter, font))
++            {
++                chinese = font;
++                break;
++            }
++        }
++        if (!chinese)
++        {
++            Msg::Log("Utage Chinese fallback font: no system Chinese font usable (byName=%d byFont=%d osFont=%d)", createByName != nullptr, createByFont != nullptr, createOSFont != nullptr);
++            return;
++        }
++        auto list = Utage_Invoke(getFallbacks, nullptr, nullptr);
++        bool added = Utage_AddFallback(list, chinese);
++        if (added)
++            mono_gchandle_new(chinese, 1);
++        Msg::Log(added ? "Utage Chinese fallback font ready" : "Utage Chinese fallback font: TMP global fallback list unavailable");
++    }
++
++    // Utage_FrameTick 每帧画布更新前在主线程尝试建立中文回退字体，不读取或输出任何文本
++    void Utage_FrameTick(hook_context *, HookParam *, TextBuffer *, uintptr_t *)
++    {
++        Utage_EnsureChineseFallback();
++    }
++
 +    void Utage_ExtractText(hook_context *context, HookParam *hp, TextBuffer *buffer, uintptr_t *)
 +    {
++        Utage_EnsureChineseFallback();
 +        auto source = reinterpret_cast<MonoObject *>(context->argof(hp->offset, hp));
 +        auto textData = Utage_FindTextData(source);
 +        if (!textData)
@@ -138,14 +340,17 @@
  namespace
  {
  #ifdef _WIN64
-@@ -155,3 +266,6 @@ namespace monocommon
+@@ -152,6 +465,9 @@ namespace monocommon
+         hp.lineSeparator = hook.lineSeparator;
+         hp.text_fun = hook.text_fun;
+         hp.filter_fun = hook.filter_fun;
 +#if defined(DANGO_UTAGE_ONLY)
 +        hp.embed_fun = hook.embed_fun;
 +#endif
          if (hook.isstring)
          {
              hp.type = USING_STRING | CODEC_UTF16 | FULL_STRING;
-@@ -204,6 +318,19 @@ namespace monocommon
+@@ -204,6 +520,24 @@ namespace monocommon
          {"Elringus.Naninovel.Runtime", "Naninovel.UI", "RevealableText", "SetTextValue", 1, 2, nullptr, true, true, nullptr, Naninovel_UI_RevealableText_SetTextValue_Filter},
  #endif
      };
@@ -161,11 +366,16 @@
 +        {"Assembly-CSharp", "Utage", "AdvUguiMessageWindow", "OnTextChanged", 1, 2, Utage_ExtractText, false, true},
 +        {"Assembly-CSharp", "", "AdvUguiMessageWindow", "OnTextChanged", 1, 2, Utage_ExtractText, false, true},
 +    };
++    // utageFrameHooks 每帧画布更新入口，只用于在游戏主线程尽早建立中文回退字体，不输出文本
++    std::vector<functioninfo> utageFrameHooks{
++        {"UnityEngine.UIModule", "UnityEngine", "Canvas", "SendWillRenderCanvases", 0, 1, Utage_FrameTick, false, false},
++        {"UnityEngine", "UnityEngine", "Canvas", "SendWillRenderCanvases", 0, 1, Utage_FrameTick, false, false},
++    };
 +#endif
      bool hook_mono_il2cpp()
      {
          for (const wchar_t *monoName : {L"mono.dll", L"mono-2.0-bdwgc.dll", L"GameAssembly.dll"})
-@@ -213,6 +340,33 @@ namespace monocommon
+@@ -213,6 +547,41 @@ namespace monocommon
                  il2cppfunctions::init(module);
                  monofunctions::init(module);
                  bool succ = false;
@@ -195,11 +405,19 @@
 +                        legacyInstalled |= isLegacy;
 +                    }
 +                }
++                // 帧入口只在文本入口已安装时追加，安装失败不影响监听；画布在全部界面文字排版前触发
++                if (succ)
++                    for (auto hook : utageFrameHooks)
++                    {
++                        auto addr = hook.getaddr(true);
++                        if (addr && NewHook_check(addr, hook))
++                            break;
++                    }
 +#else
                  for (auto hook : commonhooks)
                  {
                      auto addr = hook.getaddr();
-@@ -227,6 +381,7 @@ namespace monocommon
+@@ -227,6 +596,7 @@ namespace monocommon
                          continue;
                      succ |= NewHook_check(addr, hook);
                  }
@@ -207,7 +425,7 @@
                  if (succ)
                  {
                      if (0)
-@@ -242,4 +397,4 @@ namespace monocommon
+@@ -242,4 +612,4 @@ namespace monocommon
              }
          return false;
      }

@@ -42,6 +42,8 @@ _renpy_dialogue_raw = ""
 _renpy_dialogue_translation = None
 _renpy_dialogue_generation = 0
 _renpy_dialogue_affixes = ("", "", "")
+_renpy_dialogue_extend = None
+_renpy_last_display = None
 _renpy_adv_scope = 0
 _renpy_menu_scope = None
 _renpy_substitution_records = []
@@ -92,6 +94,30 @@ def _renpy_affixes(character, what):
     if len(what) >= len(prefix) + len(suffix) and what.startswith(prefix) and what.endswith(suffix):
         return prefix, what[len(prefix):len(what) - len(suffix)], suffix
     return "", what, ""
+
+def _renpy_extend_interjection():
+    return _renpy_unicode_text(getattr(renpy.config, "extend_interjection", "{fast}") or "")
+
+def _renpy_extend_split(core):
+    """Split a standard `extend` display string into (shown head, own text).
+
+    The common extend() joins the previous line, config.extend_interjection and
+    this statement's text. Only when the current Say statement's sayer is the
+    store's extend function is the last interjection treated as the boundary;
+    every other line returns (None, core).
+    """
+    try:
+        interjection = _renpy_extend_interjection()
+        node = renpy.game.script.lookup(renpy.game.context().current)
+        sayer = getattr(node, "who", None)
+        extend = getattr(renpy.store, "extend", None)
+        if (not interjection or interjection not in core or not isinstance(node, renpy.ast.Say) or extend is None
+                or not isinstance(sayer, _renpy_string_types) or renpy.store.__dict__.get(sayer) is not extend):
+            return None, core
+        index = core.rfind(interjection)
+        return core[:index], core[index + len(interjection):]
+    except Exception:
+        return None, core
 
 def _renpy_emit(kind, text="", speaker="", skipping=False, split=1, **fields):
     payload = dict(kind=kind, speaker=_renpy_plain_text(speaker), text=_renpy_plain_text(text),
@@ -157,20 +183,41 @@ def _renpy_current_translation():
 
 def _renpy_wrap_display_say(original):
     def wrapped(who, what, show_function, *args, **kwargs):
+        global _renpy_last_display
         if not _renpy_adv_scope:
             return original(who, what, show_function, *args, **kwargs)
         generation = _renpy_dialogue_generation
         translated = _renpy_current_translation()
         replacement = what
         prefix, core, suffix = _renpy_dialogue_affixes
-        if translated:
+        head = _renpy_dialogue_extend
+        if prefix + core + suffix == _renpy_unicode_text(what):
             # Affixes recorded for this page stay outside the translated line.
-            if prefix + core + suffix == _renpy_unicode_text(what):
-                replacement = prefix + _renpy_injected_text(core, translated) + suffix
-            else:
-                replacement = _renpy_injected_text(what, translated)
-        if generation != _renpy_dialogue_generation or _renpy_is_fast_skipping():
-            replacement = what
+            shown = core
+            if head is not None:
+                # extend: keep the already displayed (possibly translated) part
+                # and translate only this statement's own text after it.
+                interjection = _renpy_extend_interjection()
+                body = core[len(head) + len(interjection):]
+                last = _renpy_last_display
+                shown_head = last[1] if last and last[0] == head else head
+                if translated:
+                    stripped = body.strip()
+                    lead, trail = body[:len(body) - len(body.lstrip())], body[len(body.rstrip()):]
+                    body = lead + _renpy_injected_text(stripped, translated) + trail
+                shown = shown_head + interjection + body
+            elif translated:
+                shown = _renpy_injected_text(core, translated)
+            if generation != _renpy_dialogue_generation or _renpy_is_fast_skipping():
+                shown = core
+            _renpy_last_display = (core, shown)
+            replacement = prefix + shown + suffix
+        elif translated and generation == _renpy_dialogue_generation and not _renpy_is_fast_skipping():
+            replacement = _renpy_injected_text(what, translated)
+        if replacement != what and "dtt" in kwargs:
+            # Ren'Py 8 parses text tags in Character.__call__ and draws dtt.text;
+            # the display copy needs its own parse or the original is shown.
+            kwargs["dtt"] = renpy.character.DialogueTextTags(replacement)
         def show(*show_args, **show_kwargs):
             result = show_function(*show_args, **show_kwargs)
             if replacement != what:
@@ -190,23 +237,24 @@ def _renpy_wrap_display_say(original):
 
 def _renpy_wrap_dialogue(original, adv=False):
     def wrapped(self, who, what, *args, **display_args):
-        global _renpy_adv_scope, _renpy_dialogue_event, _renpy_dialogue_affixes
+        global _renpy_adv_scope, _renpy_dialogue_event, _renpy_dialogue_affixes, _renpy_dialogue_extend
         _renpy_ensure_installed()
         _renpy_dialogue_affixes = _renpy_affixes(self, what)
         core = _renpy_dialogue_affixes[1]
-        _renpy_begin_dialogue(core, _renpy_plain_text(core))
+        _renpy_dialogue_extend, body = _renpy_extend_split(core)
+        _renpy_begin_dialogue(body, _renpy_plain_text(body))
         _renpy_dialogue_event = ""
         if _renpy_is_fast_skipping():
             _renpy_emit("skip", skipping=True, split=3)
         else:
-            identity = _renpy_source_identity(core)
+            identity = _renpy_source_identity(body)
             if adv:
-                _renpy_dialogue_event = _renpy_embed_payload(core, who, identity.get("template", ""))
+                _renpy_dialogue_event = _renpy_embed_payload(body, who, identity.get("template", ""))
                 if not _renpy_dialogue_event:
                     # Too long for an embed request: the client translates the
                     # captured page for the translation box, the game keeps text.
                     identity["embed_skip"] = True
-            _renpy_emit("dialogue", text=core, speaker=who, injectable=adv, split=1, **identity)
+            _renpy_emit("dialogue", text=body, speaker=who, injectable=adv, split=1, **identity)
         previous = _renpy_adv_scope
         _renpy_adv_scope = previous + 1 if adv and not _renpy_is_fast_skipping() else 0
         try:

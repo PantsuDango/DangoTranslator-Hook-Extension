@@ -1,5 +1,13 @@
 # Changes
 
+## 2026-11-24 — DangoTranslator 7.1.0
+
+- Updated the PJADV runtime and shared layout data for Primula 2XT.
+- Fixed live dialogue replacement in Ren'Py 8 and preserved the already
+  displayed part of an `extend` line in the embedded Python bridge.
+- Added a TextMesh Pro fallback font for missing Chinese glyphs in the Utage
+  Mono Hook.
+
 ## 2026-11-13 — DangoTranslator 7.0.4
 
 - Synchronized the KiriKiri runtime with the 7.0.4 release and added the
